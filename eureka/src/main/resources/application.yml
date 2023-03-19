@@ -1,0 +1,22 @@
+# https://cloud.spring.io/spring-cloud-netflix/reference/html/
+
+spring:
+  application:
+    name: eureka-server # название вашего приложения (такое будет у каждого микросервиса)
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # настройка spring-cloud -> переключаемся на eureka
+
+server:
+  port: 8761 # указываем порт приложения
+
+# настройки eureka
+eureka:
+  instance:
+    hostname: eureka # название
+  server:
+    enable-self-preservation: false # eureka понимала, что сам сервис eureka - это не отдельный микросервис
+  client: # все остальные приложения, которые будут запущены, - это часть нашей системы
+    register-with-eureka: false
+    fetch-registry: false
