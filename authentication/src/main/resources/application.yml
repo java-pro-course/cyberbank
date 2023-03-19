@@ -1,8 +1,8 @@
 spring:
-  datasource: # стандартное подключение к БД
-    url: jdbc:postgresql://localhost:55000/cyberbank_auth
-    username: postgres
-    password: postgrespw
+  datasource:
+    url: jdbc:postgresql://rc1b-0ckq9oilrgugcaer.mdb.yandexcloud.net:6432/cyberbank_auth
+    username: javapro
+    password: ELncWdLB
   liquibase: # liquibase для накатки sql скриптов на БД
     enabled: false
     change-log: classpath:db/changelog-master.yml
