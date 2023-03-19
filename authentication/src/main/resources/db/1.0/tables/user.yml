@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - logicalFilePath: 1.0/tables/user
+  - changeSet:
+      id: user-0
+      author: svarog916
+      changes:
+        - createTable:
+            schemaName: cyberbank_auth
+            tableName: user
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: surname
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: patronymic
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: phone
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: password
+                  type: text
+                  constraints:
+                    nullable: false
