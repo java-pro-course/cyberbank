@@ -1,0 +1,23 @@
+spring:
+  datasource: # стандартное подключение к БД
+    url: jdbc:postgresql://localhost:55000/cyberbank_auth
+    username: postgres
+    password: postgrespw
+  liquibase: # liquibase для накатки sql скриптов на БД
+    enabled: false
+    change-log: classpath:db/changelog-master.yml
+    liquibase-schema: liquibase
+  application: # название приложения
+    name: authentication
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false # настройка spring-cloud -> переключаемся на eureka
+
+#jwt: # для JwtUtils (можете прям в классе создать константу и использовать ее)
+#  secret: secret # соль для хэша
+#  token:
+#    validity: 1000000000000 # длительность действия токена
+
+server:
+  port: 8081 # переопределяем порт (по умолчанию 8080) - мы сделали 8081
