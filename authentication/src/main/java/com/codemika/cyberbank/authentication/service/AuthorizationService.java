@@ -1,9 +1,11 @@
-package com.cyber.bank.service;
+package com.codemika.cyberbank.authentication.service;
 
-import com.cyber.bank.dto.RqCreateUser;
-import com.cyber.bank.entity.UserEntity;
-import com.cyber.bank.repository.UserRepository;
-import com.cyber.bank.util.JwtUtil;
+import com.codemika.cyberbank.authentication.annotation.UserCheck;
+import com.codemika.cyberbank.authentication.dto.RqCreateUser;
+import com.codemika.cyberbank.authentication.entity.UserEntity;
+import com.codemika.cyberbank.authentication.repository.UserRepository;
+import com.codemika.cyberbank.authentication.util.JwtUtil;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -13,23 +15,25 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthorisationService {
-    //TODO: Добавить/исправить различные репозитории и другие классы
+public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
     /**
      * Регистрация пользователя
      *
-     * TODO: исправить вывод и доработать клэймсы
      * @param rq
      * @return
      */
+    @UserCheck(name = "")
     public ResponseEntity<?> registration(RqCreateUser rq){
+        //TODO: Оформить все проверки
         UserEntity newUser = new UserEntity()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
+                .setPatronymic(rq.getPatronymic())
                 .setEmail(rq.getEmail())
+                .setPhone(rq.getPhone())
                 .setPassword(rq.getPassword());
 
         userRepository.save(newUser);
@@ -38,7 +42,9 @@ public class AuthorisationService {
         claims.put("id", newUser.getId());
         claims.put("name", newUser.getName());
         claims.put("surname", newUser.getSurname());
+        claims.put("patronymic", newUser.getPatronymic());
         claims.put("email", newUser.getPassword());
+        claims.put("phone", newUser.getPhone());
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -49,7 +55,6 @@ public class AuthorisationService {
     /**
      * Вход пользователя по токену
      *
-     * TODO: возможно стоит исправить вывод и что-нибудь навесить
      * @param token
      * @return
      */
@@ -59,6 +64,7 @@ public class AuthorisationService {
         String name = claims.get("name", String.class);
         String surname = claims.get("surname", String.class);
         String email = claims.get("email", String.class);
+        String phone = claims.get("phone", String.class);
 
         if(!jwtUtil.validateToken(token)){
             return ResponseEntity
@@ -68,7 +74,7 @@ public class AuthorisationService {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(String.format("Welcome %s %s! Your email: %s. New generated token: ", surname, name, email)
+                .body(String.format("Welcome %s %s! Your email: %s. Phone number: %s. New generated token: ", surname, name, email, phone)
                         + jwtUtil.generateToken(claims));
     }
 }
