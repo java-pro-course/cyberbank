@@ -5,16 +5,28 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
 import java.util.Date;
 
+/**
+ * Это класс, связанный с авторизацией и регистрацией
+ */
 @Component
 @Slf4j
 public class JwtUtil {
+    /**
+     * SIGN - это ключ для генерации и расшифровки токена.
+     */
    private final String SIGN = "SuPErSecRETsign228CyBERbANk";
+
+    /**
+     * Метод для создания нового токена. Используется при входе.
+     * Длительность токена 69,(4) дней. (317 лет было многовато =) )
+     * @param claims информация, содержащаяся в токене.
+     * @return Токен
+     */
     public String generateToken(Claims claims){
         long nowMillis = System.currentTimeMillis();
-        long expirationMillis = nowMillis + 10000000000000L;
+        long expirationMillis = nowMillis + 6_000_000_000L;
         Date exp = new Date(expirationMillis);
         return Jwts.builder().
                 setIssuedAt(new Date(System.currentTimeMillis()))
@@ -24,6 +36,12 @@ public class JwtUtil {
                 .compact();
 
     }
+
+    /**
+     * Метод для проверки токена.
+     * @param token токен
+     * @return true или false, правильный токен или нет.
+     */
     public boolean validateToken(String token){
         token = token.replace("\"", "");
         token = token.trim();
@@ -37,6 +55,12 @@ public class JwtUtil {
         }
         return isTokenValid;
     }
+
+    /**
+     * Метод для извлечения информации из токена.
+     * @param token токен
+     * @return Информацию, содержащуюся в токене.
+     */
     public Claims getClaims(String token){
         token = token.replace("\"", "");
         token = token.trim();
