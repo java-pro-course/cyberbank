@@ -1,0 +1,16 @@
+server:
+  port: 8080 # (по умолчанию тоже 8080), просто для наглядности
+
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: authentication
+          uri: lb://authentication
+          predicates: # если у запроса в начале /api/auth (дальше все что угодно), то идем в сервис authentication
+            - Path=/api/auth/**
+    loadbalancer:
+      ribbon:
+        enabled: false # настройка spring-cloud -> переключаемся на eureka
