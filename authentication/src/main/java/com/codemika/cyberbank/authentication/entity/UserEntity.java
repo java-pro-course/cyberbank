@@ -25,7 +25,7 @@ public class UserEntity {
     private String patronymic;
 
     /**
-     * Используется для входа, как логин
+     * Поле "phone" (номер телефона) используется для входа, как логин
      */
     @Column(name = "phone")
     private String phone;

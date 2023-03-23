@@ -4,6 +4,10 @@ import com.codemika.cyberbank.authentication.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+/**
+ * Это репозиторий для пользователя.
+ * Содержит методы для поиска по эл. почте и номеру телефона.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
         void findByEmail(String email);
