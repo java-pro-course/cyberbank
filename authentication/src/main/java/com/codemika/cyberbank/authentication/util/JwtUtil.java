@@ -1,4 +1,4 @@
-package com.codemika.cyberbank.authentication.until;
+package com.codemika.cyberbank.authentication.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
