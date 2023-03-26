@@ -8,6 +8,7 @@ import com.codemika.cyberbank.authentication.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Data
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -32,7 +34,7 @@ public class AuthorizationService {
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
                 .setPatronymic(rq.getPatronymic())
-                .setEmail(rq.getEmail())
+
                 .setPhone(rq.getPhone())
                 .setPassword(rq.getPassword());
 

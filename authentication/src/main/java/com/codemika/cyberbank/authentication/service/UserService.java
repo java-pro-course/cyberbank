@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @Data
 public class UserService {
     private final UserRepository userRepository;
+    private final UserEntity userEntity;
     public ResponseEntity<?> registration (String name, String surname,String patronymic,String phone, String password) {
         UserEntity newUser = new UserEntity()
                 .setName(name)
@@ -23,6 +24,23 @@ public class UserService {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(user);
+
+    }
+    public ResponseEntity<?> login(String email, String pass) {
+        if (!userRepository.existByEmail(email)) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("The user with this email doesn't exist!");
+        }
+        if (!userRepository.findByEmail(email).getPassword().equals(pass)){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Password or email is incorrect");
+
+        }
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body("Welcome to the system!");
 
     }
 }

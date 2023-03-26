@@ -1,11 +1,13 @@
 package com.codemika.cyberbank.authentication.api;
 
+import lombok.Data;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Data
 @RequestMapping(value = "api/auth/") // перед всеми контроллерами этого метода будет ставится этот префикс!
 public class TestController {
 
