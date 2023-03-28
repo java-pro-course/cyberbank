@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Entity
-@Table(schema = "cyberbank_auth", name = "card")
+@Table(schema = "cyberbank_card", name = "card")
 @Data
 @Accessors(chain = true)
 /**
