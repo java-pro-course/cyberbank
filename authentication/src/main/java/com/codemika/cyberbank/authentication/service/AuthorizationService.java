@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
- 
+
 @Data
 @Service
 @RequiredArgsConstructor
