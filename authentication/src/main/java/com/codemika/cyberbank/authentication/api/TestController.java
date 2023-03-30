@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Просто тестовый контроллер
+ */
 @RestController
 @RequestMapping(value = "api/auth/") // перед всеми контроллерами этого метода будет ставиться этот префикс!
 public class TestController {

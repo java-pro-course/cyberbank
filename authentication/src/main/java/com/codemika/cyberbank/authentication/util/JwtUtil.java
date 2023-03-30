@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 /**
- * Это класс, связанный с авторизацией и регистрацией
+ * Это класс для jwt-токенов
  */
 @Component
 @Slf4j

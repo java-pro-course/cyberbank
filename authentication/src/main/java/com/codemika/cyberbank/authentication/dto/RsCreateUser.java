@@ -3,6 +3,9 @@ package com.codemika.cyberbank.authentication.dto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+/**
+ * Класс ответа после создания пользователя
+ */
 @Data
 @Accessors(chain = true)
 public class RsCreateUser {
