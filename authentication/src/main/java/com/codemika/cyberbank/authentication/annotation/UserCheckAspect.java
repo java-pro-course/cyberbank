@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Класс для логики аннотации проверки пользователя
+ * Класс для логики аннотации проверки вользователя
  */
 @Aspect
 @Component
