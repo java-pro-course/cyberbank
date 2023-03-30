@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://rc1b-0ckq9oilrgugcaer.mdb.yandexcloud.net:6432/cyberbank_features
+    url: jdbc:postgresql://rc1b-0ckq9oilrgugcaer.mdb.yandexcloud.net:6432/javapro
     username: javapro
     password: ELncWdLB
   liquibase: # liquibase ??? ??????? sql ???????? ?? ??
