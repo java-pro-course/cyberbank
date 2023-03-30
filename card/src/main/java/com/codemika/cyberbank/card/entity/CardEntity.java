@@ -1,26 +1,35 @@
 package com.codemika.cyberbank.card.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.persistence.*;
+
+/**
+ * Entity для карт
+ */
 @Entity
 @Table(schema = "cyberbank_card", name = "card")
 @Data
 @Accessors(chain = true)
-/**
- * Entity для карт
- */
 public class CardEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "title")
     private String title;
 
-    @Column(name = "statement")
-    private Long statement;
+    @Column(name = "balance")
+    private Long balance;
 
     @Column(name = "type")
-    private String type;
+    private String type; // дебет / кредит
+
+    @Column(name = "account_number")
+    private String accountNumber;
+
+    @Column(name = "owner_user_id")
+    private Long ownerUserId;
 }
