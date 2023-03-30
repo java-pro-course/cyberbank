@@ -1,7 +1,6 @@
 package com.codemika.cyberbank.authentication.annotation;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
-import com.codemika.cyberbank.authentication.entity.UserEntity;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,15 +11,23 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 
+/**
+ * Класс для логики аннотации проверки вользователя
+ */
 @Aspect
 @Component
 @RequiredArgsConstructor
 @Slf4j
 @Data
 public class UserCheckAspect {
+    /**
+     * Основной метод класса(связующее звено)
+     * @param proceedingJoinPoint
+     * @param userCheck
+     * @return
+     */
     @Around(value = "@annotation(userCheck)")
     public Object checkThisUser(ProceedingJoinPoint proceedingJoinPoint, UserCheck userCheck){
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
@@ -33,6 +40,7 @@ public class UserCheckAspect {
 
         return bigCheck(user);
     }
+
     /**
      * Большой метод для всех основных проверок
      *

@@ -4,15 +4,16 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * Класс запроса на создание пользователя
+ * Класс ответа после создания пользователя
  */
 @Data
 @Accessors(chain = true)
-public class RqCreateUser {
+public class RsCreateUser {
+    private Long id;
     private String name;
     private String surname;
     private String patronymic;
     private String phone;
     private String email;
-    private String password;
+    private String token;
 }

@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://rc1b-0ckq9oilrgugcaer.mdb.yandexcloud.net:6432/cyberbank_auth
+    url: jdbc:postgresql://rc1b-0ckq9oilrgugcaer.mdb.yandexcloud.net:6432/javapro
     username: javapro
     password: ELncWdLB
   liquibase: # liquibase для накатки sql скриптов на БД
@@ -20,4 +20,4 @@ spring:
 #    validity: 1000000000000 # длительность действия токена
 
 server:
-  port: 9001 # переопределяем порт (по умолчанию 8080) - мы сделали 8081
+  port: 8081 # переопределяем порт (по умолчанию 8080) - мы сделали 8081

@@ -13,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+/**
+ * Сервис для авторизации
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
@@ -25,9 +28,10 @@ public class AuthorizationService {
      * @param rq
      * @return
      */
-    @UserCheck(name = "")
-    public ResponseEntity<?> registration(RqCreateUser rq){
+    @UserCheck(name = "rq")
+    public ResponseEntity<?> registration( RqCreateUser rq){
         //TODO: Оформить все проверки
+
         UserEntity newUser = new UserEntity()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
