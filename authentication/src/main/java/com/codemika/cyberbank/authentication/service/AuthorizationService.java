@@ -1,14 +1,13 @@
 package com.codemika.cyberbank.authentication.service;
 
+import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
-import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,6 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
- 
-@Data
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
@@ -33,7 +30,9 @@ public class AuthorizationService {
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    public ResponseEntity<?> registration(RqCreateUser rq){
+    @UserCheck(name = "rq")
+    public ResponseEntity<?> registration( RqCreateUser rq){
+        //TODO: Оформить все проверки
         if(!check){
             return errorMessage;
         }
@@ -81,12 +80,14 @@ public class AuthorizationService {
         String surname = claims.get("surname", String.class);
         String patronymic = claims.get("patronymic", String.class);
         String email = claims.get("email", String.class);
+        String phone = claims.get("phone", String.class);
 
         //TODO: Добавить карты, кредиты и т.д.
                 String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
+                "Ваш номер телефона: %s\n" +
                 "Ваши карты: \n" +
-                "Ваш новый токен: ", surname, name, patronymic, email) + jwtUtil.generateToken(claims);
+                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

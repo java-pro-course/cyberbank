@@ -18,7 +18,6 @@ import java.util.Arrays;
 /**
  * Класс для логики аннотации проверки пользователя
  */
-
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -55,7 +54,6 @@ public class UserCheckAspect {
         return authorizationService.registration(rq);
 
     }
-
 
     /**
      * Большой метод для всех основных проверок
