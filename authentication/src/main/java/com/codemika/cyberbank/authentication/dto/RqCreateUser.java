@@ -6,7 +6,6 @@ import lombok.experimental.Accessors;
 /**
  * Класс запроса на создание пользователя
  */
-
 @Data
 @Accessors(chain = true)
 public class RqCreateUser {
