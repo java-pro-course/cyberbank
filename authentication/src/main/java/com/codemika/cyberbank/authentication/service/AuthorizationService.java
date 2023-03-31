@@ -28,10 +28,7 @@ public class AuthorizationService {
      * @param rq
      * @return
      */
-    @UserCheck(name = "rq")
-    public ResponseEntity<?> registration( RqCreateUser rq){
-        //TODO: Оформить все проверки
-
+    public ResponseEntity<?> registration(RqCreateUser rq){
         UserEntity newUser = new UserEntity()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
@@ -63,22 +60,27 @@ public class AuthorizationService {
      * @return
      */
     public ResponseEntity<?> login(String token){
-        Claims claims = jwtUtil.getClaims(token);
-
-        String name = claims.get("name", String.class);
-        String surname = claims.get("surname", String.class);
-        String email = claims.get("email", String.class);
-        String phone = claims.get("phone", String.class);
-
         if(!jwtUtil.validateToken(token)){
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body("Something is wrong!");
         }
 
+        Claims claims = jwtUtil.getClaims(token);
+
+        String name = claims.get("name", String.class);
+        String surname = claims.get("surname", String.class);
+        String patronymic = claims.get("patronymic", String.class);
+        String email = claims.get("email", String.class);
+
+        //TODO: Добавить карты, кредиты и т.д.
+                String result = String.format("Welcome, %s %s %s!\n" +
+                "Your email: %s\n" +
+                "Cards: \n" +
+                "New generated token: ", surname, name, patronymic, email) + jwtUtil.generateToken(claims);
+
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(String.format("Welcome %s %s! Your email: %s. Phone number: %s. New generated token: ", surname, name, email, phone)
-                        + jwtUtil.generateToken(claims));
+                .body(result);
     }
 }
