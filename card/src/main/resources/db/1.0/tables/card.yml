@@ -36,6 +36,11 @@ databaseChangeLock:
                   constraints:
                     nullable: false
               - column:
+                  name: pin_code
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
                   name: owner_user_id
                   type: bigint
                   constraints:
