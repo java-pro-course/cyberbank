@@ -3,14 +3,19 @@ package com.codemika.cyberbank.card.service;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import com.codemika.cyberbank.card.repository.CardRepository;
+import com.codemika.cyberbank.card.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
+    public final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createCard(RqCreateCard rq) {
         CardEntity card = new CardEntity()
@@ -46,5 +51,19 @@ public class CardService {
         }
 
         return result.toString();
+    }
+
+    /**
+     * Метод для вывода всех карт определённого пользователя.
+     * @param token уникальный токен авторизации, содержащий id его пользователя.
+     * @return все карты пользователя, чей токен мы получаем.
+     */
+    public ResponseEntity<?> getAllCards(String token) {
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long id = claimsParseToken.get("id", Long.class);
+
+        List<CardEntity> cards = repository.findAllByOwnerUserId(id);
+
+        return ResponseEntity.ok(cards);
     }
 }
