@@ -19,6 +19,7 @@ public class CardService {
                 .setOwnerUserId(rq.getOwnerUserId()) // отправляем сначала запрос в auth и проверяем этот id!
                                                      // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
+                .setPincode(rq.getPincode())
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
