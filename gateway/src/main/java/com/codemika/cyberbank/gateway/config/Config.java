@@ -5,7 +5,7 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration // аннотация для конфигурации конфиг-класса
+@Configuration // с помощью этой аннотации мы управляем gateway (конфигурируем его)
 public class Config {
 
     /**

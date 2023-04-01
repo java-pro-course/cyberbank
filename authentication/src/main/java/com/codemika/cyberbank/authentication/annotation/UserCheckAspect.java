@@ -18,6 +18,7 @@ import java.util.Arrays;
 /**
  * Класс для логики аннотации проверки пользователя
  */
+
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -54,6 +55,7 @@ public class UserCheckAspect {
         return authorizationService.registration(rq);
 
     }
+
 
     /**
      * Большой метод для всех основных проверок
@@ -142,6 +144,7 @@ public class UserCheckAspect {
         }
         //Символы и т.д. в пароле
         String symbols = "§±!#$%&()*+,-./0123456789:;<=>?@[]^_`{|}~\"'\\";
+
         if (!lettersCheck(symbols, user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

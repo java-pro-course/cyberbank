@@ -1,12 +1,12 @@
 package com.codemika.cyberbank.authentication.dto;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
  * Класс запроса на создание пользователя
  */
+
 @Data
 @Accessors(chain = true)
 public class RqCreateUser {

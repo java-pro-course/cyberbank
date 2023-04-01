@@ -1,0 +1,47 @@
+databaseChangeLock:
+  - logicalFilePath: 1.0/card
+  - changeSet:
+      id: card-0
+      author: xCrynge
+      changes:
+        - createTable:
+            schemaName: cyberbank_card
+            tableName: card
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_number
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: pin_code
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_user_id
+                  type: bigint
+                  constraints:
+                    nullable: false

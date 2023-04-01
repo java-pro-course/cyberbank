@@ -1,1 +1,4 @@
 databaseChangeLog:
+  include:
+    file: card.yml
+    relativeToChangelogFile: true
