@@ -1,6 +1,7 @@
 package com.codemika.cyberbank.authentication.annotation;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
+import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,11 @@ import java.util.Arrays;
 @Data
 public class UserCheckAspect {
     private final AuthorizationService authorizationService;
+    private final UserRepository userRepository;
 
     /**
      * Основной метод класса(связующее звено)
+     *
      * @param proceedingJoinPoint
      * @param userCheck
      * @return результат регистрации
@@ -59,9 +62,16 @@ public class UserCheckAspect {
      * @return Результат
      */
     private ResponseEntity<?> bigCheck(RqCreateUser user){
+        //Проверка на уникальность пользователя по почте и номеру
+        if(userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()){
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Please, check your email or number! Someone have already used your contacts!");
+        }
         //Пустота заполнения(null не нужно, т.к. могут быть только пустые строчки).
         if (user.getName().equals("") || user.getSurname().equals("")
-                || user.getEmail().equals("") || user.getPassword().equals("")) {
+                || user.getPatronymic().equals("") || user.getEmail().equals("")
+                || user.getPhone().equals("") || user.getPassword().equals("")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("None of the fields must not be empty!");
@@ -78,11 +88,23 @@ public class UserCheckAspect {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Your surname must not contain spaces!");
         }
+        //Пробелы в отчестве
+        if (user.getPatronymic().contains(" ")) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Your patronymic must not contain spaces!");
+        }
         //Пробелы в почте
         if (user.getEmail().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("The email must not contain spaces!");
+        }
+        //Пробелы в номере телефона
+        if (user.getPhone().contains(" ")) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("The phone must not contain spaces!");
         }
         //Пробелы в пароле
         if (user.getPassword().contains(" ")) {
@@ -90,12 +112,13 @@ public class UserCheckAspect {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("The password must not contain spaces!");
         }
-        //Содержание имени или фамилии в пароле
+        //Содержание имени, фамилии или отчества в пароле
         if (user.getPassword().toLowerCase().contains(user.getName().toLowerCase())
-                || user.getPassword().toLowerCase().contains(user.getSurname().toLowerCase())) {
+                || user.getPassword().toLowerCase().contains(user.getSurname().toLowerCase())
+                || user.getPassword().toLowerCase().contains(user.getPatronymic().toLowerCase())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The password must not contain your name or your surname! It's not secure!");
+                    .body("The password must not contain your name, your surname or your patronymic! It's not secure!");
         }
         //Заглавные буквы в пароле
         if (user.getPassword().equals(user.getPassword().toLowerCase())
@@ -104,15 +127,21 @@ public class UserCheckAspect {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("The password must contain uppercase and lowercase letters!");
         }
+        //Корректность номера телефона
+        //TODO: Доработать
+        if(convertibleStringCheck(user.getPhone())){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Your phone number must contain numbers. It also must be num convertible");
+        }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Invalid email!");
         }
-
-        String symbols = "§±!#$%&()*+,-./0123456789:;<=>?@[]^_`{|}~\"'\\";
         //Символы и т.д. в пароле
+        String symbols = "§±!#$%&()*+,-./0123456789:;<=>?@[]^_`{|}~\"'\\";
         if (!lettersCheck(symbols, user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -140,6 +169,23 @@ public class UserCheckAspect {
                     result = true;
                 }
             }
+        }
+        return result;
+    }
+
+    /**
+     * Проверка номера телефона, которая требует доработки
+     *
+     * @param string
+     * @return true/false
+     */
+    public static boolean convertibleStringCheck(String string){
+        boolean result = true;
+        try{
+            Long number = Long.parseLong(string);
+            System.out.println(number);
+        }catch(Exception e){
+            result = false;
         }
         return result;
     }

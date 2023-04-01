@@ -36,6 +36,7 @@ public class AuthorizationService {
         if(!check){
             return errorMessage;
         }
+
         UserEntity newUser = new UserEntity()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
