@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class RegistrationController {
     private final AuthorizationService authorizationService;
 
+    @UserCheck // обязательная аннотация для проверки пользователя
     @PutMapping("register")
-    @UserCheck(name = "rq")
     public ResponseEntity<?> registration(@RequestBody RqCreateUser rq){
         return authorizationService.registration(rq);
     }

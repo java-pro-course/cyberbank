@@ -1,6 +1,7 @@
 package com.codemika.cyberbank.authentication.dto;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**

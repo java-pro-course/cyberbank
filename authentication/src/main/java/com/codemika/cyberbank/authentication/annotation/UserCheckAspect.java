@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 /**
- * Класс для логики аннотации проверки вользователя
+ * Класс для логики аннотации проверки пользователя
  */
 @Aspect
 @Component
@@ -24,23 +24,32 @@ import java.util.Arrays;
 @Data
 public class UserCheckAspect {
     private final AuthorizationService authorizationService;
+
     /**
      * Основной метод класса(связующее звено)
      * @param proceedingJoinPoint
      * @param userCheck
-     * @return
+     * @return результат регистрации
      */
     @Around(value = "@annotation(userCheck)")
-    public Object checkThisUser(ProceedingJoinPoint proceedingJoinPoint, UserCheck userCheck){
+    public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, UserCheck userCheck){
+        //Используется для поиска параметра по имени в аннотации
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
         Object[] args = proceedingJoinPoint.getArgs();
         String[] parameterNames = methodSignature.getParameterNames();
-
         int nameIndex = Arrays.asList(parameterNames).indexOf(userCheck.name());
 
         RqCreateUser rq = (RqCreateUser) args[nameIndex];
 
-        return "gg";
+        if(bigCheck(rq).getBody().toString().contains("!")){
+            authorizationService.setCheck(false);
+            authorizationService.setErrorMessage(bigCheck(rq));
+            return authorizationService.registration(rq);
+        }
+
+        authorizationService.setCheck(true);
+        return authorizationService.registration(rq);
+
     }
 
     /**

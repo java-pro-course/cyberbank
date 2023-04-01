@@ -8,6 +8,7 @@ import com.codemika.cyberbank.authentication.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,19 +17,25 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
+@Data
 @Service
 @RequiredArgsConstructor
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private Boolean check = false; // переменная проверенного пользователя
+    private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
 
     /**
      * Регистрация пользователя
      *
      * @param rq
-     * @return
+     * @return результат и новый токен
      */
     public ResponseEntity<?> registration(RqCreateUser rq){
+        if(!check){
+            return errorMessage;
+        }
         UserEntity newUser = new UserEntity()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
@@ -44,7 +51,7 @@ public class AuthorizationService {
         claims.put("name", newUser.getName());
         claims.put("surname", newUser.getSurname());
         claims.put("patronymic", newUser.getPatronymic());
-        claims.put("email", newUser.getPassword());
+        claims.put("email", newUser.getEmail());
         claims.put("phone", newUser.getPhone());
 
         return ResponseEntity
@@ -57,7 +64,7 @@ public class AuthorizationService {
      * Вход пользователя по токену
      *
      * @param token
-     * @return
+     * @return информация о пользователе
      */
     public ResponseEntity<?> login(String token){
         if(!jwtUtil.validateToken(token)){

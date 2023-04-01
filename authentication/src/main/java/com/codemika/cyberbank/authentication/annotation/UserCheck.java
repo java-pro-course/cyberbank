@@ -11,5 +11,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface UserCheck {
-    String name();
+    String name() default "rq"; // имя проверяемого параметра
 }
