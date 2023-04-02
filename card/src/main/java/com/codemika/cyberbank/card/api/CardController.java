@@ -48,7 +48,7 @@ public class CardController {
      * @param token токен для определения пользователя(чтобы знать чьи карты показывать)
      * @return все карты определённого пользователя
      */
-    @GetMapping("get-all-card")
+    @GetMapping("get-all-cards")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
 
         if (token.isEmpty() || token.trim().isEmpty()) {

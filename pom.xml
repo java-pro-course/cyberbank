@@ -14,5 +14,6 @@
         <module>authentication</module>
         <module>gateway</module>
         <module>card</module>
+        <module>features</module>
     </modules>
 </project>
