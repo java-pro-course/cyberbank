@@ -3,8 +3,10 @@ package com.codemika.cyberbank.card.api;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.service.CardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,8 +25,11 @@ public class CardController {
      */
     @PostMapping("create")
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
-        return service.createCard(token, rq);
+        Claims claims = jwtUtil.getClaims(token);
+        Long id = claims.get("id", Long.class);
+        return service.createCard(token, rq, id);
     }
+
     @DeleteMapping("delete")
     public ResponseEntity<?> deleteCard(Long id,Long ownerUserId){
         return ResponseEntity.ok(service.deleteCard(ownerUserId, id));
@@ -35,7 +40,7 @@ public class CardController {
      * @param token токен для определения пользователя(чтобы знать чьи карты показывать)
      * @return все карты определённого пользователя
      */
-    @GetMapping("get-all-card")
+    @GetMapping("get-all-cards")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
 
         if (token.isEmpty() || token.trim().isEmpty()) {

@@ -18,7 +18,7 @@ public class CardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
 
-    public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
+    public ResponseEntity<?> createCard(String token, RqCreateCard rq, Long id) {
         //Проверка на валидный пин-код
         if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
             return ResponseEntity
@@ -37,9 +37,9 @@ public class CardService {
         //Подготавливаем результат
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
-                .setType(rq.getType().trim().toLowerCase())
-                .setOwnerUserId(ownerUserId) // отправляем сначала запрос в auth и проверяем этот id!
-                                                     // для отправки запроса используем RestTemplate!
+                .setType(rq.getType())
+                .setOwnerUserId(id) // отправляем сначала запрос в auth и проверяем этот id!
+                //TODO: исправить 400 ошибку                                     // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
                 .setPincode(rq.getPincode().trim())
                 .setAccountNumber(
