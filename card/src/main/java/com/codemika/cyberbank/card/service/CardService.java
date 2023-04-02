@@ -17,12 +17,12 @@ public class CardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
 
-    public ResponseEntity<?> createCard(RqCreateCard rq) {
+    public ResponseEntity<?> createCard(RqCreateCard rq, Long id) {
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
                 .setType(rq.getType())
-                .setOwnerUserId(rq.getOwnerUserId()) // отправляем сначала запрос в auth и проверяем этот id!
-                                                     // для отправки запроса используем RestTemplate!
+                .setOwnerUserId(id) // отправляем сначала запрос в auth и проверяем этот id!
+                //TODO: исправить 400 ошибку                                     // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
                 .setPincode(rq.getPincode())
                 .setAccountNumber(

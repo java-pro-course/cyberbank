@@ -9,5 +9,4 @@ public class RqCreateCard {
     private String title;
     private String type;
     private int pincode;
-    private Long ownerUserId;
 }
