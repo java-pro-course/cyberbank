@@ -27,4 +27,9 @@ public class CardController {
 
         return service.getAllCards(token);
     }
+    @PostMapping("money-transfer")
+    public ResponseEntity<?> MoneyTransfer(@RequestBody Long id, Long ownerUserId, Long value, Long receivingId) {
+        return service.moneyTransfer(id, ownerUserId, value, receivingId);
+    }
+
 }

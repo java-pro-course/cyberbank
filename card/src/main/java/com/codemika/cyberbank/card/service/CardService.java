@@ -6,13 +6,17 @@ import com.codemika.cyberbank.card.repository.CardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
@@ -34,6 +38,31 @@ public class CardService {
 
         card = repository.save(card);
         return ResponseEntity.ok(card);
+    }
+    @Transactional
+    public ResponseEntity<?> moneyTransfer(Long id, Long ownerUserId, Long value, Long receivingId) {
+        Optional<CardEntity> card = repository.findById(id);
+        Optional<CardEntity> receivingCard = repository.findById(receivingId);
+        if(!card.isPresent()){
+            return ResponseEntity.badRequest().body("Карты с id:" + id + "не существует");
+        }
+        if(!receivingCard.isPresent()){
+            return ResponseEntity.badRequest().body("Карты с id:" + receivingId + "не существует");
+        }
+        if(!card.get().getOwnerUserId().equals(ownerUserId)){
+            return ResponseEntity.badRequest().body("Пользователь с id: " + ownerUserId + " не обладает картой с id: " + id);
+        }
+        if(card.get().getBalance() < value){
+            return ResponseEntity.badRequest().body("На карте недостаточно средств");
+        }
+        if(id.equals(receivingId)){
+            return ResponseEntity.badRequest().body("Вы не можете перевести деньги на свою карту");
+        }
+        receivingCard.get().setBalance(receivingCard.get().getBalance() + value);
+        card.get().setBalance(card.get().getBalance() - value);
+        repository.MoneyTransfer(card.get().getBalance(), id);
+        repository.MoneyTransfer(receivingCard.get().getBalance(), receivingId);
+        return ResponseEntity.ok("Successful money transfer!");
     }
 
     /**
