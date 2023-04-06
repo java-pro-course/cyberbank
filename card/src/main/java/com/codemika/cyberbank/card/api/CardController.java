@@ -4,6 +4,7 @@ import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.service.CardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,10 +20,18 @@ public class CardController {
         return service.createCard(rq);
     }
     @GetMapping("get-all-card")
-    public ResponseEntity<?> GetAllCards(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
+
+        if (token.isEmpty() || token.trim().isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Token must not be empty!");
+        }
 
         if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.ok("token invalid!");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Token is invalid!");
         }
 
         return service.getAllCards(token);

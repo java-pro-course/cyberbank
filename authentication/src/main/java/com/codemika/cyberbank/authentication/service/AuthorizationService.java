@@ -1,6 +1,5 @@
 package com.codemika.cyberbank.authentication.service;
 
-import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
@@ -24,13 +23,13 @@ import org.springframework.stereotype.Service;
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private Boolean check = false; // переменная проверенного пользователя
+    private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
 
     /**
      * Регистрация пользователя
      *
-     * @param rq
+     * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
     public ResponseEntity<?> registration(RqCreateUser rq){
@@ -65,7 +64,7 @@ public class AuthorizationService {
     /**
      * Вход пользователя по токену
      *
-     * @param token
+     * @param token токен
      * @return информация о пользователе
      */
     public ResponseEntity<?> login(String token){
