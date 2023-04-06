@@ -6,6 +6,7 @@ import com.codemika.cyberbank.card.repository.CardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +64,10 @@ public class CardService {
         Long id = claimsParseToken.get("id", Long.class);
 
         List<CardEntity> cards = repository.findAllByOwnerUserId(id);
+
+        if (!cards.isEmpty()) return ResponseEntity
+                                        .status(HttpStatus.NOT_FOUND)
+                                        .body("This user have no cards!");
 
         return ResponseEntity.ok(cards);
     }

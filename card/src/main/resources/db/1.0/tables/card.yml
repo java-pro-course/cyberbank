@@ -1,5 +1,5 @@
-databaseChangeLock:
-  - logicalFilePath: 1.0/card
+databaseChangeLog:
+  - logicalFilePath: 1.0/tables/card
   - changeSet:
       id: card-0
       author: xCrynge

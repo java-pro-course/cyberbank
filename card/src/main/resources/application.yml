@@ -4,9 +4,9 @@ spring:
     username: javapro
     password: ELncWdLB
   liquibase: # liquibase liquibase для накатки sql скриптов на БД
-    enabled: false
+    enabled: true
     change-log: classpath:db/changelog-master.yml
-    liquibase-schema: liquibase
+    liquibase-schema: cyberbank_liquibase
   application: # название приложения
     name: card
   cloud:
