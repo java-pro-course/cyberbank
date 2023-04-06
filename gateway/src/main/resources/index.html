@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cyberbank</title>
+    <style>
+        body {
+            background: #000 url(index-main-page.jpg); /* Фоновый цвет и фоновый рисунок*/
+            color: #fff; /*Цвет текста на странице*/
+            background-attachment: fixed; /* Фон страницы фиксируется */
+            background-repeat: repeat-x; /* Изображение повторяется по горизонтали */
+            background-size: 100%;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+</head>
+<body>
+<h2 align="center"><span style="color: red">Мы можем вам предложить:</span></h2>
+<div id="carouselExample" class="carousel slide">
+    <div align="center" class="carousel-inner">
+        <div class="carousel-item active">
+	    <a href="https://debetCard">
+            <img src="card.bmp" width="900" height="600" class="d-block" alt="Оформить дебетовую карту">
+	    </a>
+        </div>
+        <div class="carousel-item">
+	    <a href="https://creaditCard">
+            <img src="CreditCard.jpg" width="900" height="600" class="d-block" alt="Оформить кредит">
+	    </a>
+        </div>
+        <div class="carousel-item">
+	    <a href="https://ипотека">
+            <img src="cyberhouse.jpg" width="900" height="600" class="d-block" alt="Оформить ипотеку">
+	    </a>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+<form action="hi.exe" method="post">
+  <label for="username">Username:</label>
+  <input type="text" id="username" name="username" required>
+
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+
+  <label for="confirm-password">Confirm Password:</label>
+  <input type="password" id="confirm-password" name="confirm-password" required>
+
+  <input type="submit" value="Register">
+</form>
+
+</body>
+</html>
