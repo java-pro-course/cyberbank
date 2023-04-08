@@ -5,7 +5,6 @@ import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
