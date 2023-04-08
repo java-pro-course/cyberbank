@@ -16,8 +16,8 @@ public class CardController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("create")
-    public ResponseEntity<?> createCard(@RequestBody RqCreateCard rq) {
-        return service.createCard(rq);
+    public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
+        return service.createCard(token, rq);
     }
     @GetMapping("get-all-card")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {

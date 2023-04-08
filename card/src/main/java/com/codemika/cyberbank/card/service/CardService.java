@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -18,11 +17,28 @@ public class CardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
 
-    public ResponseEntity<?> createCard(RqCreateCard rq) {
+    public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
+
+        //Проверка на валидный пин-код
+        if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("The pincode must consist of digits!!! For example 3856");
+
+        if(rq.getPincode().trim().length() != 4)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("The pincode must consist of 4 digits!!! For example 3856");
+
+        //Достаём id из токена
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+        //Подготавливаем результат
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
                 .setType(rq.getType())
-                .setOwnerUserId(rq.getOwnerUserId()) // отправляем сначала запрос в auth и проверяем этот id!
+                .setOwnerUserId(ownerUserId) // отправляем сначала запрос в auth и проверяем этот id!
                                                      // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
                 .setPincode(rq.getPincode())
@@ -32,7 +48,6 @@ public class CardService {
 
         // TODO: проверять номер карты на уникальность
         // TODO: проверять id-пользователя из rq на валидность
-
         card = repository.save(card);
         return ResponseEntity.ok(card);
     }
@@ -65,7 +80,7 @@ public class CardService {
 
         List<CardEntity> cards = repository.findAllByOwnerUserId(id);
 
-        if (!cards.isEmpty()) return ResponseEntity
+        if (cards.isEmpty()) return ResponseEntity
                                         .status(HttpStatus.NOT_FOUND)
                                         .body("This user have no cards!");
 
@@ -75,9 +90,9 @@ public class CardService {
 
         List<CardEntity> cards = repository.findAll();
 
-        if (!cards.isEmpty()) return ResponseEntity
+        if (cards.isEmpty()) return ResponseEntity
                                         .status(HttpStatus.NOT_FOUND)
-                                        .body("This user have no cards!");
+                                        .body("Any user have no cards!");
 
         return ResponseEntity.ok(cards);
     }
