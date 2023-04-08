@@ -71,4 +71,14 @@ public class CardService {
 
         return ResponseEntity.ok(cards);
     }
+    public ResponseEntity<?> getAllCards() {
+
+        List<CardEntity> cards = repository.findAll();
+
+        if (!cards.isEmpty()) return ResponseEntity
+                                        .status(HttpStatus.NOT_FOUND)
+                                        .body("This user have no cards!");
+
+        return ResponseEntity.ok(cards);
+    }
 }

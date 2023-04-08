@@ -91,4 +91,23 @@ public class AuthorizationService {
                 .status(HttpStatus.OK)
                 .body(result);
     }
+
+    public ResponseEntity<?> getAllUsers() {
+        if (userRepository.findAll().isEmpty()) return ResponseEntity
+                                                            .status(HttpStatus.ACCEPTED)
+                                                            .body("We still have no users... Do u wanna sigh up?😔");
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(userRepository.findAll());
+    }
+    public ResponseEntity<?> getUserById(Long id) {
+        if (!userRepository.findById(id).isPresent()) return ResponseEntity
+                                                            .status(HttpStatus.ACCEPTED)
+                                                            .body("This user does not exist!");
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(userRepository.findById(id));
+    }
 }
