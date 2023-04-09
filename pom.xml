@@ -13,6 +13,6 @@
         <module>eureka</module>
         <module>authentication</module>
         <module>gateway</module>
-        <module>card/untitled</module>
+        <module>card</module>
     </modules>
 </project>
