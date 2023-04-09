@@ -37,11 +37,11 @@ public class CardService {
         //Подготавливаем результат
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
-                .setType(rq.getType())
+                .setType(rq.getType().trim().toLowerCase())
                 .setOwnerUserId(ownerUserId) // отправляем сначала запрос в auth и проверяем этот id!
                                                      // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
-                .setPincode(rq.getPincode())
+                .setPincode(rq.getPincode().trim())
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
@@ -86,6 +86,11 @@ public class CardService {
 
         return ResponseEntity.ok(cards);
     }
+    //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
+    /** ТОЛЬКО ДЛЯ МОДЕРОВ
+     * Метод для получения ВСЕХ карт в банке
+     * @return все карты банка
+     */
     public ResponseEntity<?> getAllCards() {
 
         List<CardEntity> cards = repository.findAll();

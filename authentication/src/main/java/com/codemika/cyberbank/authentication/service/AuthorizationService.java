@@ -1,6 +1,7 @@
 package com.codemika.cyberbank.authentication.service;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
+import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.util.JwtUtil;
@@ -70,8 +71,8 @@ public class AuthorizationService {
     public ResponseEntity<?> login(String token){
         if(!jwtUtil.validateToken(token)){
             return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body("Something is wrong!");
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Token invalid!");
         }
 
         Claims claims = jwtUtil.getClaims(token);
@@ -93,21 +94,72 @@ public class AuthorizationService {
     }
 
     public ResponseEntity<?> getAllUsers() {
-        if (userRepository.findAll().isEmpty()) return ResponseEntity
-                                                            .status(HttpStatus.ACCEPTED)
-                                                            .body("We still have no users... Do u wanna sigh up?😔");
+        if (userRepository.findAll().isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body("We still have no users... Do u wanna sigh up?😔");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(userRepository.findAll());
     }
+
+    /**
+     * Метод для поиска пользователя по id (только для модеров)
+     * @param id идентификационный номер пользователя
+     * @return искомого пользователя
+     */
     public ResponseEntity<?> getUserById(Long id) {
-        if (!userRepository.findById(id).isPresent()) return ResponseEntity
-                                                            .status(HttpStatus.ACCEPTED)
-                                                            .body("This user does not exist!");
+        if (!userRepository.findById(id).isPresent())
+            return ResponseEntity
+                    .status(HttpStatus.ACCEPTED)
+                    .body("This user does not exist!");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body(userRepository.findById(id));
+    }
+    /**
+     * Метод для поиска пользователя по эл. почте
+     * @param email эл. почта
+     * @return имя, фамилию и отчество требуемого пользователя
+     */
+    public ResponseEntity<?> getUserByEmail(String email) {
+        if (!userRepository.findByEmail(email).isPresent())
+            return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("This user does not exist!");
+
+        UserEntity rq = userRepository.findByEmail(email).get();
+        RsInfoUser rs = new RsInfoUser()
+                .setName(rq.getName())
+                .setSurname(rq.getSurname())
+                .setPatronymic(rq.getPatronymic());
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(rs);
+    }
+
+    /**
+     * Метод для поиска пользователя по номеру телефона
+     * @param phone номер телефона
+     * @return имя, фамилию и отчество требуемого пользователя
+     */
+    public ResponseEntity<?> getUserByPhone(String phone) {
+        if (!userRepository.findByPhone(phone).isPresent())
+            return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("This user does not exist!");
+
+        UserEntity rq = userRepository.findByPhone(phone).get();
+        RsInfoUser rs = new RsInfoUser()
+                .setName(rq.getName())
+                .setSurname(rq.getSurname())
+                .setPatronymic(rq.getPatronymic());
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body(rs);
     }
 }
