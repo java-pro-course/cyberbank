@@ -31,7 +31,7 @@ public class CardEntity {
     private String accountNumber;
 
     @Column(name = "pin_code")
-    private int pincode; //пин-код состоит из 4-х цифр.
+    private String pincode; //пин-код состоит из 4-х цифр.
 
     @Column(name = "owner_user_id")
     private Long ownerUserId;

@@ -37,7 +37,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: pin_code
-                  type: bigint
+                  type: text
                   constraints:
                     nullable: false
               - column:
