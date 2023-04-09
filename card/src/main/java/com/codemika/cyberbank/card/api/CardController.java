@@ -61,4 +61,8 @@ public class CardController {
     public ResponseEntity<?> getAllCardsModer() {
         return service.getAllCards();
     }
+    @GetMapping("get-me-money")
+    public ResponseEntity<?> getMeMoney(@RequestParam Long cardId, @RequestParam Long value) {
+        return service.getMeMoney(cardId, value);
+    }
 }
