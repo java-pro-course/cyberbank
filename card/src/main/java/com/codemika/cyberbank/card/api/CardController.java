@@ -22,7 +22,7 @@ public class CardController {
      * @return созданную карту
      */
     @PostMapping("create")
-    public ResponseEntity<?> createCard(String token, @RequestBody RqCreateCard rq) {
+    public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
         return service.createCard(token, rq);
     }
     @DeleteMapping("delete")
