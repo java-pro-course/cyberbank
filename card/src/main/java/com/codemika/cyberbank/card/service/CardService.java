@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +50,6 @@ public class CardService {
 
         // TODO: проверять номер карты на уникальность
         // TODO: проверять id-пользователя из rq на валидность
-
         card = repository.save(card);
         return ResponseEntity.ok(card);
     }
@@ -59,29 +57,47 @@ public class CardService {
     public ResponseEntity<?> moneyTransfer(Long id, Long ownerUserId, Long value, Long receivingId) {
         Optional<CardEntity> card = repository.findById(id);
         Optional<CardEntity> receivingCard = repository.findById(receivingId);
-        if(value > 0) {
-            if (!card.isPresent()) {
-                return ResponseEntity.badRequest().body("Карты с id:" + id + "не существует");
-            }
-            if (!receivingCard.isPresent()) {
-                return ResponseEntity.badRequest().body("Карты с id:" + receivingId + "не существует");
-            }
-            if (!card.get().getOwnerUserId().equals(ownerUserId)) {
-                return ResponseEntity.badRequest().body("Пользователь с id: " + ownerUserId + " не обладает картой с id: " + id);
-            }
-            if (card.get().getBalance() < value) {
-                return ResponseEntity.badRequest().body("На карте недостаточно средств");
-            }
-            if (id.equals(receivingId)) {
-                return ResponseEntity.badRequest().body("Вы не можете перевести деньги на свою карту");
-            }
-            receivingCard.get().setBalance(receivingCard.get().getBalance() + value);
-            card.get().setBalance(card.get().getBalance() - value);
-            repository.MoneyTransfer(card.get().getBalance(), id);
-            repository.MoneyTransfer(receivingCard.get().getBalance(), receivingId);
-            return ResponseEntity.ok("Successful money transfer!");
-        }
-        return ResponseEntity.badRequest().body("Вы не можете переводить отрицательные суммы");
+        if(value <= 0)
+            return ResponseEntity
+                    .badRequest()
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent())
+            return ResponseEntity
+                    .badRequest()
+                    .body("Карты с id: " + id + " не существует");
+
+        if (!receivingCard.isPresent())
+            return ResponseEntity
+                    .badRequest()
+                    .body("Карты с id: " + receivingId + " не существует");
+
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .badRequest()
+                    .body("Пользователь с id: " + ownerUserId + " не обладает картой с id: " + id);
+
+        if (card.get().getBalance() < value)
+            return ResponseEntity
+                    .badRequest()
+                    .body("На карте недостаточно средств");
+
+        if (id.equals(receivingId))
+            return ResponseEntity
+                    .badRequest()
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        receivingCard
+                .get()
+                .setBalance(receivingCard.get().getBalance() + value);
+        card.get()
+            .setBalance(card.get().getBalance() - value);
+
+        repository.moneyTransfer(card.get().getBalance(), id);
+        repository.moneyTransfer(receivingCard.get().getBalance(), receivingId);
+
+        return ResponseEntity
+                .ok("Successful money transfer! Currently, your balance is " + card.get().getBalance() + "₽");
     }
 
     /**
@@ -132,5 +148,33 @@ public class CardService {
                                         .body("Any user have no cards!");
 
         return ResponseEntity.ok(cards);
+    }
+
+    /** !!ТОЛЬКО ДЛЯ ЛЮДЕЙ С РОЛЯМИ МОДЕР + ТЕСТЕР!!
+     * Бесконечная генерация денег))
+     * @param cardId карта на которую, требуется зачислить деньги
+     * @param value количество денег
+     * @return ответ
+     */
+    @Transactional
+    public ResponseEntity<?> getMeMoney(Long cardId,  Long value) {
+        Optional<CardEntity> card = repository.findById(cardId);
+        if(value <= 0)
+            return ResponseEntity
+                    .badRequest()
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent())
+            return ResponseEntity
+                    .badRequest()
+                    .body("Карты с id: " + cardId + " не существует");
+
+        card.get()
+                .setBalance(card.get().getBalance() + value);
+
+        repository.moneyTransfer(card.get().getBalance(), cardId);
+
+        return ResponseEntity
+                .ok("Successful money transfer! Currently, your balance is " + card.get().getBalance() + "₽");
     }
 }

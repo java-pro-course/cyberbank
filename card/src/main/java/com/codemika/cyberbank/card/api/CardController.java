@@ -53,10 +53,10 @@ public class CardController {
     public ResponseEntity<?> MoneyTransfer(Long id,  Long ownerUserId,  Long value, Long receivingId) {
         return service.moneyTransfer(id, ownerUserId, value, receivingId);
     }
-
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return service.getAllCards();
+
     }
 }

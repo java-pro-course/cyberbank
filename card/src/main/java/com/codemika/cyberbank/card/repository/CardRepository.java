@@ -12,5 +12,5 @@ public interface CardRepository extends JpaRepository<CardEntity, Long> {
     List<CardEntity> findAllByOwnerUserId(Long id);
     @Modifying
     @Query("UPDATE CardEntity card SET card.balance = ?1 WHERE card.id = ?2")
-    void MoneyTransfer(Long value, Long id);
+    void moneyTransfer(Long value, Long id);
 }
