@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,6 @@ public class CardService {
     public final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
-
         //Проверка на валидный пин-код
         if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
             return ResponseEntity
@@ -50,6 +50,17 @@ public class CardService {
         // TODO: проверять id-пользователя из rq на валидность
         card = repository.save(card);
         return ResponseEntity.ok(card);
+    }
+    public ResponseEntity<?> deleteCard(Long ownerUserId, Long id){
+        Optional<CardEntity> card = repository.findById(id);
+        if(!card.isPresent()){
+            return ResponseEntity.badRequest().body("Card with ID: " + id + " isn't present");
+        }
+        if (!card.get().getOwnerUserId().equals(ownerUserId)){
+            return ResponseEntity.badRequest().body("You cannot delete the card because it does not belong to you.");
+        }
+        repository.deleteById(id);
+        return ResponseEntity.ok().body("The card has been successfully deleted");
     }
 
     /**
