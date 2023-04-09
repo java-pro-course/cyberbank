@@ -31,4 +31,13 @@ public class TestController {
     public ResponseEntity<?> getUserById(@RequestParam Long id){
         return service.getUserById(id);
     }
+    @GetMapping("get-user-by-email")
+    public ResponseEntity<?> getUserByEmail(@RequestParam String email){
+        return service.getUserByEmail(email);
+    }
+    @GetMapping("get-user-by-phone")
+    public ResponseEntity<?> getUserByPhone(@RequestParam String phone){
+        return service.getUserByPhone(phone);
+    }
+
 }

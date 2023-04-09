@@ -15,10 +15,22 @@ public class CardController {
     private final CardService service;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Метод для оформления(создания) новой карты
+     * @param token токен пользователя, который оформляет карту
+     * @param rq все данные карты(название, тип(деб/кред), пин-код)
+     * @return созданную карту
+     */
     @PostMapping("create")
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
         return service.createCard(token, rq);
     }
+
+    /**
+     * Метод для просмотра пользователем всех своих карт
+     * @param token токен для определения пользователя(чтобы знать чьи карты показывать)
+     * @return все карты определённого пользователя
+     */
     @GetMapping("get-all-card")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
 
