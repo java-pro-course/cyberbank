@@ -52,10 +52,14 @@ public class CardController {
     @PostMapping("money-transfer")
     public ResponseEntity<?> MoneyTransfer(Long id,  Long ownerUserId,  Long value, Long receivingId) {
         return service.moneyTransfer(id, ownerUserId, value, receivingId);
-        
+    }
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return service.getAllCards();
+    }
+    @GetMapping("get-me-money")
+    public ResponseEntity<?> getMeMoney(@RequestParam Long cardId, @RequestParam Long value) {
+        return service.getMeMoney(cardId, value);
     }
 }
