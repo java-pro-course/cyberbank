@@ -57,7 +57,11 @@ public class CardService {
             return ResponseEntity.badRequest().body("Card with ID: " + id + " isn't present");
         }
         if (!card.get().getOwnerUserId().equals(ownerUserId)){
-            return ResponseEntity.badRequest().body("You cannot delete the card because it does not belong to you.");
+            return ResponseEntity.badRequest().body("You cannot delete the card because it does not belong to you");
+        }
+        if(card.get().getBalance() != 0){
+            return ResponseEntity.badRequest().body("You cannot delete a card with the balance available on it." +
+                    "Please cash out at the nearest ATM or transfer money to another card.");
         }
         repository.deleteById(id);
         return ResponseEntity.ok().body("The card has been successfully deleted");
