@@ -28,7 +28,7 @@ public class CardService {
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
-
+        if(repository.findAllByAccountNumber().isPresent())
         // TODO: проверять номер карты на уникальность
         // TODO: проверять id-пользователя из rq на валидность
 
