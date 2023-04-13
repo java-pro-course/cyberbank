@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
+//м    private final RestTemplate restTemplate;
     public final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createCard(String token, RqCreateCard rq, Long id) {
@@ -37,17 +41,27 @@ public class CardService {
         //Подготавливаем результат
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
-                .setType(rq.getType())
-                .setOwnerUserId(id) // отправляем сначала запрос в auth и проверяем этот id!
-                //TODO: исправить 400 ошибку                                     // для отправки запроса используем RestTemplate!
+                .setType(rq.getType().trim().toLowerCase())
+                .setOwnerUserId(ownerUserId)
                 .setBalance(0L)
                 .setPincode(rq.getPincode().trim())
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
-        if(repository.findAllByAccountNumber().isPresent())
-        // TODO: проверять номер карты на уникальность
-        // TODO: проверять id-пользователя из rq на валидность
+        if(repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("This card number is already exists!");
+        }
+
+        //Проверка валидности пользователя
+//        boolean validation = restTemplate.getForObject("localhost:8081/api/auth/validate-user/{id}",
+//                Boolean.class, ownerUserId);
+//        if(!validation){
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("User is invalid!");
+//        }
         card = repository.save(card);
         return ResponseEntity.ok(card);
     }

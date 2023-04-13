@@ -14,10 +14,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Класс для логики аннотации проверки вользователя
+ * Класс для логики аннотации проверки пользователя
  */
+
 @Aspect
 @Component
 @RequiredArgsConstructor
@@ -54,6 +57,7 @@ public class UserCheckAspect {
         return authorizationService.registration(rq);
 
     }
+
 
     /**
      * Большой метод для всех основных проверок
@@ -128,11 +132,10 @@ public class UserCheckAspect {
                     .body("The password must contain uppercase and lowercase letters!");
         }
         //Корректность номера телефона
-        //TODO: Доработать
-        if(convertibleStringCheck(user.getPhone())){
+        if(!numberCheck(user.getPhone())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your phone number must contain numbers. It also must be num convertible");
+                    .body("Your phone number must contain numbers. It also must be correct!");
         }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
@@ -172,6 +175,19 @@ public class UserCheckAspect {
             }
         }
         return result;
+    }
+
+    /**
+     * Проверка номера телефона
+     *
+     * @param number
+     * @return true/false
+     */
+    public static boolean numberCheck(String number){
+        Pattern ptrn = Pattern.compile("(0/300)?[7-9][0-9]{9}");
+        Matcher match = ptrn.matcher(number);
+
+        return match.find();
     }
 
     /**
