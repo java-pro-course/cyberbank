@@ -1,8 +1,6 @@
 package com.codemika.cyberbank.authentication.annotation;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
-import com.codemika.cyberbank.authentication.repository.UserRepository;
-import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Класс для логики аннотации проверки пользователя
@@ -128,11 +128,10 @@ public class UserCheckAspect {
                     .body("The password must contain uppercase and lowercase letters!");
         }
         //Корректность номера телефона
-        //TODO: Доработать
-        if(convertibleStringCheck(user.getPhone())){
+        if(!numberCheck(user.getPhone())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your phone number must contain numbers. It also must be num convertible");
+                    .body("Your phone number must contain numbers. It also must be correct!");
         }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
@@ -175,19 +174,15 @@ public class UserCheckAspect {
     }
 
     /**
-     * Проверка номера телефона, которая требует доработки
+     * Проверка номера телефона
      *
-     * @param string
+     * @param number
      * @return true/false
      */
-    public static boolean convertibleStringCheck(String string){
-        boolean result = true;
-        try{
-            Long number = Long.parseLong(string);
-            System.out.println(number);
-        }catch(Exception e){
-            result = false;
-        }
-        return result;
+    public static boolean numberCheck(String number){
+        Pattern ptrn = Pattern.compile("(0/300)?[7-9][0-9]{9}");
+        Matcher match = ptrn.matcher(number);
+
+        return match.find();
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-
 @Repository
 public interface CardRepository extends JpaRepository<CardEntity, Long> {
     List<CardEntity> findAllByOwnerUserId(Long id);
