@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Класс для логики аннотации проверки пользователя
@@ -60,7 +62,7 @@ public class UserCheckAspect {
     /**
      * Большой метод для всех основных проверок
      *
-     * @param user
+     * @param user проверяемый пользователь
      * @return Результат
      */
     private ResponseEntity<?> bigCheck(RqCreateUser user){
@@ -130,11 +132,10 @@ public class UserCheckAspect {
                     .body("The password must contain uppercase and lowercase letters!");
         }
         //Корректность номера телефона
-        //TODO: Доработать
-        if(convertibleStringCheck(user.getPhone())){
+        if(isValidNumber(user.getPhone())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your phone number must contain numbers. It also must be num convertible");
+                    .body("Your phone number invalid!");
         }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
@@ -177,19 +178,17 @@ public class UserCheckAspect {
     }
 
     /**
-     * Проверка номера телефона, которая требует доработки
-     *
-     * @param string
-     * @return true/false
+     * Метод для проверки на правильность написания номера телефона
+     * @param number номер телефона
+     * @return валидный или нет
      */
-    public static boolean convertibleStringCheck(String string){
-        boolean result = true;
-        try{
-            Long number = Long.parseLong(string);
-            System.out.println(number);
-        }catch(Exception e){
-            result = false;
-        }
-        return result;
+    public static boolean isValidNumber(String number) {
+        //(0/91): номер начинается с 0-91
+        //[7-9]: начало номера может содержать цифру от 7 до 9
+        //[0-9]: затем содержит цифры от 0 до 9
+        Pattern pattern = Pattern.compile("(0/91)?[7-9][0-9]{9}");
+        //matcher() метод создает мэтчер, который будет сопоставлять заданные входные данные с этим шаблоном
+        Matcher match = pattern.matcher(number);
+        return (match.find() && match.group().equals(number));
     }
 }
