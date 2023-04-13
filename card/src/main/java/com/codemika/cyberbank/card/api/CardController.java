@@ -25,6 +25,10 @@ public class CardController {
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
         return service.createCard(token, rq);
     }
+    @DeleteMapping("delete")
+    public ResponseEntity<?> deleteCard(Long id,Long ownerUserId){
+        return ResponseEntity.ok(service.deleteCard(ownerUserId, id));
+    }
 
     /**
      * Метод для просмотра пользователем всех своих карт
