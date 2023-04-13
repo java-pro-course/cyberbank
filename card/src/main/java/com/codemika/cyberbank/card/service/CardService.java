@@ -76,9 +76,11 @@ public class CardService {
         String alphabet = "0123456789";
 
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < n; i++) {
-            int index = (int) (alphabet.length() * Math.random());
-            result.append(alphabet.charAt(index));
+        while (repository.findCardByAccountNumber(result).isPresent() || result.equals("")){
+            for (int i = 0; i < n; i++) {
+                int index = (int) (alphabet.length() * Math.random());
+                result.append(alphabet.charAt(index));
+            }
         }
 
         return result.toString();
