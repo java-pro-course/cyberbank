@@ -6,7 +6,6 @@ import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +24,9 @@ public class CardController {
      */
     @PostMapping("create")
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.ok("token invalid!");
+        }
         Claims claims = jwtUtil.getClaims(token);
         Long id = claims.get("id", Long.class);
         return service.createCard(token, rq, id);

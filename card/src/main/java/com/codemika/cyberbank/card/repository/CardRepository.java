@@ -3,6 +3,7 @@ package com.codemika.cyberbank.card.repository;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
