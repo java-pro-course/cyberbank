@@ -3,7 +3,7 @@ package com.codemika.cyberbank.card.api;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.service.CardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +56,9 @@ public class CardController {
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return service.getAllCards();
+    }
+    @PostMapping("money-transfer")
+    public ResponseEntity<?> MoneyTransfer(Long id,  Long ownerUserId,  Long value, Long receivingId) {
+        return service.moneyTransfer(id, ownerUserId, value, receivingId);
     }
 }
