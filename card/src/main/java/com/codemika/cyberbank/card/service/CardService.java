@@ -22,6 +22,7 @@ public class CardService {
     public final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
+
         //Проверка на валидный пин-код
         if(!rq.getPincode().matches("[0-9]+"))
             return ResponseEntity
