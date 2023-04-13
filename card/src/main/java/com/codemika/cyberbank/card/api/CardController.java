@@ -26,8 +26,8 @@ public class CardController {
         return service.createCard(token, rq);
     }
     @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(Long id,Long ownerUserId){
-        return ResponseEntity.ok(service.deleteCard(ownerUserId, id));
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
+        return ResponseEntity.ok(service.deleteCard(token, id));
     }
 
     /**
@@ -54,13 +54,19 @@ public class CardController {
     }
 
     @PostMapping("money-transfer")
-    public ResponseEntity<?> MoneyTransfer(Long id,  Long ownerUserId,  Long value, Long receivingId) {
-        return service.moneyTransfer(id, ownerUserId, value, receivingId);
+    public ResponseEntity<?> MoneyTransfer(@RequestHeader("Authorization") String token, @RequestParam String pincode, @RequestParam Long id, @RequestParam  Long value, @RequestParam Long receivingId) {
+        return service.moneyTransfer(token, pincode, id, value, receivingId);
     }
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return service.getAllCards();
+
+    }
+    //Необходимые права - тестер + модер
+    @GetMapping("get-me-money")
+    public ResponseEntity<?> getMeMoney(@RequestParam Long cardId, @RequestParam Long value) {
+        return service.getMeMoney(cardId, value);
 
     }
 }
