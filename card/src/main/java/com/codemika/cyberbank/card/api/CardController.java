@@ -82,4 +82,9 @@ public class CardController {
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
         return debetCardService.getMeMoney(cardId, value);
     }
+    //Для тестов//todo разобраться какой нужен
+    @GetMapping("get-all-card-for-moder")
+    public ResponseEntity<?> getAllCardsModer() {
+        return service.getAllCards();
+    }
 }
