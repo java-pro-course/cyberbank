@@ -24,6 +24,7 @@ public class CardService {
 
     /**
      * Создание карты
+     *
      * @param token пользователя(будущего владельца)
      * @param rq параметры карты
      * @return Созданную карту
@@ -76,6 +77,7 @@ public class CardService {
 
     /**
      * Удаление карты
+     *
      * @param ownerUserId id владельца
      * @param id id карты
      * @return Результат удаления
@@ -100,6 +102,7 @@ public class CardService {
 
     /**
      * Генерация случайного номера карты
+     *
      * @param n размер строки(у нас 16)
      * @return Случайную строку
      */
@@ -117,6 +120,7 @@ public class CardService {
 
     /**
      * Вывод всех карт пользователя
+     *
      * @param token уникальный токен авторизации
      * @return Все карты
      */
@@ -135,6 +139,7 @@ public class CardService {
     //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
     /** ТОЛЬКО ДЛЯ МОДЕРОВ
      * Получение ВСЕХ карт в банке
+     *
      * @return Все карты банка
      */
     public ResponseEntity<?> getAllCards() {

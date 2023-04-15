@@ -17,6 +17,12 @@ public class LoginController {
     private final JwtUtil jwtUtil;
     private final AuthorizationService authorizationService;
 
+    /**
+     * Вход по токену
+     *
+     * @param token уникальный токен
+     * @return
+     */
     @GetMapping("login")
     public ResponseEntity<?> loginWithToken(String token){
         return authorizationService.login(token);

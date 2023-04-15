@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * Класс ответа после создания пользователя
+ * Образ ответа после создания пользователя
  */
 @Data
 @Accessors(chain = true)

@@ -21,6 +21,12 @@ public class RegistrationController {
     private final AuthorizationService authorizationService;
     private final UserRepository userRepository;
 
+    /**
+     * Регистрация пользователя
+     *
+     * @param rq образ пользователя
+     * @return Результат
+     */
     @UserCheck // обязательная аннотация для проверки пользователя
     @PutMapping("register")
     public ResponseEntity<?> registration(@RequestBody RqCreateUser rq){

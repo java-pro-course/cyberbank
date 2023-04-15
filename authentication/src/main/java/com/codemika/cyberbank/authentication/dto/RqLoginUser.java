@@ -4,7 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 /**
- * Класс запроса на логин, но вход реализован через токен
+ * Образ запроса на логин
  */
 @Data
 @Accessors(chain = true)

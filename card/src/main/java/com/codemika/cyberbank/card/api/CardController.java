@@ -19,6 +19,7 @@ public class CardController {
 
     /**
      * Оформление(создание) новой карты
+     *
      * @param token токен пользователя, который оформляет карту
      * @param rq все данные карты(название, тип(деб/кред), пин-код)
      * @return Созданную карту
@@ -30,6 +31,7 @@ public class CardController {
 
     /**
      * Удаление карты
+     *
      * @param ownerUserId id владельца
      * @param id id карты
      * @return
@@ -41,6 +43,7 @@ public class CardController {
 
     /**
      * Просмотр пользователем всех своих карт
+     *
      * @param token токен пользователя(чьи карты)
      * @return Все карты
      */

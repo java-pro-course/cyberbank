@@ -20,7 +20,8 @@ public class JwtUtil {
    private final String SIGN = "SuPErSecRETsign228CyBERbANk";
 
     /**
-     * Создание нового токена. Используется при входе.
+     * Создание нового токена(используется при входе)
+     *
      * Длительность токена 69,(4) дней.
      * @param claims информация, содержащаяся в токене.
      * @return Токен
@@ -39,9 +40,10 @@ public class JwtUtil {
     }
 
     /**
-     * Проверка токена.
+     * Проверка токена
+     *
      * @param token токен
-     * @return true или false, правильный токен или нет.
+     * @return true или false, правильный токен или нет
      */
     public boolean validateToken(String token){
         token = token.replace("\"", "");
@@ -60,9 +62,10 @@ public class JwtUtil {
     }
 
     /**
-     * Извлечение информации из токена.
+     * Извлечение информации из токена
+     *
      * @param token токен
-     * @return Информацию, содержащуюся в токене.
+     * @return Информацию, содержащуюся в токене
      */
     public Claims getClaims(String token){
         token = token.replace("\"", "");
