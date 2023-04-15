@@ -19,7 +19,7 @@ public class CardController {
     private final JwtUtil jwtUtil;
 
     /**
-     * Метод для оформления(создания) новой карты
+     * Оформление(создание) новой карты
      * @param token токен пользователя, который оформляет карту
      * @param rq все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
@@ -38,15 +38,21 @@ public class CardController {
                                               @RequestBody RqCreateCreditCard rq) {
         return creditCardService.createCreditCard(token, rq);
     }
+    /**
+     * Удаление кредитной карты
+     * @param ownerUserId id владельца
+     * @param id id карты
+     * @return
+     */
     @DeleteMapping("delete-credit")
     public ResponseEntity<?> deleteCreditCard(Long id,Long ownerUserId){
         return ResponseEntity.ok(creditCardService.deleteCreditCard(ownerUserId, id));
     }
 
     /**
-     * Метод для просмотра пользователем всех своих карт
-     * @param token токен для определения пользователя(чтобы знать чьи карты показывать)
-     * @return все карты определённого пользователя
+     * Просмотр пользователем всех своих карт
+     * @param token токен пользователя(чьи карты)
+     * @return Все карты
      */
     @GetMapping("get-all-cards")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
@@ -65,6 +71,7 @@ public class CardController {
 
         return debetCardService.getAllCards(token);
     }
+
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
