@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 public class Config {
 
     /**
-     * Метод для определения правил перемещения пользователя по ссылке
+     * Определение правил перемещения пользователя по ссылке
      * @param builder
      * @return
      */

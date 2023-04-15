@@ -19,7 +19,7 @@ public class JwtUtil {
    private final String SIGN = "SuPErSecRETsign228CyBERbANk";
 
     /**
-     * Метод для создания нового токена. Используется при входе.
+     * Создание нового токена. Используется при входе.
      * Длительность токена 69,(4) дней.
      * @param claims информация, содержащаяся в токене.
      * @return Токен
@@ -28,17 +28,17 @@ public class JwtUtil {
         long nowMillis = System.currentTimeMillis();
         long expirationMillis = nowMillis + 6_000_000_000L;
         Date exp = new Date(expirationMillis);
+
         return Jwts.builder().
                 setIssuedAt(new Date(System.currentTimeMillis()))
                 .setClaims(claims)
                 .setExpiration(exp)
                 .signWith(SignatureAlgorithm.HS512, SIGN)
                 .compact();
-
     }
 
     /**
-     * Метод для проверки токена.
+     * Проверка токена.
      * @param token токен
      * @return true или false, правильный токен или нет.
      */
@@ -46,6 +46,7 @@ public class JwtUtil {
         token = token.replace("\"", "");
         token = token.trim();
         boolean isTokenValid = false;
+
         try{
             Jwts.parser().setSigningKey(SIGN).parseClaimsJws(token);
             isTokenValid = true;
@@ -53,17 +54,19 @@ public class JwtUtil {
             log.error("Token is invalid");
             log.error(e.getMessage() + "=>"+ e);
         }
+
         return isTokenValid;
     }
 
     /**
-     * Метод для извлечения информации из токена.
+     * Извлечение информации из токена.
      * @param token токен
      * @return Информацию, содержащуюся в токене.
      */
     public Claims getClaims(String token){
         token = token.replace("\"", "");
         token = token.trim();
+
         try{
             return Jwts.parser()
                     .setSigningKey(SIGN)
@@ -73,6 +76,7 @@ public class JwtUtil {
             log.error("Token is invalid");
             log.error(e.getMessage() + "=>"+ e);
         }
+
         return null;
     }
 }

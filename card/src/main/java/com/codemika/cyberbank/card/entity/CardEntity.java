@@ -7,7 +7,6 @@ import javax.persistence.*;
 /**
  * Entity для карт
  */
-
 @Entity
 @Table(schema = "cyberbank_card", name = "card")
 @Data

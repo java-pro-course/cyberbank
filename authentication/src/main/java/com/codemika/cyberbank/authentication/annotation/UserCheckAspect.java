@@ -45,9 +45,9 @@ public class UserCheckAspect {
         RqCreateUser rq = (RqCreateUser) args[nameIndex];
 
         if(bigCheck(rq).getBody().toString().contains("!")){
-            authorizationService.setCheck(false);
-            authorizationService.setErrorMessage(bigCheck(rq));
-            return authorizationService.registration(rq);
+            authorizationService.setCheck(false); // устанавливаем параметр проверки в сервисе
+            authorizationService.setErrorMessage(bigCheck(rq)); // отправляем сообщение с ошибкой
+            return authorizationService.registration(rq); // вызываем метод сервиса
         }
 
         authorizationService.setCheck(true);
