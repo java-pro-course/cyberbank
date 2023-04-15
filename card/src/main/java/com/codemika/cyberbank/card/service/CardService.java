@@ -19,9 +19,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
-//м    private final RestTemplate restTemplate;
+//    private final RestTemplate restTemplate;
     public final JwtUtil jwtUtil;
 
+    /**
+     * Создание карты
+     * @param token пользователя(будущего владельца)
+     * @param rq параметры карты
+     * @return Созданную карту
+     */
     public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
         //Проверка на валидный пин-код
         if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
@@ -48,6 +54,7 @@ public class CardService {
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
+
         if(repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -66,8 +73,16 @@ public class CardService {
         card = repository.save(card);
         return ResponseEntity.ok(card);
     }
+
+    /**
+     * Удаление карты
+     * @param ownerUserId id владельца
+     * @param id id карты
+     * @return Результат удаления
+     */
     public ResponseEntity<?> deleteCard(Long ownerUserId, Long id){
         Optional<CardEntity> card = repository.findById(id);
+
         if(!card.isPresent()){
             return ResponseEntity.badRequest().body("Card with ID: " + id + " isn't present");
         }
@@ -78,14 +93,15 @@ public class CardService {
             return ResponseEntity.badRequest().body("You cannot delete a card with the balance available on it." +
                     "Please cash out at the nearest ATM or transfer money to another card.");
         }
+
         repository.deleteById(id);
         return ResponseEntity.ok().body("The card has been successfully deleted");
     }
 
     /**
-     * Метод для генерации случайного номера карты
-     * @param n размер строки (у нас 16)
-     * @return случайную строку
+     * Генерация случайного номера карты
+     * @param n размер строки(у нас 16)
+     * @return Случайную строку
      */
     private static String generateAccountNumber(int n) {
         String alphabet = "0123456789";
@@ -100,9 +116,9 @@ public class CardService {
     }
 
     /**
-     * Метод для вывода всех карт определённого пользователя.
-     * @param token уникальный токен авторизации, содержащий id его пользователя.
-     * @return все карты пользователя, чей токен мы получаем.
+     * Вывод всех карт пользователя
+     * @param token уникальный токен авторизации
+     * @return Все карты
      */
     public ResponseEntity<?> getAllCards(String token) {
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -118,11 +134,10 @@ public class CardService {
     }
     //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
     /** ТОЛЬКО ДЛЯ МОДЕРОВ
-     * Метод для получения ВСЕХ карт в банке
-     * @return все карты банка
+     * Получение ВСЕХ карт в банке
+     * @return Все карты банка
      */
     public ResponseEntity<?> getAllCards() {
-
         List<CardEntity> cards = repository.findAll();
 
         if (cards.isEmpty()) return ResponseEntity

@@ -59,7 +59,6 @@ public class AuthorizationService {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body("Successful registration! Your token is: " + jwtUtil.generateToken(claims));
-
     }
 
     /**
@@ -105,7 +104,7 @@ public class AuthorizationService {
     }
 
     /**
-     * Метод для поиска пользователя по id (только для модеров)
+     * Поиск пользователя по id (только для модеров)
      * @param id идентификационный номер пользователя
      * @return искомого пользователя
      */
@@ -120,7 +119,7 @@ public class AuthorizationService {
                 .body(userRepository.findById(id));
     }
     /**
-     * Метод для поиска пользователя по эл. почте
+     * Поиск пользователя по эл. почте
      * @param email эл. почта
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -142,7 +141,7 @@ public class AuthorizationService {
     }
 
     /**
-     * Метод для поиска пользователя по номеру телефона
+     * Поиск пользователя по номеру телефона
      * @param phone номер телефона
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -163,6 +162,7 @@ public class AuthorizationService {
                 .body(rs);
     }
 
+    //Валидация пользователя по id
     public boolean validateUserById(Long id){
         return userRepository.findById(id).isPresent();
     }
