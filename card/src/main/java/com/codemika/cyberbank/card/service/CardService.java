@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -20,12 +21,12 @@ public class CardService {
 
     public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
         //Проверка на валидный пин-код
-        if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
+        if (!rq.getPincode().toLowerCase().matches("[0-9]+"))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("The pincode must consist of digits!!! For example 3856");
 
-        if(rq.getPincode().trim().length() != 4)
+        if (rq.getPincode().trim().length() != 4)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("The pincode must consist of 4 digits!!! For example 3856");
@@ -39,7 +40,7 @@ public class CardService {
                 .setTitle(rq.getTitle())
                 .setType(rq.getType().trim().toLowerCase())
                 .setOwnerUserId(ownerUserId) // отправляем сначала запрос в auth и проверяем этот id!
-                                                     // для отправки запроса используем RestTemplate!
+                // для отправки запроса используем RestTemplate!
                 .setBalance(0L)
                 .setPincode(rq.getPincode().trim())
                 .setAccountNumber(
@@ -51,15 +52,16 @@ public class CardService {
         card = repository.save(card);
         return ResponseEntity.ok(card);
     }
-    public ResponseEntity<?> deleteCard(Long ownerUserId, Long id){
+
+    public ResponseEntity<?> deleteCard(Long ownerUserId, Long id) {
         Optional<CardEntity> card = repository.findById(id);
-        if(!card.isPresent()){
+        if (!card.isPresent()) {
             return ResponseEntity.badRequest().body("Card with ID: " + id + " isn't present");
         }
-        if (!card.get().getOwnerUserId().equals(ownerUserId)){
+        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
             return ResponseEntity.badRequest().body("You cannot delete the card because it does not belong to you");
         }
-        if(card.get().getBalance() != 0){
+        if (card.get().getBalance() != 0) {
             return ResponseEntity.badRequest().body("You cannot delete a card with the balance available on it." +
                     "Please cash out at the nearest ATM or transfer money to another card.");
         }
@@ -69,14 +71,15 @@ public class CardService {
 
     /**
      * Метод для генерации случайного номера карты
+     *
      * @param n размер строки (у нас 16)
      * @return случайную строку
      */
-    private static String generateAccountNumber(int n) {
+    private String generateAccountNumber(int n) {
         String alphabet = "0123456789";
 
         StringBuilder result = new StringBuilder();
-        while (repository.findCardByAccountNumber(result).isPresent() || result.equals("")){
+        while (repository.findCardByAccountNumber(String.valueOf(result)).isPresent() || result.equals("")) {
             for (int i = 0; i < n; i++) {
                 int index = (int) (alphabet.length() * Math.random());
                 result.append(alphabet.charAt(index));
@@ -88,6 +91,7 @@ public class CardService {
 
     /**
      * Метод для вывода всех карт определённого пользователя.
+     *
      * @param token уникальный токен авторизации, содержащий id его пользователя.
      * @return все карты пользователя, чей токен мы получаем.
      */
@@ -98,14 +102,17 @@ public class CardService {
         List<CardEntity> cards = repository.findAllByOwnerUserId(id);
 
         if (cards.isEmpty()) return ResponseEntity
-                                        .status(HttpStatus.NOT_FOUND)
-                                        .body("This user have no cards!");
+                .status(HttpStatus.NOT_FOUND)
+                .body("This user have no cards!");
 
         return ResponseEntity.ok(cards);
     }
     //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
-    /** ТОЛЬКО ДЛЯ МОДЕРОВ
+
+    /**
+     * ТОЛЬКО ДЛЯ МОДЕРОВ
      * Метод для получения ВСЕХ карт в банке
+     *
      * @return все карты банка
      */
     public ResponseEntity<?> getAllCards() {
@@ -113,8 +120,8 @@ public class CardService {
         List<CardEntity> cards = repository.findAll();
 
         if (cards.isEmpty()) return ResponseEntity
-                                        .status(HttpStatus.NOT_FOUND)
-                                        .body("Any user have no cards!");
+                .status(HttpStatus.NOT_FOUND)
+                .body("Any user have no cards!");
 
         return ResponseEntity.ok(cards);
     }
