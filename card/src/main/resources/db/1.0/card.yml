@@ -40,3 +40,8 @@ databaseChangeLock:
                   type: bigint
                   constraints:
                     nullable: false
+              - column:
+                  name: status
+                  type: bool
+                  constraints:
+                    nullable: false

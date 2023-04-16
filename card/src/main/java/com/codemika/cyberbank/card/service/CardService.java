@@ -4,8 +4,12 @@ import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import com.codemika.cyberbank.card.repository.CardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,5 +49,19 @@ public class CardService {
         }
 
         return result.toString();
+    }
+
+    public ResponseEntity<?> FreezeCard(RqCreateCard card, Long id, Date time, Long OwnerUserId){
+        Optional<CardEntity> cardEntity = repository.findById(id);
+        if(!cardEntity.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The card doesn't exist!");
+        }
+            card.setIsFrozen(true);
+
+
+        repository.updateById(card.getTitle(), card.getType(), card.getAccountNumber(), card.getOwnerUserId(), card.getIsFrozen(), id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(String.format("Card's status changed"));
+
     }
 }

@@ -8,5 +8,7 @@ import lombok.experimental.Accessors;
 public class RqCreateCard {
     private String title;
     private String type;
+    private String accountNumber;
     private Long ownerUserId;
+    private Boolean isFrozen;
 }
