@@ -46,9 +46,8 @@ public class CreditCardService {
         CardEntity card = new CardEntity()
                 .setTitle(rq.getTitle())
                 .setType("Кредитная")
-                .setOwnerUserId(1L) // отправляем сначала запрос в auth и проверяем этот id!
+                .setOwnerUserId(ownerUserId) // отправляем сначала запрос в auth и проверяем этот id!
                 // для отправки запроса используем RestTemplate!
-                .setBalance(0L)
                 .setPincode(rq.getPincode().trim())
                 .setAccountNumber(
                         generateAccountNumber(16)
