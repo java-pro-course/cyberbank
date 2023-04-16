@@ -5,8 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class RqCreateCard {
+public class RqCreateDebetCard {
     private String title;
-    private String type;
     private String pincode;
 }

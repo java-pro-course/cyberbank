@@ -1,7 +1,9 @@
 package com.codemika.cyberbank.card.api;
 
-import com.codemika.cyberbank.card.dto.RqCreateCard;
-import com.codemika.cyberbank.card.service.CardService;
+import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
+import com.codemika.cyberbank.card.dto.RqCreateDebetCard;
+import com.codemika.cyberbank.card.service.CreditCardService;
+import com.codemika.cyberbank.card.service.DebetCardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
@@ -12,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("api/card")
 @Data
 public class CardController {
-    private final CardService service;
+    private final DebetCardService debetCardService;
+    private final CreditCardService creditCardService;
     private final JwtUtil jwtUtil;
 
     /**
@@ -21,13 +24,21 @@ public class CardController {
      * @param rq все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
      */
-    @PostMapping("create")
-    public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCard rq) {
-        return service.createCard(token, rq);
+    @PostMapping("create-debet")
+    public ResponseEntity<?> createDebetCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateDebetCard rq) {
+        return debetCardService.createDebetCard(token, rq);
     }
-    @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(Long id,Long ownerUserId){
-        return ResponseEntity.ok(service.deleteCard(ownerUserId, id));
+    @DeleteMapping("delete-debet")
+    public ResponseEntity<?> deleteDebetCard(Long id,Long ownerUserId){
+        return ResponseEntity.ok(debetCardService.deleteDebetCard(ownerUserId, id));
+    }
+    @PostMapping("create-credit")
+    public ResponseEntity<?> createCreditCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCreditCard rq) {
+        return creditCardService.createCreditCard(token, rq);
+    }
+    @DeleteMapping("delete-credit")
+    public ResponseEntity<?> deleteCreditCard(Long id,Long ownerUserId){
+        return ResponseEntity.ok(creditCardService.deleteCreditCard(ownerUserId, id));
     }
 
     /**
@@ -50,11 +61,11 @@ public class CardController {
                     .body("Token is invalid!");
         }
 
-        return service.getAllCards(token);
+        return debetCardService.getAllCards(token);
     }
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
-        return service.getAllCards();
+        return debetCardService.getAllCards();
     }
 }
