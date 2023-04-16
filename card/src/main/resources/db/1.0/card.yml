@@ -42,6 +42,6 @@ databaseChangeLock:
                     nullable: false
               - column:
                   name: status
-                  type: bool
+                  type: boolean
                   constraints:
                     nullable: false
