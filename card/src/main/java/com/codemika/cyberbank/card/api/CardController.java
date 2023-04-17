@@ -63,6 +63,6 @@ public class CardController {
     }
     @PostMapping("get-me-money")
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
-        return service.getMeMoney(id, value);
+        return service.getMeMoney(cardId, value);
     }
 }
