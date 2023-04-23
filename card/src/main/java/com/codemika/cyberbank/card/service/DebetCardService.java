@@ -21,8 +21,6 @@ public class DebetCardService {
     public final JwtUtil jwtUtil;
 
     public ResponseEntity<?> createDebetCard(String token, RqCreateDebetCard rq) {
-        //Проверка на валидный пин-код
-    public ResponseEntity<?> createCard(String token, RqCreateCard rq) {
         //Проверка на валидный пин-код//todo exception pin-code can be null!
         if (rq.getPincode().isEmpty())
             return ResponseEntity
