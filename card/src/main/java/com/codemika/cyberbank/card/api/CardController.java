@@ -5,7 +5,7 @@ import com.codemika.cyberbank.card.dto.RqCreateDebetCard;
 import com.codemika.cyberbank.card.service.CreditCardService;
 import com.codemika.cyberbank.card.service.DebetCardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +69,11 @@ public class CardController {
         return debetCardService.getAllCards();
     }
     @PostMapping("money-transfer")
-    public ResponseEntity<?> MoneyTransfer(Long id,  Long ownerUserId,  Long value, Long receivingId) {
-        return service.moneyTransfer(id, ownerUserId, value, receivingId);
+    public ResponseEntity<?> moneyTransfer(String token, String pincode, Long senderId, Long value, Long receivingId) {
+        return service.moneyTransfer(token, pincode, senderId, value, receivingId);
+    }
+    @PostMapping("get-me-money")
+    public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
+        return service.getMeMoney(cardId, value);
     }
 }

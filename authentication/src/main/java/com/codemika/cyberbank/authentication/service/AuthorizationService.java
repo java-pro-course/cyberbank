@@ -58,7 +58,7 @@ public class AuthorizationService {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Successful registration! Your token is: " + jwtUtil.generateToken(claims));
+                .body("Успешная регистрация! Ваш токен для подтверждения личности: " + jwtUtil.generateToken(claims));
 
     }
 
@@ -83,10 +83,10 @@ public class AuthorizationService {
         String email = claims.get("email", String.class);
 
         //TODO: Добавить карты, кредиты и т.д.
-                String result = String.format("Welcome, %s %s %s!\n" +
-                "Your email: %s\n" +
-                "Cards: \n" +
-                "New generated token: ", surname, name, patronymic, email) + jwtUtil.generateToken(claims);
+                String result = String.format("Добро пожаловать, %s %s %s!\n" +
+                "Ваша эл. почта: %s\n" +
+                "Ваши карты: \n" +
+                "Ваш новый токен: ", surname, name, patronymic, email) + jwtUtil.generateToken(claims);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -97,7 +97,7 @@ public class AuthorizationService {
         if (userRepository.findAll().isEmpty())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body("We still have no users... Do u wanna sigh up?😔");
+                    .body("У нас ещё нет ни одного пользователя... Хотите стать первым пользователем?😔");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -113,7 +113,7 @@ public class AuthorizationService {
         if (!userRepository.findById(id).isPresent())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body("This user does not exist!");
+                    .body("Данный пользователь не существует!");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -128,7 +128,7 @@ public class AuthorizationService {
         if (!userRepository.findByEmail(email).isPresent())
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("This user does not exist!");
+                .body("Данный пользователь не существует!");
 
         UserEntity rq = userRepository.findByEmail(email).get();
         RsInfoUser rs = new RsInfoUser()
@@ -150,7 +150,7 @@ public class AuthorizationService {
         if (!userRepository.findByPhone(phone).isPresent())
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("This user does not exist!");
+                .body("Данный пользователь не существует!");
 
         UserEntity rq = userRepository.findByPhone(phone).get();
         RsInfoUser rs = new RsInfoUser()
