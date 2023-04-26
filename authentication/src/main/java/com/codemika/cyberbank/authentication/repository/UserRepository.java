@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Это репозиторий для пользователя.
+ * Репозиторий для пользователя.
  * Содержит методы для поиска по эл. почте и номеру телефона.
  */
 @Repository

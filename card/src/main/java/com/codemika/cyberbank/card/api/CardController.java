@@ -60,13 +60,13 @@ public class CardController {
         if (token.isEmpty() || token.trim().isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Token must not be empty!");
+                    .body("Токен не должен быть пустым!");
         }
 
         if (!jwtUtil.validateToken(token)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Token is invalid!");
+                    .body("Неверный токен!");
         }
 
         return debetCardService.getAllCards(token);
@@ -88,10 +88,5 @@ public class CardController {
     @PostMapping("get-me-money")
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
         return debetCardService.getMeMoney(cardId, value);
-    }
-    //Для тестов//todo разобраться какой нужен
-    @GetMapping("get-all-card-for-moder")
-    public ResponseEntity<?> getAllCardsModer() {
-        return service.getAllCards();
     }
 }
