@@ -42,7 +42,7 @@ public class JwtUtil {
      * @param token токен
      * @return true или false, правильный токен или нет.
      */
-    public boolean validateToken(String token){
+    public boolean validateToken(String token){//todo token can be null!
         token = token.replace("\"", "");
         token = token.trim();
         boolean isTokenValid = false;

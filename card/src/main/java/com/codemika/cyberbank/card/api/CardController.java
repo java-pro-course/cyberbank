@@ -25,7 +25,8 @@ public class CardController {
      * @return созданную карту
      */
     @PostMapping("create-debet")
-    public ResponseEntity<?> createDebetCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateDebetCard rq) {
+    public ResponseEntity<?> createDebetCard(@RequestHeader("Authorization") String token,
+                                             @RequestBody RqCreateDebetCard rq) {
         return debetCardService.createDebetCard(token, rq);
     }
     @DeleteMapping("delete-debet")
@@ -33,7 +34,8 @@ public class CardController {
         return ResponseEntity.ok(debetCardService.deleteDebetCard(ownerUserId, id));
     }
     @PostMapping("create-credit")
-    public ResponseEntity<?> createCreditCard(@RequestHeader("Authorization") String token, @RequestBody RqCreateCreditCard rq) {
+    public ResponseEntity<?> createCreditCard(@RequestHeader("Authorization") String token,
+                                              @RequestBody RqCreateCreditCard rq) {
         return creditCardService.createCreditCard(token, rq);
     }
     @DeleteMapping("delete-credit")
@@ -67,5 +69,17 @@ public class CardController {
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return debetCardService.getAllCards();
+    }
+    @PostMapping("money-transfer")
+    public ResponseEntity<?> moneyTransfer(String token,
+                                           String pincode,
+                                           Long senderId,
+                                           Long value,
+                                           Long receivingId) {
+        return debetCardService.moneyTransfer(token, pincode, senderId, value, receivingId);
+    }
+    @PostMapping("get-me-money")
+    public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
+        return debetCardService.getMeMoney(cardId, value);
     }
 }
