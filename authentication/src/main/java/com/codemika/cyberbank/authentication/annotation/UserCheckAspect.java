@@ -1,6 +1,8 @@
 package com.codemika.cyberbank.authentication.annotation;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
+import com.codemika.cyberbank.authentication.repository.UserRepository;
+import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

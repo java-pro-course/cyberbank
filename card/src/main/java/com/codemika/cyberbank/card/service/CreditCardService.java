@@ -1,7 +1,6 @@
 package com.codemika.cyberbank.card.service;
 
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
-import com.codemika.cyberbank.card.dto.RqCreateDebetCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import com.codemika.cyberbank.card.repository.CardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
@@ -24,19 +23,19 @@ public class CreditCardService {
         if (!rq.getPincode().toLowerCase().matches("[0-9]+"))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The pincode must consist of digits!!! For example 3856");
+                    .body("Пин код должен состоять из 4-х цифр! Например, 3856");
 
         // это для расчета максимальной суммы кредита
         int maxValue = (int) ((rq.getMonthlyIncome() * rq.getCreditTerm() * 0.5) / (1 + (0.15 * rq.getCreditTerm()))); // хз насколько я правильно эту формулу вписал.
 
         if (rq.getValue() > maxValue)
         {
-            return ResponseEntity.badRequest().body("given your details, we cannot issue you a loan in the amount: " + rq.getValue());
+            return ResponseEntity.badRequest().body("Учитывая ваши данные, мы не можем выдать вам кредит на сумму: " + rq.getValue());
         }
         if (rq.getPincode().trim().length() != 4)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The pincode must consist of 4 digits!!! For example 3856");
+                    .body("Пин код должен состоять из 4-х цифр! Например, 3856");
 
         //Достаём id из токена
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -63,18 +62,18 @@ public class CreditCardService {
     public ResponseEntity<?> deleteCreditCard(Long ownerUserId, Long id) {
         Optional<CardEntity> card = repository.findById(id);
         if (!card.isPresent()) {
-            return ResponseEntity.badRequest().body("Card with ID: " + id + " isn't present");
+            return ResponseEntity.badRequest().body("Карты с ID: " + id + " не существует");
         }
         if (!card.get().getOwnerUserId().equals(ownerUserId)) {
-            return ResponseEntity.badRequest().body("You cannot delete the card because it does not belong to you");
+            return ResponseEntity.badRequest().body("Вы не можете удалять чужие карты! Откуда вы вообще знаете её id? Вы злоумышленник?");
         }
         if (card.get().getBalance() != 0) {
-            return ResponseEntity.badRequest().body("You cannot delete a card with the balance available on it." +
-                    "Please cash out at the nearest ATM or transfer money to another card.");
+            return ResponseEntity.badRequest().body("Вы не можете удалить карту с балансом не равным нулю." +
+                    "Пожалуйста, потратьте, снимите в банкомате или переведите деньги с этой карты перед удалением иной.");
         }
         // TODO надо будет как-нибудь добавить проверку погашен ли кредит.
         repository.deleteById(id);
-        return ResponseEntity.ok().body("The card has been successfully deleted");
+        return ResponseEntity.ok().body("Ваша карты была успешно удалена");
     }
 
     /**

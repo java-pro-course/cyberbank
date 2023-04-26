@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.authentication.service;
 
+import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
@@ -8,7 +9,7 @@ import com.codemika.cyberbank.authentication.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import lombok.RequiredArgsConstructor;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Service;
  * Сервис для авторизации
  */
 @Service
-@RequiredArgsConstructor
+@Data
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -30,7 +31,7 @@ public class AuthorizationService {
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    @UserCheck(name = "rq")
+    @UserCheck()
     public ResponseEntity<?> registration( RqCreateUser rq){
         //TODO: Оформить все проверки
         if(!check){
