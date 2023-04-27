@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Класс для логики аннотации проверки вользователя
+ * Класс для логики аннотации проверки пользователя
  */
 @Aspect
 @Component
@@ -60,7 +60,7 @@ public class UserCheckAspect {
     /**
      * Большой метод для всех основных проверок
      *
-     * @param user
+     * @param user проверяемый пользователь
      * @return Результат
      */
     private ResponseEntity<?> bigCheck(RqCreateUser user){
@@ -68,7 +68,7 @@ public class UserCheckAspect {
         if(userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Please, check your email or number! Someone have already used your contacts!");
+                    .body("Пожалуйста, проверьте свои номер телефона и электронную почту! Кто-то уже использует их!");
         }
         //Пустота заполнения(null не нужно, т.к. могут быть только пустые строчки).
         if (user.getName().equals("") || user.getSurname().equals("")
@@ -76,43 +76,43 @@ public class UserCheckAspect {
                 || user.getPhone().equals("") || user.getPassword().equals("")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("None of the fields must not be empty!");
+                    .body("Ни одно из полей не должно быть пустым!");
         }
         //Пробелы в имени
         if (user.getName().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your name must not contain spaces!");
+                    .body("Ваше имя не должно содержать пробелы!");
         }
         //Пробелы в фамилии
         if (user.getSurname().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your surname must not contain spaces!");
+                    .body("Ваша фамилия не должна содержать пробелы!");
         }
         //Пробелы в отчестве
         if (user.getPatronymic().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your patronymic must not contain spaces!");
+                    .body("Ваше отчество не должно содержать пробелы!");
         }
         //Пробелы в почте
         if (user.getEmail().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The email must not contain spaces!");
+                    .body("Адрес электронной почты не должен содержать пробелы!");
         }
         //Пробелы в номере телефона
         if (user.getPhone().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The phone must not contain spaces!");
+                    .body("Номер телефона не должен содержать пробелы!");
         }
         //Пробелы в пароле
         if (user.getPassword().contains(" ")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The password must not contain spaces!");
+                    .body("Пароль не должен содержать пробелы!");
         }
         //Содержание имени, фамилии или отчества в пароле
         if (user.getPassword().toLowerCase().contains(user.getName().toLowerCase())
@@ -120,26 +120,26 @@ public class UserCheckAspect {
                 || user.getPassword().toLowerCase().contains(user.getPatronymic().toLowerCase())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The password must not contain your name, your surname or your patronymic! It's not secure!");
+                    .body("В пароле не должно быть вашего имени, фамилии или отчества! Это не безопасно!");
         }
         //Заглавные буквы в пароле
         if (user.getPassword().equals(user.getPassword().toLowerCase())
                 || user.getPassword().equals(user.getPassword().toUpperCase())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The password must contain uppercase and lowercase letters!");
+                    .body("Ваш пароль должен состоять из ЗАГЛАВНых и строчных букв!");
         }
         //Корректность номера телефона
         if(!numberCheck(user.getPhone())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Your phone number must contain numbers. It also must be correct!");
+                    .body("Ваш номер телефона должен состоять из цифр!");
         }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid email!");
+                    .body("Неверная эл. почта!");
         }
         //Символы и т.д. в пароле
         String symbols = "§±!#$%&()*+,-./0123456789:;<=>?@[]^_`{|}~\"'\\";
@@ -147,12 +147,12 @@ public class UserCheckAspect {
         if (!lettersCheck(symbols, user.getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Provide your password with symbols and numbers!");
+                    .body("Введите пароль с символами и цифрами!");
         }
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Success");
+                .body("Успешно!");
     }
 
     /**

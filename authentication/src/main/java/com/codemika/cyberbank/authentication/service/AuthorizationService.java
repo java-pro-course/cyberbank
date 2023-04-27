@@ -72,7 +72,7 @@ public class AuthorizationService {
         if(!jwtUtil.validateToken(token)){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Token invalid!");
+                    .body("Неверный токен!");
         }
 
         Claims claims = jwtUtil.getClaims(token);

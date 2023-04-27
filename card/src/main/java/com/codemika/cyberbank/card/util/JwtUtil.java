@@ -52,7 +52,7 @@ public class JwtUtil {
             Jwts.parser().setSigningKey(SIGN).parseClaimsJws(token);
             isTokenValid = true;
         }catch (RuntimeException e){
-            log.error("Token is invalid");
+            log.error("Неверный токен");
             log.error(e.getMessage() + "=>"+ e);
         }
 
@@ -74,7 +74,7 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         }catch (RuntimeException e){
-            log.error("Token is invalid");
+            log.error("Неверный токен");
             log.error(e.getMessage() + "=>"+ e);
         }
 
