@@ -20,6 +20,12 @@ public class DebetCardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
 
+    /**
+     * Согдание дебетовой карты
+     * @param token токен владельца
+     * @param rq данные для её создания
+     * @return новая карта
+     */
     public ResponseEntity<?> createDebetCard(String token, RqCreateDebetCard rq) {
         //Проверка на валидный пин-код//todo exception pin-code can be null!
         if (rq.getPincode().isEmpty())
@@ -57,6 +63,12 @@ public class DebetCardService {
         return ResponseEntity.ok(card);
     }
 
+    /**
+     * Удаление дебетовой карты
+     * @param ownerUserId id-владельца
+     * @param id id-карты
+     * @return сообщение
+     */
     public ResponseEntity<?> deleteDebetCard(Long ownerUserId, Long id) {
         Optional<CardEntity> card = repository.findById(id);
         if (!card.isPresent()) {
@@ -129,6 +141,16 @@ public class DebetCardService {
 
         return ResponseEntity.ok(cards);
     }
+
+    /**
+     * Метод для перевода денег с карты на карту
+     * @param token токен переводящего деньги
+     * @param pincode пин-код карты, с которой переводятся деньги
+     * @param id id-карты, с которой переводятся деньги
+     * @param value количество переводимых денег (в рублях)
+     * @param receivingId id-карты, на которую переводятся деньги
+     * @return сообщение об переводе и текущий баланс
+     */
     @Transactional
     public ResponseEntity<?> moneyTransfer(String token, String pincode, Long id, Long value, Long receivingId) {
         Optional<CardEntity> card = repository.findById(id);
@@ -188,6 +210,13 @@ public class DebetCardService {
         return ResponseEntity
                 .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
     }
+
+    /** Метод только для пользователей с ролями МОДЕР и ТЕСТЕР
+     * Создание денег из воздуха
+     * @param cardId карта, на которую зачисляются деньги
+     * @param value количество денег
+     * @return сообщение
+     */
     @Transactional
     public ResponseEntity<?> getMeMoney(Long cardId,  Long value) {
         Optional<CardEntity> card = repository.findById(cardId);

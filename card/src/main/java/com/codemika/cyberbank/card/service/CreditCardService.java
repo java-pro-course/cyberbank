@@ -18,6 +18,12 @@ public class CreditCardService {
     private final CardRepository repository;
     public final JwtUtil jwtUtil;
 
+    /**
+     * Создание кредитной карты
+     * @param token токен владельца (будущего)
+     * @param rq данные для её создарния
+     * @return созданная карта
+     */
     public ResponseEntity<?> createCreditCard(String token, RqCreateCreditCard rq) {
         //Проверка на валидный пин-код
         if (!rq.getPincode().toLowerCase().matches("[0-9]+"))
@@ -59,6 +65,12 @@ public class CreditCardService {
         return ResponseEntity.ok(card);
     }
 
+    /**
+     * Удаление дебетовых карт
+     * @param ownerUserId id владельца
+     * @param id id карты
+     * @return
+     */
     public ResponseEntity<?> deleteCreditCard(Long ownerUserId, Long id) {
         Optional<CardEntity> card = repository.findById(id);
         if (!card.isPresent()) {

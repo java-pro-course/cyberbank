@@ -27,7 +27,6 @@ public class AuthorizationService {
 
     /**
      * Регистрация пользователя
-     *
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
@@ -64,7 +63,6 @@ public class AuthorizationService {
 
     /**
      * Вход пользователя по токену
-     *
      * @param token токен
      * @return информация о пользователе
      */
@@ -95,6 +93,10 @@ public class AuthorizationService {
                 .body(result);
     }
 
+    /**
+     * Поиск всех пользователей на сайте
+     * @return все пользователи нашего банка
+     */
     public ResponseEntity<?> getAllUsers() {
         if (userRepository.findAll().isEmpty())
             return ResponseEntity
