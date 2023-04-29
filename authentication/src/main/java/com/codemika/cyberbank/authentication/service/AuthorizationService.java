@@ -1,6 +1,5 @@
 package com.codemika.cyberbank.authentication.service;
 
-import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
@@ -30,7 +29,6 @@ public class AuthorizationService {
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    @UserCheck()
     public ResponseEntity<?> registration( RqCreateUser rq){
         //TODO: Оформить все проверки
         if(!check){

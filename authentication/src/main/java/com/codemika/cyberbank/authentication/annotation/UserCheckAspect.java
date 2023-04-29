@@ -68,7 +68,7 @@ public class UserCheckAspect {
         if(userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Пожалуйста, проверьте свои номер телефона и электронную почту! Кто-то уже использует их!");
+                    .body("Пожалуйста, проверьте свои номер телефона и/или электронную почту! Кто-то уже использует их!");
         }
         //Пустота заполнения(null не нужно, т.к. могут быть только пустые строчки).
         if (user.getName().equals("") || user.getSurname().equals("")
@@ -127,7 +127,7 @@ public class UserCheckAspect {
                 || user.getPassword().equals(user.getPassword().toUpperCase())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Ваш пароль должен состоять из ЗАГЛАВНых и строчных букв!");
+                    .body("Ваш пароль должен состоять из ЗАГЛАВНЫХ и строчных букв!");
         }
         //Корректность номера телефона
         if(!numberCheck(user.getPhone())){
