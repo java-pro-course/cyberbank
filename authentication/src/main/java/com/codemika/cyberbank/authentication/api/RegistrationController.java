@@ -6,7 +6,7 @@ import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +22,8 @@ public class RegistrationController {
     private final UserRepository userRepository;
 
     @UserCheck // обязательная аннотация для проверки пользователя
-    @PutMapping("register")
+    @PostMapping("register")
     public ResponseEntity<?> registration(@RequestBody RqCreateUser rq){
-        return authorizationService.registration(rq); // вообще тут можно ничего не ставить
+        return null;//authorizationService.registration(rq); // вообще тут можно ничего не ставить
     }
 }

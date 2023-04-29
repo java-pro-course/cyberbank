@@ -30,7 +30,6 @@ public class AuthorizationService {
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    @UserCheck()
     public ResponseEntity<?> registration( RqCreateUser rq){
         //TODO: Оформить все проверки
         if(!check){
