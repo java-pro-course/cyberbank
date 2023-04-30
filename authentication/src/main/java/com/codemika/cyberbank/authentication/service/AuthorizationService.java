@@ -1,6 +1,5 @@
 package com.codemika.cyberbank.authentication.service;
 
-import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
@@ -10,6 +9,7 @@ import com.codemika.cyberbank.authentication.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
-@Service
+ 
 @Data
+@Service
+@RequiredArgsConstructor
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -27,11 +29,11 @@ public class AuthorizationService {
 
     /**
      * Регистрация пользователя
+     *
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    public ResponseEntity<?> registration( RqCreateUser rq){
-        //TODO: Оформить все проверки
+    public ResponseEntity<?> registration(RqCreateUser rq){
         if(!check){
             return errorMessage;
         }
@@ -56,12 +58,12 @@ public class AuthorizationService {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Успешная регистрация! Ваш токен для подтверждения личности: " + jwtUtil.generateToken(claims));
-
+                .body("Successful registration! Your token is: " + jwtUtil.generateToken(claims));
     }
 
     /**
      * Вход пользователя по токену
+     *
      * @param token токен
      * @return информация о пользователе
      */
@@ -69,38 +71,34 @@ public class AuthorizationService {
         if(!jwtUtil.validateToken(token)){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный токен!");
+                    .body("Token invalid!");
         }
 
         Claims claims = jwtUtil.getClaims(token);
 
+        Long id = claims.get("id", Long.class);
         String name = claims.get("name", String.class);
         String surname = claims.get("surname", String.class);
         String patronymic = claims.get("patronymic", String.class);
         String email = claims.get("email", String.class);
-        String phone = claims.get("phone", String.class);
 
         //TODO: Добавить карты, кредиты и т.д.
-                String result = String.format("Добро пожаловать, %s %s %s!\n" +
-                "Ваша эл. почта: %s\n" +
-                "Ваш номер телефона: %s\n" +
-                "Ваши карты: \n" +
-                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
+                String result = String.format("Welcome, %s %s %s!\n" +
+                "Your email: %s\n" +
+                "ID: %s\n" +
+                "Cards: \n" +
+                "New generated token: ", surname, name, patronymic, email, id) + jwtUtil.generateToken(claims);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(result);
     }
 
-    /**
-     * Поиск всех пользователей на сайте
-     * @return все пользователи нашего банка
-     */
     public ResponseEntity<?> getAllUsers() {
         if (userRepository.findAll().isEmpty())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body("У нас ещё нет ни одного пользователя... Хотите стать первым пользователем?😔");
+                    .body("We still have no users... Do u wanna sigh up?😔");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -109,6 +107,7 @@ public class AuthorizationService {
 
     /**
      * Поиск пользователя по id (только для модеров)
+     *
      * @param id идентификационный номер пользователя
      * @return искомого пользователя
      */
@@ -116,7 +115,7 @@ public class AuthorizationService {
         if (!userRepository.findById(id).isPresent())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body("Данный пользователь не существует!");
+                    .body("This user does not exist!");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -124,6 +123,7 @@ public class AuthorizationService {
     }
     /**
      * Поиск пользователя по эл. почте
+     *
      * @param email эл. почта
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -131,7 +131,7 @@ public class AuthorizationService {
         if (!userRepository.findByEmail(email).isPresent())
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Данный пользователь не существует!");
+                .body("This user does not exist!");
 
         UserEntity rq = userRepository.findByEmail(email).get();
         RsInfoUser rs = new RsInfoUser()
@@ -146,6 +146,7 @@ public class AuthorizationService {
 
     /**
      * Поиск пользователя по номеру телефона
+     *
      * @param phone номер телефона
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -153,7 +154,7 @@ public class AuthorizationService {
         if (!userRepository.findByPhone(phone).isPresent())
             return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Данный пользователь не существует!");
+                .body("This user does not exist!");
 
         UserEntity rq = userRepository.findByPhone(phone).get();
         RsInfoUser rs = new RsInfoUser()
