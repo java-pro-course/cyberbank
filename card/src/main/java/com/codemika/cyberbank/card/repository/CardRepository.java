@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<CardEntity, Long> {
     List<CardEntity> findAllByOwnerUserId(Long id);
     Optional<CardEntity> findCardByAccountNumber(String AccountNumber);
+    Optional<CardEntity> findAllByAccountNumber(String AccountNumber);
     @Modifying
     @Query("UPDATE CardEntity card SET card.balance = ?1 WHERE card.id = ?2")
     void moneyTransfer(Long value, Long id);
