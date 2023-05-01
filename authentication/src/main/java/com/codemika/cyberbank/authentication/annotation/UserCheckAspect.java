@@ -182,7 +182,7 @@ public class UserCheckAspect {
      * @return true/false
      */
     public static boolean numberCheck(String number){
-        Pattern ptrn = Pattern.compile("(0/300)?[7-9][0-9]{9}");
+        Pattern ptrn = Pattern.compile("(0/300)?[7-9]?[0-9]?{9}");
         Matcher match = ptrn.matcher(number);
 
         return match.find();
