@@ -5,7 +5,6 @@ import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.util.JwtUtil;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
@@ -58,7 +57,7 @@ public class AuthorizationService {
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body("Successful registration! Your token is: " + jwtUtil.generateToken(claims));
+                .body("Успешная регистрация! Ваш токен для подтверждения личности: " + jwtUtil.generateToken(claims));
     }
 
     /**
@@ -168,7 +167,9 @@ public class AuthorizationService {
     }
 
     //Валидация пользователя по id
-    public boolean validateUserById(Long id){
+    public Boolean validateUserByToken(String token){
+        Claims claims = jwtUtil.getClaims(token);
+        Long id = claims.get("id", Long.class);
         return userRepository.findById(id).isPresent();
     }
 }

@@ -15,4 +15,11 @@
         <module>gateway</module>
         <module>card</module>
     </modules>
+    <dependencies>
+        <dependency>
+            <groupId>io.appform.rules</groupId>
+            <artifactId>json-rules</artifactId>
+            <version>1.0.14</version>
+        </dependency>
+    </dependencies>
 </project>

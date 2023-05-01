@@ -4,26 +4,23 @@ import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import com.codemika.cyberbank.card.repository.CardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
     private final RestTemplate restTemplate = new RestTemplate();
-    private final String url = "localhost:8081/api/auth/validate-user/";
+    private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
     public final JwtUtil jwtUtil;
 
     /**
@@ -38,12 +35,12 @@ public class CardService {
         if(!rq.getPincode().toLowerCase().matches("[0-9]+"))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The pincode must consist of digits!!! For example 3856");
+                    .body("Пин-код должен состоять из цифр! Например: 3856");
 
         if(rq.getPincode().trim().length() != 4)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("The pincode must consist of 4 digits!!! For example 3856");
+                    .body("Длина пин-кода должна быть 4 цифры!!! Например: 3856");
 
         //Достаём id из токена
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -63,19 +60,21 @@ public class CardService {
         if(repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("This card number is already exists!");
+                    .body("Такая карта уже существует!");
         }
 
+        ResponseEntity<Boolean> response = restTemplate.getForEntity(url + token, Boolean.class);
 
         //Проверка валидности пользователя
-        boolean validation = restTemplate.getForObject(url + ownerUserId, Boolean.class);
-        if(!validation){
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.info(card.toString());
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("User is invalid!");
+                    .body("Такого пользователя не существует! Попробуйте снова.");
         }
 
         card = repository.save(card);
+
         return ResponseEntity.ok(card);
     }
 

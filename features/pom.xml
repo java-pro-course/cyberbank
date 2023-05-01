@@ -84,7 +84,12 @@
 			<artifactId>spring-security-crypto</artifactId>
 			<version>6.0.1</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>io.appform.rules</groupId>
+            <artifactId>json-rules</artifactId>
+            <version>1.0.14</version>
+        </dependency>
+    </dependencies>
 
 	<dependencyManagement>
 		<dependencies>

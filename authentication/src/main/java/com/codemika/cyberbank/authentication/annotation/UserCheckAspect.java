@@ -46,7 +46,7 @@ public class UserCheckAspect {
 
         RqCreateUser rq = (RqCreateUser) args[nameIndex];
 
-        if(bigCheck(rq).getBody().toString().contains("!")){
+        if(!bigCheck(rq).getStatusCode().is2xxSuccessful()){
             authorizationService.setCheck(false); // устанавливаем параметр проверки в сервисе
             authorizationService.setErrorMessage(bigCheck(rq)); // отправляем сообщение с ошибкой
             return authorizationService.registration(rq); // вызываем метод сервиса
@@ -68,7 +68,7 @@ public class UserCheckAspect {
         if(userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Пожалуйста, проверьте свои номер телефона и/или электронную почту! Кто-то уже использует их!");
+                    .body("Пожалуйста, проверьте свою контактную информацию. Такой человек уже существует!");
         }
         //Пустота заполнения(null не нужно, т.к. могут быть только пустые строчки).
         if (user.getName().equals("") || user.getSurname().equals("")
@@ -133,7 +133,7 @@ public class UserCheckAspect {
         if(!numberCheck(user.getPhone())){
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Ваш номер телефона должен состоять из цифр!");
+                    .body("Ваш номер телефона должен быть настоящим!");
         }
         //Корректность почты
         if (!user.getEmail().contains("@") || !user.getEmail().contains(".")) {
@@ -152,7 +152,7 @@ public class UserCheckAspect {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("Успешно!");
+                .body("Успешно.");
     }
 
     /**
