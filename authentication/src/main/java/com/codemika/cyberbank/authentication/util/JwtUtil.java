@@ -20,7 +20,6 @@ public class JwtUtil {
 
     /**
      * Создание нового токена. Используется при входе
-     *
      * Длительность токена 69,(4) дней
      * @param claims информация, содержащаяся в токене
      * @return Токен
@@ -70,7 +69,7 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         }catch (RuntimeException e){
-            log.error("Token is invalid");
+            log.error("Неверный токен");
             log.error(e.getMessage() + "=>"+ e);
         }
 

@@ -54,11 +54,6 @@
             <artifactId>lombok</artifactId>
             <version>1.18.22</version>
         </dependency>
-        <dependency>
-            <groupId>io.appform.rules</groupId>
-            <artifactId>json-rules</artifactId>
-            <version>1.0.14</version>
-        </dependency>
     </dependencies>
 
     <dependencyManagement>
