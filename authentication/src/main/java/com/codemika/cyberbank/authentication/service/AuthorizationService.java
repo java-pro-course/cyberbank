@@ -1,12 +1,10 @@
 package com.codemika.cyberbank.authentication.service;
 
-import com.codemika.cyberbank.authentication.annotation.UserCheck;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.dto.RsInfoUser;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.util.JwtUtil;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
@@ -17,8 +15,9 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
-@Service
+ 
 @Data
+@Service
 public class AuthorizationService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -27,11 +26,11 @@ public class AuthorizationService {
 
     /**
      * Регистрация пользователя
+     *
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    public ResponseEntity<?> registration( RqCreateUser rq){
-        //TODO: Оформить все проверки
+    public ResponseEntity<?> registration(RqCreateUser rq){
         if(!check){
             return errorMessage;
         }
@@ -57,11 +56,11 @@ public class AuthorizationService {
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
                 .body("Успешная регистрация! Ваш токен для подтверждения личности: " + jwtUtil.generateToken(claims));
-
     }
 
     /**
      * Вход пользователя по токену
+     *
      * @param token токен
      * @return информация о пользователе
      */
@@ -81,7 +80,7 @@ public class AuthorizationService {
         String phone = claims.get("phone", String.class);
 
         //TODO: Добавить карты, кредиты и т.д.
-                String result = String.format("Добро пожаловать, %s %s %s!\n" +
+        String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
                 "Ваши карты: \n" +
@@ -109,6 +108,7 @@ public class AuthorizationService {
 
     /**
      * Поиск пользователя по id (только для модеров)
+     *
      * @param id идентификационный номер пользователя
      * @return искомого пользователя
      */
@@ -124,6 +124,7 @@ public class AuthorizationService {
     }
     /**
      * Поиск пользователя по эл. почте
+     *
      * @param email эл. почта
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -146,6 +147,7 @@ public class AuthorizationService {
 
     /**
      * Поиск пользователя по номеру телефона
+     *
      * @param phone номер телефона
      * @return имя, фамилию и отчество требуемого пользователя
      */
@@ -167,7 +169,9 @@ public class AuthorizationService {
     }
 
     //Валидация пользователя по id
-    public boolean validateUserById(Long id){
+    public Boolean validateUserByToken(String token){
+        Claims claims = jwtUtil.getClaims(token);
+        Long id = claims.get("id", Long.class);
         return userRepository.findById(id).isPresent();
     }
 }

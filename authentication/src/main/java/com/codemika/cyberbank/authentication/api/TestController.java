@@ -39,6 +39,6 @@ public class TestController {
         return service.getUserByPhone(phone);
     }
     @GetMapping("validate-user")
-    public boolean validateUserById(@RequestParam Long id){return service.validateUserById(id);}
+    public Boolean validateUserByToken(@RequestParam String token){return service.validateUserByToken(token);}
 
 }
