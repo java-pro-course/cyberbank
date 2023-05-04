@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * Сервис для авторизации
  */
@@ -173,5 +175,52 @@ public class AuthorizationService {
         Claims claims = jwtUtil.getClaims(token);
         Long id = claims.get("id", Long.class);
         return userRepository.findById(id).isPresent();
+    }
+
+    /**
+     * Вход пользователя по номеру телефона и паролю
+     *
+     * @param phone номер телефона
+     * @param pass пароль
+     * @return Результат входа и, в случае успеха, новый токен
+     */
+    public ResponseEntity<?> login(String phone, String pass) {
+        if (!userRepository.findByPhone(phone).isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Пользователь с таким номером телефона не существует!");
+        }
+
+        if (!userRepository.findByPhone(phone).get().getPassword().equals(pass)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пароль или номер телефона неверны");
+        }
+
+        Optional<UserEntity> tmpUser = userRepository.findByPhone(phone);
+
+
+        Claims claims = Jwts.claims();
+        claims.put("id", tmpUser.get().getId());
+        claims.put("name", tmpUser.get().getName());
+        claims.put("surname", tmpUser.get().getSurname());
+        claims.put("patronymic", tmpUser.get().getPatronymic());
+        claims.put("email", tmpUser.get().getEmail());
+        claims.put("phone", tmpUser.get().getPhone());
+
+
+        //TODO: Добавить карты, кредиты и т.д.
+        String result = String.format("Добро пожаловать, %s %s %s!\n" +
+                "Ваша эл. почта: %s\n" +
+                "Ваш номер телефона: %s\n" +
+                "Ваши карты: \n" +
+                "Ваш новый токен: ",
+                tmpUser.get().getSurname(), tmpUser.get().getName(),
+                tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
+                phone) + jwtUtil.generateToken(claims);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
     }
 }
