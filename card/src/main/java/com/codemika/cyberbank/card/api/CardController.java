@@ -18,29 +18,32 @@ public class CardController {
 
     /**
      * Оформление(создание) новой карты
+     *
      * @param token токен пользователя, который оформляет карту
-     * @param rq все данные карты(название, тип(деб/кред), пин-код)
+     * @param rq    все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
      */
     @PostMapping("create")
     public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token,
-                                             @RequestBody RqCreateCard rq) throws JsonProcessingException {
+                                        @RequestBody RqCreateCard rq) throws JsonProcessingException {
         return cardService.createCard(token, rq);
     }
 
     /**
      * Удаление карты
+     *
      * @param ownerUserId id владельца
-     * @param id id карты
+     * @param id          id карты
      * @return
      */
     @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(Long id,Long ownerUserId){
+    public ResponseEntity<?> deleteCard(Long id, Long ownerUserId) {
         return ResponseEntity.ok(cardService.deleteCard(ownerUserId, id));
     }
 
     /**
      * Просмотр пользователем всех своих карт
+     *
      * @param token токен пользователя(чьи карты)
      * @return Все карты
      */

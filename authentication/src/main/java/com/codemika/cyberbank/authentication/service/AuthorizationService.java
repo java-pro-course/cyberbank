@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 /**
  * Сервис для авторизации
  */
- 
+
 @Data
 @Service
 public class AuthorizationService {
@@ -30,8 +30,8 @@ public class AuthorizationService {
      * @param rq запрос на создание пользователя
      * @return результат и новый токен
      */
-    public ResponseEntity<?> registration(RqCreateUser rq){
-        if(!check){
+    public ResponseEntity<?> registration(RqCreateUser rq) {
+        if (!check) {
             return errorMessage;
         }
 
@@ -64,8 +64,8 @@ public class AuthorizationService {
      * @param token токен
      * @return информация о пользователе
      */
-    public ResponseEntity<?> login(String token){
-        if(!jwtUtil.validateToken(token)){
+    public ResponseEntity<?> login(String token) {
+        if (!jwtUtil.validateToken(token)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Неверный токен!");
@@ -93,6 +93,7 @@ public class AuthorizationService {
 
     /**
      * Поиск всех пользователей на сайте
+     *
      * @return все пользователи нашего банка
      */
     public ResponseEntity<?> getAllUsers() {
@@ -122,6 +123,7 @@ public class AuthorizationService {
                 .status(HttpStatus.ACCEPTED)
                 .body(userRepository.findById(id));
     }
+
     /**
      * Поиск пользователя по эл. почте
      *
@@ -131,8 +133,8 @@ public class AuthorizationService {
     public ResponseEntity<?> getUserByEmail(String email) {
         if (!userRepository.findByEmail(email).isPresent())
             return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body("Данный пользователь не существует!");
+                    .status(HttpStatus.ACCEPTED)
+                    .body("Данный пользователь не существует!");
 
         UserEntity rq = userRepository.findByEmail(email).get();
         RsInfoUser rs = new RsInfoUser()
@@ -154,8 +156,8 @@ public class AuthorizationService {
     public ResponseEntity<?> getUserByPhone(String phone) {
         if (!userRepository.findByPhone(phone).isPresent())
             return ResponseEntity
-                .status(HttpStatus.ACCEPTED)
-                .body("Данный пользователь не существует!");
+                    .status(HttpStatus.ACCEPTED)
+                    .body("Данный пользователь не существует!");
 
         UserEntity rq = userRepository.findByPhone(phone).get();
         RsInfoUser rs = new RsInfoUser()
@@ -169,7 +171,7 @@ public class AuthorizationService {
     }
 
     //Валидация пользователя по id
-    public Boolean validateUserByToken(String token){
+    public Boolean validateUserByToken(String token) {
         Claims claims = jwtUtil.getClaims(token);
         Long id = claims.get("id", Long.class);
         return userRepository.findById(id).isPresent();

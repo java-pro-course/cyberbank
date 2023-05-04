@@ -23,22 +23,28 @@ public class TestController {
     }
 
     @GetMapping("get-all-users")
-    public ResponseEntity<?> getAllUsers(){
+    public ResponseEntity<?> getAllUsers() {
         return service.getAllUsers();
     }
+
     @GetMapping("get-user-by-id")
-    public ResponseEntity<?> getUserById(@RequestParam Long id){
+    public ResponseEntity<?> getUserById(@RequestParam Long id) {
         return service.getUserById(id);
     }
+
     @GetMapping("get-user-by-email")
-    public ResponseEntity<?> getUserByEmail(@RequestParam String email){
+    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
         return service.getUserByEmail(email);
     }
+
     @GetMapping("get-user-by-phone")
-    public ResponseEntity<?> getUserByPhone(@RequestParam String phone){
+    public ResponseEntity<?> getUserByPhone(@RequestParam String phone) {
         return service.getUserByPhone(phone);
     }
+
     @GetMapping("validate-user")
-    public Boolean validateUserByToken(@RequestParam String token){return service.validateUserByToken(token);}
+    public Boolean validateUserByToken(@RequestParam String token) {
+        return service.validateUserByToken(token);
+    }
 
 }

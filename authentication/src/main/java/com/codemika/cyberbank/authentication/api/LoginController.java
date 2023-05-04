@@ -18,7 +18,7 @@ public class LoginController {
     private final AuthorizationService authorizationService;
 
     @GetMapping("login")
-    public ResponseEntity<?> loginWithToken(String token){
+    public ResponseEntity<?> loginWithToken(String token) {
         return authorizationService.login(token);
     }
 
