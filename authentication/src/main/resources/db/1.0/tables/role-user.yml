@@ -1,5 +1,5 @@
 databaseChangeLog:
-  - logicalFilePath: 1.0/tables/role-user
+  - logicalFilePath: tables/role-user
   - changeSet:
       id: role-user-0
       author: svarog916
