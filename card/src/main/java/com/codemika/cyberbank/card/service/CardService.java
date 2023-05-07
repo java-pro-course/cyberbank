@@ -78,6 +78,12 @@ public class CardService {
         return ResponseEntity.ok(card);
     }
 
+    public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
+        Optional<CardEntity> card = repository.findById(id);
+        card.updateCardTitle();
+        return null;
+    }
+
     /**
      * Удаление карты
      *
