@@ -29,6 +29,17 @@ public class CardController {
     }
 
     /**
+     * Изменение названия карты
+     * @param id - id карты
+     * @param newTitle - новое название карты
+     * @return - изменение названия карты
+     */
+    @PostMapping("change-card-title")
+    public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
+        return cardService.changeCardTitle(id, newTitle);
+    }
+
+    /**
      * Удаление карты
      * @param ownerUserId id владельца
      * @param id id карты

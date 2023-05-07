@@ -79,12 +79,18 @@ public class CardService {
         return ResponseEntity.ok(card);
     }
 
+    /**
+     * Изменение названия карты
+     * @param id - id карты
+     * @param newTitle - новое название карты
+     * @return - сообщение об изменении названия карты
+     */
     public ResponseEntity<?> changeCardTitle(Long id, String newTitle) {
         Optional<CardEntity> card = repository.findById(id);
         if (!card.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с таким id не существует");
+                    .body("Карты с таким id не существует!");
         }
         repository.updateCardTitle(newTitle, card.get().getId());
         return ResponseEntity.ok("Название карты изменено.");
