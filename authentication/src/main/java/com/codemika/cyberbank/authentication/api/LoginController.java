@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
     private final AuthorizationService authorizationService;
 
-    @GetMapping("login")
+    @GetMapping("login/token")
     public ResponseEntity<?> loginWithToken(String token){
         return authorizationService.login(token);
     }
