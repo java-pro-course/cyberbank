@@ -85,7 +85,7 @@ public class AuthorizationService {
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
-                "Ваши карты: \n" +
+                //"Ваши карты: \n" +
                 "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
 
         return ResponseEntity
@@ -101,7 +101,7 @@ public class AuthorizationService {
         if (userRepository.findAll().isEmpty())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
-                    .body("У нас ещё нет ни одного пользователя... Хотите стать первым пользователем?😔");
+                    .body("У нас ещё нет ни одного пользователя... Хотите стать первым?🥺");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
@@ -213,7 +213,7 @@ public class AuthorizationService {
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
-                "Ваши карты: \n" +
+                //"Ваши карты: \n" +
                 "Ваш новый токен: ",
                 tmpUser.get().getSurname(), tmpUser.get().getName(),
                 tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
