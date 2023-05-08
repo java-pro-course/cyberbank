@@ -18,8 +18,9 @@ public class CardController {
 
     /**
      * Оформление(создание) новой карты
+     *
      * @param token токен пользователя, который оформляет карту
-     * @param rq все данные карты(название, тип(деб/кред), пин-код)
+     * @param rq    все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
      */
     @PostMapping("create/debit")
@@ -31,6 +32,18 @@ public class CardController {
     public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
                                              @RequestBody RqCreateCreditCard rq) {
         return cardService.createCredit(token, rq);
+
+    }
+
+    /**
+     * Изменение названия карты
+     * @param id - id карты
+     * @param newTitle - новое название карты
+     * @return - изменение названия карты
+     */
+    @PostMapping("change-card-title")
+    public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
+        return cardService.changeCardTitle(id, newTitle);
     }
 
     /**
@@ -46,6 +59,7 @@ public class CardController {
 
     /**
      * Просмотр пользователем всех своих карт
+     *
      * @param token токен пользователя(чьи карты)
      * @return Все карты
      */

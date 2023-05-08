@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +30,7 @@ public class CardService {
      * Создание дебетовой карты
      *
      * @param token пользователя(будущего владельца)
-     * @param rq параметры карты
+     * @param rq    параметры карты
      * @return Созданную карту
      */
     public ResponseEntity<?> createDebit(String token, RqCreateDebitCard rq) {
@@ -48,7 +49,7 @@ public class CardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пин-код должен состоять из цифр! Например: 3856");
 
-        if(rq.getPincode().trim().length() != 4)
+        if (rq.getPincode().trim().length() != 4)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Длина пин-кода должна быть 4 цифры!!! Например: 3856");
@@ -77,7 +78,7 @@ public class CardService {
                         generateAccountNumber(16)
                 );
 
-        if(repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()){
+        if (repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Такая карта уже существует!");
@@ -243,6 +244,22 @@ public class CardService {
 
         return ResponseEntity
                 .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
+}
+     /**
+     * Изменение названия карты
+     * @param id - id карты
+     * @param newTitle - новое название карты
+     * @return - сообщение об изменении названия карты
+     */
+    public ResponseEntity<?> changeCardTitle(Long id, String newTitle) {
+        Optional<CardEntity> card = repository.findById(id);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким id не существует!");
+        }
+        repository.updateCardTitle(newTitle, card.get().getId());
+        return ResponseEntity.ok("Название карты изменено.");
     }
 
     /**
@@ -304,13 +321,15 @@ public class CardService {
         List<CardEntity> cards = repository.findAllByOwnerUserId(id);
 
         if (cards.isEmpty()) return ResponseEntity
-                                        .status(HttpStatus.NOT_FOUND)
-                                        .body("У вас ещё нету не одной карты! Желаете оформить?");
+                .status(HttpStatus.NOT_FOUND)
+                .body("This user have no cards!");
 
         return ResponseEntity.ok(cards);
     }
     //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
-    /** ТОЛЬКО ДЛЯ МОДЕРОВ
+
+    /**
+     * ТОЛЬКО ДЛЯ МОДЕРОВ
      * Получение ВСЕХ карт в банке
      *
      * @return Все карты банка
@@ -319,8 +338,8 @@ public class CardService {
         List<CardEntity> cards = repository.findAll();
 
         if (cards.isEmpty()) return ResponseEntity
-                                        .status(HttpStatus.NOT_FOUND)
-                                        .body("В банке отсутствуют какие-либо карты!");
+                .status(HttpStatus.NOT_FOUND)
+                .body("All users have no cards!");
 
         return ResponseEntity.ok(cards);
     }

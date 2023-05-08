@@ -23,7 +23,7 @@ public class RegistrationController {
 
     @UserCheck // обязательная аннотация для проверки пользователя
     @PostMapping("register")
-    public ResponseEntity<?> registration(@RequestBody RqCreateUser rq){
+    public ResponseEntity<?> registration(@RequestBody RqCreateUser rq) {
         return null;//authorizationService.registration(rq); // вообще тут можно ничего не ставить
     }
 }
