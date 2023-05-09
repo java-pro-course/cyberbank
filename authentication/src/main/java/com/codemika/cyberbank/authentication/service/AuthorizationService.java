@@ -2,7 +2,11 @@ package com.codemika.cyberbank.authentication.service;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
 import com.codemika.cyberbank.authentication.dto.RsInfoUser;
+import com.codemika.cyberbank.authentication.entity.RoleEntity;
+import com.codemika.cyberbank.authentication.entity.RoleUserEntity;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
+import com.codemika.cyberbank.authentication.repository.RoleRepository;
+import com.codemika.cyberbank.authentication.repository.RoleUserRepository;
 import com.codemika.cyberbank.authentication.repository.UserRepository;
 import com.codemika.cyberbank.authentication.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -22,6 +26,8 @@ import java.util.Optional;
 @Service
 public class AuthorizationService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final RoleUserRepository roleUserRepository;
     private final JwtUtil jwtUtil;
     private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
@@ -45,7 +51,17 @@ public class AuthorizationService {
                 .setPhone(rq.getPhone())
                 .setPassword(rq.getPassword());
 
+        Optional<RoleEntity> role = roleRepository.findByRole("USER");
+        if (!role.isPresent()) {
+            return ResponseEntity.badRequest().body("Данная роль не существует");
+        }
+
         userRepository.save(newUser);
+        RoleUserEntity roleUser = new RoleUserEntity()
+                .setUser(newUser)
+                .setRole(role.get());
+
+        roleUserRepository.save(roleUser);
 
         Claims claims = Jwts.claims();
         claims.put("id", newUser.getId());
