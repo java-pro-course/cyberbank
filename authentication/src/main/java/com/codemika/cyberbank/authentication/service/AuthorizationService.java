@@ -54,6 +54,7 @@ public class AuthorizationService {
         claims.put("patronymic", newUser.getPatronymic());
         claims.put("email", newUser.getEmail());
         claims.put("phone", newUser.getPhone());
+        claims.put("role", "USER");
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)

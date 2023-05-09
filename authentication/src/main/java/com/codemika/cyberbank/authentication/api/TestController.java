@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.authentication.api;
 
+import com.codemika.cyberbank.authentication.annotation.CheckRole;
 import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
@@ -22,21 +23,25 @@ public class TestController {
         return ResponseEntity.ok("Hello from auth!");
     }
 
+    @CheckRole(role = "MODER")
     @GetMapping("get-all-users")
     public ResponseEntity<?> getAllUsers() {
         return service.getAllUsers();
     }
 
+    @CheckRole(role = "MODER")
     @GetMapping("get-user-by-id")
     public ResponseEntity<?> getUserById(@RequestParam Long id) {
         return service.getUserById(id);
     }
 
+    @CheckRole(role = "MODER")
     @GetMapping("get-user-by-email")
     public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
         return service.getUserByEmail(email);
     }
 
+    @CheckRole(role = "MODER")
     @GetMapping("get-user-by-phone")
     public ResponseEntity<?> getUserByPhone(@RequestParam String phone) {
         return service.getUserByPhone(phone);

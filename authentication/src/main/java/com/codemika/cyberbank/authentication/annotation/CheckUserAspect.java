@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Slf4j
 @Data
-public class UserCheckAspect {
+public class CheckUserAspect {
     private final AuthorizationService authorizationService;
     private final UserRepository userRepository;
 
@@ -33,16 +33,16 @@ public class UserCheckAspect {
      * Основной метод класса(связующее звено)
      *
      * @param proceedingJoinPoint
-     * @param userCheck
+     * @param checkUser
      * @return результат регистрации
      */
     @Around(value = "@annotation(userCheck)")
-    public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, UserCheck userCheck){
+    public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, CheckUser checkUser){
         //Используется для поиска параметра по имени в аннотации
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
         Object[] args = proceedingJoinPoint.getArgs();
         String[] parameterNames = methodSignature.getParameterNames();
-        int nameIndex = Arrays.asList(parameterNames).indexOf(userCheck.name());
+        int nameIndex = Arrays.asList(parameterNames).indexOf(checkUser.name());
 
         RqCreateUser rq = (RqCreateUser) args[nameIndex];
 
