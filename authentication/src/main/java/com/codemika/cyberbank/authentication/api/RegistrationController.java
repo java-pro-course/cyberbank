@@ -18,12 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/auth/")
 @RequiredArgsConstructor
 public class RegistrationController {
-    private final AuthorizationService authorizationService;
-    private final UserRepository userRepository;
 
     @CheckUser // обязательная аннотация для проверки пользователя
     @PostMapping("register")
     public ResponseEntity<?> registration(@RequestBody RqCreateUser rq) {
-        return null;//authorizationService.registration(rq); // вообще тут можно ничего не ставить
+        return null;
     }
 }
