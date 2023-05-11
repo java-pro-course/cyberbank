@@ -80,13 +80,13 @@ public class CardController {
         return cardService.getAllCards(token);
     }
     /**
-     * Метод для перевода денег с карты на карту
-     * @param token токен переводящего деньги
-     * @param pincode пин-код карты, с которой переводятся деньги
-     * @param senderId id-карты, с которой переводятся деньги
-     * @param value количество переводимых денег (в рублях)
-     * @param receivingId id-карты, на которую переводятся деньги
-     * @return сообщение об переводе и текущий баланс
+     * Метод для перевода денег с карты на карту по id
+     * @param token - токен пользователя, переводящего деньги
+     * @param pincode - пин-код карты, с которой переводятся деньги
+     * @param senderId - id карты, с которой переводятся деньги
+     * @param value - сумма перевода (в рублях)
+     * @param receivingId - id карты, на которую переводятся деньги
+     * @return - перевод средств
      */
     @PostMapping("money-transfer")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
@@ -95,6 +95,24 @@ public class CardController {
                                            Long value,
                                            Long receivingId) {
         return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
+    }
+
+    /**
+     * Метод для перевода денег с карты на карту по номерам карт
+     * @param token - токен пользователя, переводящего деньги
+     * @param pincode - пин-код карты, с которой переводятся деньги
+     * @param senderAccountNumber - номер карты, с которой переводятся деньги
+     * @param value - сумма перевода (в рублях)
+     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
+     * @return - перевод средств
+     */
+    @PostMapping("money-transfer")
+    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+                                           String pincode,
+                                           String senderAccountNumber,
+                                           Long value,
+                                           String receivingAccountNumber) {
+        return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
     }
 
     //Для тестов

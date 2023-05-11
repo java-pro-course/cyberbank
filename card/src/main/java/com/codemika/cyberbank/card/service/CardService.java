@@ -178,13 +178,13 @@ public class CardService {
     }
 
     /**
-     * Метод для перевода денег с карты на карту
-     * @param token токен переводящего деньги
-     * @param pincode пин-код карты, с которой переводятся деньги
-     * @param id id-карты, с которой переводятся деньги
-     * @param value количество переводимых денег (в рублях)
-     * @param receivingId id-карты, на которую переводятся деньги
-     * @return сообщение об переводе и текущий баланс
+     * Метод для перевода денег с карты на карту по id
+     * @param token - токен пользователя, переводящего деньги
+     * @param pincode - пин-код карты, с которой переводятся деньги
+     * @param id - id карты, с которой переводятся деньги
+     * @param value - количество переводимых денег (в рублях)
+     * @param receivingId - id карты, на которую переводятся деньги
+     * @return - сообщение о переводе и текущем балансе
      */
     @Transactional
     public ResponseEntity<?> moneyTransfer(String token, String pincode, Long id, Long value, Long receivingId) {
@@ -206,7 +206,7 @@ public class CardService {
         if (!card.isPresent())
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с id: " + id + " не существует");
+                    .body("Карты с id " + id + " не существует");
 
         if (!pincode.equals(card.get().getPincode()))
             return ResponseEntity
@@ -216,12 +216,12 @@ public class CardService {
         if (!receivingCard.isPresent())
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с id: " + receivingId + " не существует");
+                    .body("Карты с id " + receivingId + " не существует");
 
         if (!card.get().getOwnerUserId().equals(ownerUserId))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Пользователь с id: " + ownerUserId + " не обладает картой с id: " + id);
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id: " + id);
 
         if (card.get().getBalance() < value)
             return ResponseEntity
@@ -245,6 +245,75 @@ public class CardService {
         return ResponseEntity
                 .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
 }
+
+    /**
+     * Метод для перервода денег с карты на карту по номерам карт
+     * @param token - токен пользователя, переводящего деньги
+     * @param pincode - пин-код карты, с которой переводятся деньги
+     * @param accountNumber - номер карты, с которой переводятся деньги
+     * @param value - количество переводимых денег (в рублях)
+     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
+     * @return - сообщение о переводе и текущем балансе
+     */
+    @Transactional
+    public ResponseEntity<?> moneyTransfer(String token, String pincode, String accountNumber, Long value, String receivingAccountNumber) {
+        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
+        Optional<CardEntity> receivingCard = repository.findCardByAccountNumber(receivingAccountNumber);
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+        if (value == null)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Некорректная сумма перевода");
+        if(value <= 0)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с номером карты " + accountNumber + " не существует");
+
+        if (!pincode.equals(card.get().getPincode()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный пин-код");
+
+        if (!receivingCard.isPresent())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с номером карты " + receivingAccountNumber + " не существует");
+
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты: " + accountNumber);
+
+        if (card.get().getBalance() < value)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("На карте недостаточно средств");
+
+        if (accountNumber.equals(receivingAccountNumber))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        receivingCard
+                .get()
+                .setBalance(receivingCard.get().getBalance() + value);
+        card.get()
+                .setBalance(card.get().getBalance() - value);
+
+        repository.moneyTransfer(card.get().getBalance(), card.get().getId());
+        repository.moneyTransfer(receivingCard.get().getBalance(), receivingCard.get().getId());
+
+        return ResponseEntity
+                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
+    }
      /**
      * Изменение названия карты
      * @param id - id карты
