@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Accessors(chain = true)
-@Table(schema = "cyberbank_auth", name = "role-user")
+@Table(schema = "cyberbank_auth", name = "role_user")
 public class RoleUserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

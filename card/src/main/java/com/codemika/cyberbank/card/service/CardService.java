@@ -322,7 +322,7 @@ public class CardService {
 
         if (cards.isEmpty()) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body("This user have no cards!");
+                .body("У вас нет карт!");
 
         return ResponseEntity.ok(cards);
     }

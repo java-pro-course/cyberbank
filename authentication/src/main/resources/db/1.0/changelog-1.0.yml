@@ -6,5 +6,5 @@ databaseChangeLog:
       file: tables/role.yml
       relativeToChangelogFile: true
   - include:
-      file: tables/role-user.yml
+      file: tables/role_user.yml
       relativeToChangelogFile: true

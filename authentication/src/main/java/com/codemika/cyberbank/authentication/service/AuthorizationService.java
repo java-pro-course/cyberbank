@@ -52,11 +52,13 @@ public class AuthorizationService {
                 .setPassword(rq.getPassword());
 
         Optional<RoleEntity> role = roleRepository.findByRole("USER");
+
         if (!role.isPresent()) {
             return ResponseEntity.badRequest().body("Данная роль не существует");
         }
 
         userRepository.save(newUser);
+
         RoleUserEntity roleUser = new RoleUserEntity()
                 .setUser(newUser)
                 .setRole(role.get());
@@ -91,6 +93,10 @@ public class AuthorizationService {
         }
 
         Claims claims = jwtUtil.getClaims(token);
+
+        if (jwtUtil.getClaims(token).get("role", String.class) == null){
+            claims.put("role", "USER");
+        }
 
         String name = claims.get("name", String.class);
         String surname = claims.get("surname", String.class);

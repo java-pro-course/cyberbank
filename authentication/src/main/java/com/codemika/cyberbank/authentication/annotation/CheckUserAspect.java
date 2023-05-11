@@ -36,7 +36,7 @@ public class CheckUserAspect {
      * @param checkUser
      * @return результат регистрации
      */
-    @Around(value = "@annotation(userCheck)")
+    @Around(value = "@annotation(checkUser)")
     public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, CheckUser checkUser){
         //Используется для поиска параметра по имени в аннотации
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();

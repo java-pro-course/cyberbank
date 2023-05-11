@@ -2,12 +2,11 @@ package com.codemika.cyberbank.authentication.api;
 
 import com.codemika.cyberbank.authentication.annotation.CheckRole;
 import com.codemika.cyberbank.authentication.service.AuthorizationService;
+import com.codemika.cyberbank.authentication.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Контроллер для тестирования
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "api/auth/") // перед всеми контроллерами этого метода будет ставиться этот префикс!
 public class TestController {
     private final AuthorizationService service;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("test") // полный url: http://localhost:8080/api/auth/test
     public ResponseEntity<?> testController() {
@@ -52,4 +52,9 @@ public class TestController {
         return service.validateUserByToken(token);
     }
 
+    @GetMapping("get-token-claims")
+    public ResponseEntity<?> beLuckyMethod(@RequestHeader("Authorization") String token) {
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        return ResponseEntity.ok(claimsParseToken.toString());
+    }
 }

@@ -2,6 +2,7 @@ package com.codemika.cyberbank.authentication.entity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * Entity для пользователя
@@ -35,4 +36,7 @@ public class UserEntity {
 
     @Column(name = "password")
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<RoleUserEntity> userRoles;
 }
