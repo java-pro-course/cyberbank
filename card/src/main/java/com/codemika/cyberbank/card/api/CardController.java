@@ -36,7 +36,7 @@ public class CardController {
     }
 
     /**
-     * Изменение названия карты
+     * Изменение названия карты по id карты
      * @param id - id карты
      * @param newTitle - новое название карты
      * @return - изменение названия карты
@@ -44,6 +44,39 @@ public class CardController {
     @PostMapping("change-card-title")
     public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
         return cardService.changeCardTitle(id, newTitle);
+    }
+
+    /**
+     * Изменение названия карты по номеру карты
+     * @param accountNumber - номер карты
+     * @param newTitle - новое название карты
+     * @return - изменение названия карты
+     */
+    @PostMapping("change-card-title")
+    public ResponseEntity<?> changeCardTitle(String accountNumber, String newTitle){
+        return cardService.changeCardTitle(accountNumber, newTitle);
+    }
+
+    /**
+     * Изменение пин-кода карты по id карты
+     * @param id - id карты
+     * @param newPinCode - новый пин-код карты
+     * @return - изменение пин-кода карты
+     */
+    @PostMapping("change-card-pincode")
+    public ResponseEntity<?> changePinCode(Long id, String newPinCode){
+        return cardService.changeCardPinCode(id, newPinCode);
+    }
+
+    /**
+     * Изменение пин-кода карты по номеру карты
+     * @param accountNumber - номер карты
+     * @param newPinCode - новый пин-код карты
+     * @return - изменение карты
+     */
+    @PostMapping("change-card-pincode")
+    public ResponseEntity<?> changePinCode(String accountNumber, String newPinCode){
+        return cardService.changeCardPinCode(accountNumber, newPinCode);
     }
 
     /**

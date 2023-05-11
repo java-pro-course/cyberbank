@@ -246,7 +246,7 @@ public class CardService {
                 .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
 }
      /**
-     * Изменение названия карты
+     * Изменение названия карты по id
      * @param id - id карты
      * @param newTitle - новое название карты
      * @return - сообщение об изменении названия карты
@@ -260,6 +260,57 @@ public class CardService {
         }
         repository.updateCardTitle(newTitle, card.get().getId());
         return ResponseEntity.ok("Название карты изменено.");
+    }
+
+    /**
+     * Изменение названия карты по номеру карты
+     * @param accountNumber - номер карты
+     * @param newTitle - новое название карты
+     * @return - сообщение об изменении названия карты
+     */
+    public ResponseEntity<?> changeCardTitle(String accountNumber, String newTitle) {
+        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким номером не существует!");
+        }
+        repository.updateCardTitle(newTitle, card.get().getId());
+        return ResponseEntity.ok("Название карты изменено.");
+    }
+
+    /**
+     * Изменение пин-кода по id карты
+     * @param id - id карты
+     * @param newPinCode - новый пин-код карты
+     * @return - сообщение об изменении пин-кода карты
+     */
+    public ResponseEntity<?> changeCardPinCode(Long id, String newPinCode) {
+        Optional<CardEntity> card = repository.findById(id);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким id не существует!");
+        }
+        repository.updateCardPinCode(newPinCode, card.get().getId());
+        return ResponseEntity.ok("Пин-код карты изменен.");
+    }
+
+    /**
+     * Изменение пин-кода карты по номеру карты
+     * @param accountNumber - номер карты
+     * @param newPinCode - новый пин-код карты
+     * @return - сообщение об изменении пин-кода карты
+     */
+    public ResponseEntity<?> changeCardPinCode(String accountNumber, String newPinCode) {
+        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким номером не существует!");
+        }
+        repository.updateCardPinCode(newPinCode, card.get().getId());
+        return ResponseEntity.ok("Пин-код карты изменен.");
     }
 
     /**
