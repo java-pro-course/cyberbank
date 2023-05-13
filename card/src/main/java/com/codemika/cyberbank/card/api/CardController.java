@@ -25,13 +25,13 @@ public class CardController {
      * @return созданную карту
      */
     @CheckRole(role = "USER")
-    @PostMapping("create/debit")
+    @PostMapping("create-debit")
     public ResponseEntity<?> createDebit(@RequestHeader("Authorization") String token,//проверка на налы.1
                                              @RequestBody RqCreateDebitCard rq) {
         return cardService.createDebit(token, rq);
     }
     @CheckRole(role = "USER")
-    @PostMapping("create/credit")
+    @PostMapping("create-credit")
     public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
                                              @RequestBody RqCreateCreditCard rq) {
         return cardService.createCredit(token, rq);

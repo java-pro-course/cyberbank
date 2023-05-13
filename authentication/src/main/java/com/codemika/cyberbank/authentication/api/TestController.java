@@ -57,4 +57,8 @@ public class TestController {
         Claims claimsParseToken = jwtUtil.getClaims(token);
         return ResponseEntity.ok(claimsParseToken.toString());
     }
+    @PostMapping("become-moder")
+    public ResponseEntity<?> becomeModer(@RequestHeader("Authorization") String token, Long idNewModer){
+        return service.becomeModer(idNewModer);
+    }
 }

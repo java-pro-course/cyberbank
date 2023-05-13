@@ -80,7 +80,60 @@ public class AuthorizationService {
     }
 
     /**
-     * Вход пользователя по токену
+     * Вход пользователя по номеру телефона и паролю
+     *
+     * @param phone номер телефона
+     * @param pass пароль
+     * @return Результат входа и, в случае успеха, новый токен
+     */
+    public ResponseEntity<?> login(String phone, String pass) {
+        Optional<UserEntity> tmpUser = userRepository.findByPhone(phone);
+        if (!tmpUser.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Пользователь с таким номером телефона не существует!");
+        }
+
+        if (!tmpUser.get().getPassword().equals(pass)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пароль или номер телефона неверны");
+        }
+
+        Optional<RoleUserEntity> roleUser = roleUserRepository.getRoleUserEntitiesByUser(tmpUser.get());
+        String role;
+        if (roleUser.isPresent()){
+            role = roleUser.get().getRole().getRole();
+        } else {
+            role = "USER";
+        }
+
+        Claims claims = Jwts.claims();
+        claims.put("id", tmpUser.get().getId());
+        claims.put("name", tmpUser.get().getName());
+        claims.put("surname", tmpUser.get().getSurname());
+        claims.put("patronymic", tmpUser.get().getPatronymic());
+        claims.put("email", tmpUser.get().getEmail());
+        claims.put("phone", tmpUser.get().getPhone());
+        claims.put("role", role);
+
+        //TODO: Добавить карты, кредиты и т.д.
+        String result = String.format("Добро пожаловать, %s %s %s!\n" +
+                        "Ваша эл. почта: %s\n" +
+                        "Ваш номер телефона: %s\n" +
+                        //"Ваши карты: \n" +
+                        "Ваш новый токен: ",
+                tmpUser.get().getSurname(), tmpUser.get().getName(),
+                tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
+                phone) + jwtUtil.generateToken(claims);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(result);
+    }
+
+    /**
+     * Вход пользователя по токену (Просто смена токена и выдача инфы)
      *
      * @param token токен
      * @return информация о пользователе
@@ -202,50 +255,17 @@ public class AuthorizationService {
         return userRepository.findById(id).isPresent();
     }
 
-    /**
-     * Вход пользователя по номеру телефона и паролю
-     *
-     * @param phone номер телефона
-     * @param pass пароль
-     * @return Результат входа и, в случае успеха, новый токен
-     */
-    public ResponseEntity<?> login(String phone, String pass) {
-        if (!userRepository.findByPhone(phone).isPresent()) {
+    public ResponseEntity<?> becomeModer(Long idNewModer) {
+        Optional<UserEntity> user = userRepository.findById(idNewModer);
+        if (!user.isPresent()){
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Пользователь с таким номером телефона не существует!");
+                    .body("Данный пользователь не существует!");
         }
-
-        if (!userRepository.findByPhone(phone).get().getPassword().equals(pass)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пароль или номер телефона неверны");
-        }
-
-        Optional<UserEntity> tmpUser = userRepository.findByPhone(phone);
-
-
-        Claims claims = Jwts.claims();
-        claims.put("id", tmpUser.get().getId());
-        claims.put("name", tmpUser.get().getName());
-        claims.put("surname", tmpUser.get().getSurname());
-        claims.put("patronymic", tmpUser.get().getPatronymic());
-        claims.put("email", tmpUser.get().getEmail());
-        claims.put("phone", tmpUser.get().getPhone());
-
-
-        //TODO: Добавить карты, кредиты и т.д.
-        String result = String.format("Добро пожаловать, %s %s %s!\n" +
-                "Ваша эл. почта: %s\n" +
-                "Ваш номер телефона: %s\n" +
-                //"Ваши карты: \n" +
-                "Ваш новый токен: ",
-                tmpUser.get().getSurname(), tmpUser.get().getName(),
-                tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
-                phone) + jwtUtil.generateToken(claims);
-
+        Optional<RoleUserEntity> roleUser = roleUserRepository.getRoleUserEntitiesByUser(user.get());
+        roleUserRepository.updateUserRole(new RoleEntity().setRole("MODER"), roleUser.get().getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(result);
+                .body(String.format("Пользователь %s успешно получил роль MODER!", idNewModer));
     }
 }

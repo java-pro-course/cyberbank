@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ErrorHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleALlExceptions(Exception e) {
-        log.error("Exception! Message: " + e.getMessage());
+        log.error("Exception in " + e.getLocalizedMessage() + "! Message: " + e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(e.getMessage());

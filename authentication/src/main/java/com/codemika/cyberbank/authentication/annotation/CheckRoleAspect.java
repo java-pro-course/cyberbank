@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 
 @Aspect
@@ -57,13 +56,31 @@ public class CheckRoleAspect {
         Claims claims = jwtUtil.getClaims(token);
 
         String role = claims.get("role", String.class);
-        if (Objects.equals(role, checkRole.role())
-                || Objects.equals(role, TESTER)
-                || Objects.equals(role, HACKER)) {
+        if (role == null || role.isEmpty()){
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Ваш последний сеанс истёк. Пожалуйста, войдите в свой аккаунт заново!");
+        }
+        if (getRoleAccessLevel(role) >= getRoleAccessLevel(checkRole.role())) {
             return proceedingJoinPoint.proceed();
         } else {
             //403 - Forbidden - Доступ запрещён
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Вы не имеете доступа к данной функции.");
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Вы не имеете доступа к данной функции.");
         }
+    }
+
+    /**
+     * Определение уровня доступа роли
+     * @param role роль
+     * @return уровень доступа(целый от 0 до 3)
+     */
+    public int getRoleAccessLevel(String role){
+        if (role.equals(USER)) return 0;
+        if (role.equals(MODER)) return 1;
+        if (role.equals(TESTER)) return 2;
+        if (role.equals(HACKER)) return 3;
+        return 0;
     }
 }
