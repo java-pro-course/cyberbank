@@ -41,9 +41,9 @@ public class CardController {
      * @param newTitle - новое название карты
      * @return - изменение названия карты
      */
-    @PostMapping("change-card-title")
-    public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
-        return cardService.changeCardTitle(id, newTitle);
+    @PostMapping("change-card-title-by-id")
+    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
+        return cardService.changeCardTitle(token, id, newTitle);
     }
 
     /**
@@ -52,9 +52,9 @@ public class CardController {
      * @param newTitle - новое название карты
      * @return - изменение названия карты
      */
-    @PostMapping("change-card-title")
-    public ResponseEntity<?> changeCardTitle(String accountNumber, String newTitle){
-        return cardService.changeCardTitle(accountNumber, newTitle);
+    @PostMapping("change-card-title-by-account-number")
+    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
+        return cardService.changeCardTitle(token, accountNumber, newTitle);
     }
 
     /**
@@ -63,9 +63,9 @@ public class CardController {
      * @param newPinCode - новый пин-код карты
      * @return - изменение пин-кода карты
      */
-    @PostMapping("change-card-pincode")
-    public ResponseEntity<?> changePinCode(Long id, String newPinCode){
-        return cardService.changeCardPinCode(id, newPinCode);
+    @PostMapping("change-card-pincode-by-id")
+    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
+        return cardService.changeCardPinCode(token, id, pincode, newPinCode);
     }
 
     /**
@@ -74,9 +74,9 @@ public class CardController {
      * @param newPinCode - новый пин-код карты
      * @return - изменение карты
      */
-    @PostMapping("change-card-pincode")
-    public ResponseEntity<?> changePinCode(String accountNumber, String newPinCode){
-        return cardService.changeCardPinCode(accountNumber, newPinCode);
+    @PostMapping("change-card-pincode-by-account-number")
+    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
+        return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
     }
 
     /**
@@ -121,7 +121,7 @@ public class CardController {
      * @param receivingId - id карты, на которую переводятся деньги
      * @return - перевод средств
      */
-    @PostMapping("money-transfer")
+    @PostMapping("money-transfer-by-id")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
                                            String pincode,
                                            Long senderId,
@@ -139,7 +139,7 @@ public class CardController {
      * @param receivingAccountNumber - номер карты, на которую переводятся деньги
      * @return - перевод средств
      */
-    @PostMapping("money-transfer")
+    @PostMapping("money-transfer-by-account-number")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
                                            String pincode,
                                            String senderAccountNumber,
