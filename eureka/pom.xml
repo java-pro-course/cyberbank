@@ -30,6 +30,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.appform.rules</groupId>
+            <artifactId>json-rules</artifactId>
+            <version>1.0.14</version>
+        </dependency>
     </dependencies>
 
     <dependencyManagement>

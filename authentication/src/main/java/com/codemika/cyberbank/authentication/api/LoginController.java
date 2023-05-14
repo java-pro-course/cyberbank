@@ -1,12 +1,27 @@
-//package com.codemika.cyberbank.authentication.api;
-//
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
-//
-///**
-// * Контроллер для входа.
-// */
-//@RestController
-//public class LoginController {
-//    // писать код тут!
-//}
+package com.codemika.cyberbank.authentication.api;
+
+import com.codemika.cyberbank.authentication.service.AuthorizationService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * Контроллер для входа.
+ */
+@RestController
+@RequestMapping("api/auth/")
+@RequiredArgsConstructor
+public class LoginController {
+    private final AuthorizationService authorizationService;
+
+    @GetMapping("login/token")
+    public ResponseEntity<?> loginWithToken(String token){
+        return authorizationService.login(token);
+    }
+
+    @GetMapping("login")
+    public ResponseEntity<?> login(@RequestParam String phone, @RequestParam String pass) {
+        return authorizationService.login(phone, pass);
+    }
+}

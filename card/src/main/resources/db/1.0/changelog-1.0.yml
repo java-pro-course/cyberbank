@@ -1,4 +1,4 @@
 databaseChangeLog:
-  include:
-    file: card.yml
-    relativeToChangelogFile: true
+  - include:
+      file: tables/card.yml
+      relativeToChangelogFile: true

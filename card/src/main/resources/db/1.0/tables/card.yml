@@ -1,5 +1,5 @@
-databaseChangeLock:
-  - logicalFilePath: 1.0/card
+databaseChangeLog:
+  - logicalFilePath: 1.0/tables/card
   - changeSet:
       id: card-0
       author: xCrynge
@@ -32,6 +32,11 @@ databaseChangeLock:
                     nullable: false
               - column:
                   name: account_number
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: pin_code
                   type: text
                   constraints:
                     nullable: false

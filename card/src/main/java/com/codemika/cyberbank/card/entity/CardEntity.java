@@ -2,7 +2,6 @@ package com.codemika.cyberbank.card.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
-
 import javax.persistence.*;
 
 /**
@@ -29,6 +28,9 @@ public class CardEntity {
 
     @Column(name = "account_number")
     private String accountNumber;
+
+    @Column(name = "pin_code")
+    private String pincode; //пин-код состоит из 4-х цифр.
 
     @Column(name = "owner_user_id")
     private Long ownerUserId;
