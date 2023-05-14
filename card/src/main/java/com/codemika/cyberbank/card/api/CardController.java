@@ -27,38 +27,41 @@ public class CardController {
     @CheckRole(role = "USER")
     @PostMapping("create-debit")
     public ResponseEntity<?> createDebit(@RequestHeader("Authorization") String token,//проверка на налы.1
-                                             @RequestBody RqCreateDebitCard rq) {
+                                         @RequestBody RqCreateDebitCard rq) {
         return cardService.createDebit(token, rq);
     }
+
     @CheckRole(role = "USER")
     @PostMapping("create-credit")
     public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
-                                             @RequestBody RqCreateCreditCard rq) {
+                                          @RequestBody RqCreateCreditCard rq) {
         return cardService.createCredit(token, rq);
 
     }
 
     /**
      * Изменение названия карты
-     * @param id - id карты
+     *
+     * @param id       - id карты
      * @param newTitle - новое название карты
      * @return - изменение названия карты
      */
     @CheckRole(role = "USER")
     @PostMapping("change-card-title")
-    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
+    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle) {
         return cardService.changeCardTitle(id, newTitle);
     }
 
     /**
      * Удаление карты
+     *
      * @param token токен владельца
-     * @param id id карты
+     * @param id    id карты
      * @return сообщение об успешном/не успешном удалении
      */
     @CheckRole(role = "USER")
     @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id) {
         return ResponseEntity.ok(cardService.deleteCard(token, id));
     }
 
@@ -85,12 +88,14 @@ public class CardController {
 
         return cardService.getAllCards(token);
     }
+
     /**
      * Метод для перевода денег с карты на карту
-     * @param token токен переводящего деньги
-     * @param pincode пин-код карты, с которой переводятся деньги
-     * @param senderId id-карты, с которой переводятся деньги
-     * @param value количество переводимых денег (в рублях)
+     *
+     * @param token       токен переводящего деньги
+     * @param pincode     пин-код карты, с которой переводятся деньги
+     * @param senderId    id-карты, с которой переводятся деньги
+     * @param value       количество переводимых денег (в рублях)
      * @param receivingId id-карты, на которую переводятся деньги
      * @return сообщение об переводе и текущий баланс
      */
@@ -110,6 +115,7 @@ public class CardController {
     public ResponseEntity<?> getAllCardsModer(@RequestHeader("Authorization") String token) {
         return cardService.getAllCards();
     }
+
     @CheckRole(role = "TESTER")
     @PostMapping("get-me-money")
     public ResponseEntity<?> getMeMoney(@RequestHeader("Authorization") String token, Long cardId, Long value) {

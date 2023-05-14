@@ -48,7 +48,7 @@ public class CheckRoleAspect {
         Claims claims = jwtUtil.getClaims(token);
 
         String role = claims.get("role", String.class);
-        if (role == null || role.isEmpty()){
+        if (role == null || role.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("Ваш последний сеанс истёк. Пожалуйста, войдите в свой аккаунт заново!");
@@ -62,12 +62,14 @@ public class CheckRoleAspect {
                     .body("Вы не имеете доступа к данной функции.");
         }
     }
+
     /**
      * Определение уровня доступа роли
+     *
      * @param role роль
      * @return уровень доступа(целый от 0 до 3)
      */
-    public int getRoleAccessLevel(String role){
+    public int getRoleAccessLevel(String role) {
         if (role.equals(USER)) return 0;
         if (role.equals(MODER)) return 1;
         if (role.equals(TESTER)) return 2;
