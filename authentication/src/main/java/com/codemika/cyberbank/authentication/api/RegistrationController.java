@@ -2,8 +2,6 @@ package com.codemika.cyberbank.authentication.api;
 
 import com.codemika.cyberbank.authentication.annotation.CheckUser;
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
-import com.codemika.cyberbank.authentication.repository.UserRepository;
-import com.codemika.cyberbank.authentication.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
