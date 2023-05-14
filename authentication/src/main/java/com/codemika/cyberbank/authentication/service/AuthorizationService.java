@@ -263,7 +263,15 @@ public class AuthorizationService {
                     .body("Данный пользователь не существует!");
         }
         Optional<RoleUserEntity> roleUser = roleUserRepository.getRoleUserEntitiesByUser(user.get());
-        roleUserRepository.updateUserRole(new RoleEntity().setRole("MODER"), roleUser.get().getId());
+        if (!roleRepository.findByRole("MODER").isPresent()){
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Извините, произошла ошибка! Данной роли не существует.");
+        }
+        RoleUserEntity newRoleUser = new RoleUserEntity()
+                .setUser(roleUser.get().getUser())
+                .setRole(roleRepository.findByRole("MODER").get());
+        roleUserRepository.save(newRoleUser);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(String.format("Пользователь %s успешно получил роль MODER!", idNewModer));

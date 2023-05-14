@@ -11,7 +11,4 @@ import java.util.Optional;
 
 public interface RoleUserRepository extends JpaRepository<RoleUserEntity, Long> {
     Optional<RoleUserEntity> getRoleUserEntitiesByUser(UserEntity user);
-    @Modifying
-    @Query("UPDATE RoleUserEntity roleUser SET roleUser.role = ?1 WHERE roleUser.id = ?2")
-    void updateUserRole(RoleEntity role, Long id);
 }
