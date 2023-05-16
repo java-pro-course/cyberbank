@@ -221,7 +221,7 @@ public class CardService {
         if (!card.get().getOwnerUserId().equals(ownerUserId))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id: " + id);
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id " + id);
 
         if (card.get().getBalance() < value)
             return ResponseEntity
@@ -290,7 +290,7 @@ public class CardService {
         if (!card.get().getOwnerUserId().equals(ownerUserId))
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты: " + accountNumber);
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
 
         if (card.get().getBalance() < value)
             return ResponseEntity
@@ -314,21 +314,116 @@ public class CardService {
         return ResponseEntity
                 .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
     }
-     /**
-     * Изменение названия карты
+
+    /**
+     * Изменение названия карты по id карты
+     * @param token - токен пользователя
      * @param id - id карты
      * @param newTitle - новое название карты
      * @return - сообщение об изменении названия карты
      */
-    public ResponseEntity<?> changeCardTitle(Long id, String newTitle) {
+    public ResponseEntity<?> changeCardTitle(String token, Long id, String newTitle) {
         Optional<CardEntity> card = repository.findById(id);
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким номером не существует!");
+        }
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Нельзя менять данные чужой карты!");
+        repository.updateCardTitle(newTitle, card.get().getId());
+        return ResponseEntity.ok("Название карты изменено.");
+    }
+
+    /**
+     * Изменение названия карты по номеру карты
+     * @param token - токен пользователя
+     * @param accountNumber - номер карты
+     * @param newTitle - новое название карты
+     * @return - сообщение об изменении названия карты
+     */
+    public ResponseEntity<?> changeCardTitle(String token, String accountNumber, String newTitle) {
+        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким номером не существует!");
+        }
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Нельзя менять данные чужой карты!");
+
+        repository.updateCardTitle(newTitle, card.get().getId());
+        return ResponseEntity.ok("Название карты изменено.");
+    }
+
+    /**
+     * Изменение пин-кода по id карты
+     * @param token - токен пользователя
+     * @param id - id карты
+     * @param pincode - старый пин-код
+     * @param newPinCode - новый пин-код карты
+     * @return - сообщение об изменении пин-кода карты
+     */
+    public ResponseEntity<?> changeCardPinCode(String token, Long id, String pincode, String newPinCode) {
+        Optional<CardEntity> card = repository.findById(id);
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
         if (!card.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Карты с таким id не существует!");
         }
-        repository.updateCardTitle(newTitle, card.get().getId());
-        return ResponseEntity.ok("Название карты изменено.");
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Нельзя менять данные чужой карты!");
+        if (!card.get().getPincode().equals(pincode)){
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пин-код неверный!");
+        }
+
+        repository.updateCardPinCode(newPinCode, card.get().getId());
+        return ResponseEntity.ok("Пин-код карты изменен.");
+    }
+
+    /**
+     * Изменение пин-кода карты по номеру карты
+     * @param token - токен пользователя
+     * @param accountNumber - номер карты
+     * @param pincode - старый пин-код
+     * @param newPinCode - новый пин-код карты
+     * @return - сообщение об изменении пин-кода карты
+     */
+    public ResponseEntity<?> changeCardPinCode(String token, String accountNumber, String pincode, String newPinCode) {
+        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с таким номером не существует!");
+        }
+        if (!card.get().getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Нельзя менять данные чужой карты!");
+        if (!card.get().getPincode().equals(pincode)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пин-код неверный!");
+        }
+
+        repository.updateCardPinCode(newPinCode, card.get().getId());
+        return ResponseEntity.ok("Пин-код карты изменен.");
     }
 
     /**
