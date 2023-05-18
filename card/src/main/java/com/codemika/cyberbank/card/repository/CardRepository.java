@@ -16,7 +16,7 @@ public interface CardRepository extends JpaRepository<CardEntity, Long> {
 
   @Modifying
     @Query("UPDATE CardEntity card SET card.isFrozen = ?1 WHERE card.id = ?2")
-    void updateById(Boolean isFrozen, Long id);
+    void updateById(String isFrozen, Long id);
 
     List<CardEntity> findAllByOwnerUserId(Long id);
     Optional<CardEntity> findCardByAccountNumber(String AccountNumber);

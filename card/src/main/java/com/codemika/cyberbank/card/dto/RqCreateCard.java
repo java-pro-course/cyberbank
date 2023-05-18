@@ -10,5 +10,5 @@ public class RqCreateCard {
     private String type;
     private String accountNumber;
     private Long ownerUserId;
-    private Boolean isFrozen;
+    private String isFrozen;
 }
