@@ -130,7 +130,7 @@ public class CardController {
     }
 
     @PutMapping("freeze-card-by-id/{id}")
-    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card, @PathVariable Long id, @PathVariable Date time, @PathVariable Long userId){
-        return cardService.FreezeCard(card, id, time, userId);
+    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card, @PathVariable Long id, @PathVariable Long userId){
+        return cardService.FreezeAndUnfreezeCard(card, id, userId);
     }
 }
