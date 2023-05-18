@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.smartcardio.Card;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
+    private final CreditCardRepository creditRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
     public final JwtUtil jwtUtil;
@@ -445,7 +447,7 @@ public class CardService {
         if (!card.get().getOwnerUserId().equals(ownerUserId)){
             return ResponseEntity.badRequest().body("Вы не можете удалить чужую карту!");
         }
-        if(card.get().getBalance() != 0){
+        if (card.get().getBalance() != 0){
             return ResponseEntity.badRequest().body("Вы не можете удалить карту, на которой есть деньги! " +
                     "Пожалуйста, снимите их или переведите на другую карту!");
         }
@@ -453,6 +455,31 @@ public class CardService {
         repository.deleteById(id);
         return ResponseEntity.ok().body("Карта была успешно удалена!");
     }
+
+    public ResponseEntity<?> deleteCreditCard(String token, Long id){
+        Optional<CardEntity> card = creditRepository.findById(id);
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+        if (!card.isPresent()){
+            return ResponseEntity.badRequest().body("Карта с id: " + id + " не существует!");
+        }
+
+        if (!card.get().getOwnerUserId().equals(ownerUserId)){
+            return ResponseEntity.badRequest().body("Вы не являетесь владельцем данной карты!");
+        }
+
+        if (card.get().getBalance() != 0){
+            return ResponseEntity.badRequest().body("Вы не можете удалисть карту на которой есть деньги!" +
+                    "Пожалуйста, снимите их или переведите на другую карту");
+        }
+
+        creditRepository.deleteById(id);
+        return ResponseEntity.ok().body("Карта была успешно удалена");
+    }
+
+
 
     /**
      * Генерация случайного номера карты
