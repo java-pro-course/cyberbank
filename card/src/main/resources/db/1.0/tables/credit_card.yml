@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - logicalFilePath: 1.0/tables/card
+  - changeSet:
+      id: credit_card-0
+      author: xCrynge
+      changes:
+        - createTable:
+            schemaName: cyberbank_card
+            tableName: credit_card
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: balance
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: account_number
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: pin_code
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: credit_term
+                  type: int
+                  constraints:
+                    nullable: false

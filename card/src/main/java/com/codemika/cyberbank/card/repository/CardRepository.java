@@ -22,7 +22,8 @@ public interface CardRepository extends JpaRepository<CardEntity, Long> {
     @Modifying
     @Query("UPDATE CardEntity card SET card.title = ?1 WHERE card.id = ?2")
     void updateCardTitle(String title, Long id);
+    //Прога не запускается если писать как в БД pin_code. Надо pincode
     @Modifying
-    @Query("UPDATE CardEntity card SET card.pin_code = ?1 WHERE card.id = ?2")
+    @Query("UPDATE CardEntity card SET card.pincode = ?1 WHERE card.id = ?2")
     void updateCardPinCode(String pincode, Long id);
 }

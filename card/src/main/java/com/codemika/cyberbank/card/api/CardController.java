@@ -24,7 +24,7 @@ public class CardController {
      * @return созданную карту
      */
     @PostMapping("create/debit")
-    public ResponseEntity<?> createDebit(@RequestHeader("Authorization") String token,//проверка на налы.1
+    public ResponseEntity<?> createDebit(String token,//проверка на налы.1
                                              @RequestBody RqCreateDebitCard rq) {
         return cardService.createDebit(token, rq);
     }
