@@ -1,9 +1,9 @@
 package com.codemika.cyberbank.card.api;
 
-import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
-import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
+import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.service.CardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,41 +20,39 @@ public class CardController {
      * Оформление(создание) новой карты
      *
      * @param token токен пользователя, который оформляет карту
-     * @param rq    все данные карты(название, тип(деб/кред), пин-код)
+     * @param rq все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
      */
-    @PostMapping("create/debit")
-    public ResponseEntity<?> createDebit(@RequestHeader("Authorization") String token,//проверка на налы.1
-                                             @RequestBody RqCreateDebitCard rq) {
-        return cardService.createDebit(token, rq);
-    }
-    @PostMapping("create/credit")
-    public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
-                                             @RequestBody RqCreateCreditCard rq) {
-        return cardService.createCredit(token, rq);
-
+    @PostMapping("create")
+    public ResponseEntity<?> createCard(@RequestHeader("Authorization") String token,
+                                             @RequestBody RqCreateCard rq) throws JsonProcessingException {
+        return cardService.createCard(token, rq);
     }
 
     /**
-     * Изменение названия карты
-     * @param id - id карты
-     * @param newTitle - новое название карты
-     * @return - изменение названия карты
-     */
-    @PostMapping("change-card-title")
-    public ResponseEntity<?> changeCardTitle(Long id, String newTitle){
-        return cardService.changeCardTitle(id, newTitle);
-    }
-
-    /**
-     * Удаление карты
-     * @param token токен владельца
+     * Удаление карты по id
+     *
+     * @param ownerUserId id владельца
      * @param id id карты
-     * @return сообщение об успешном/не успешном удалении
+     * @return
      */
-    @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
-        return ResponseEntity.ok(cardService.deleteCard(token, id));
+    @DeleteMapping("delete-by-id")
+    public ResponseEntity<?> deleteCardById(@RequestParam Long ownerUserId, @RequestParam Long id){
+        return ResponseEntity.ok(cardService.deleteCard(ownerUserId, id));
+    }
+
+    /**
+     * Удаление карты по номеру
+     *
+     * @param ownerUserId id владельца
+     * @param accountNumber номер карты
+     * @param pincode пин-код карты
+     * @return
+     */
+    @DeleteMapping("delete-by-number")
+    public ResponseEntity<?> deleteCardByNumber(@RequestParam Long ownerUserId, @RequestParam String accountNumber,
+                                                @RequestParam Short pincode){
+        return ResponseEntity.ok(cardService.deleteCard(ownerUserId, accountNumber, pincode));
     }
 
     /**
@@ -79,49 +77,25 @@ public class CardController {
 
         return cardService.getAllCards(token);
     }
-    /**
-     * Метод для перевода денег с карты на карту по id
-     * @param token - токен пользователя, переводящего деньги
-     * @param pincode - пин-код карты, с которой переводятся деньги
-     * @param senderId - id карты, с которой переводятся деньги
-     * @param value - сумма перевода (в рублях)
-     * @param receivingId - id карты, на которую переводятся деньги
-     * @return - перевод средств
-     */
-    @PostMapping("money-transfer")
-    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-                                           String pincode,
-                                           Long senderId,
-                                           Long value,
-                                           Long receivingId) {
-        return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
-    }
 
-    /**
-     * Метод для перевода денег с карты на карту по номерам карт
-     * @param token - токен пользователя, переводящего деньги
-     * @param pincode - пин-код карты, с которой переводятся деньги
-     * @param senderAccountNumber - номер карты, с которой переводятся деньги
-     * @param value - сумма перевода (в рублях)
-     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
-     * @return - перевод средств
-     */
-    @PostMapping("money-transfer")
-    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-                                           String pincode,
-                                           String senderAccountNumber,
-                                           Long value,
-                                           String receivingAccountNumber) {
-        return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
-    }
+    //TODO: Пошаманьте с методом moneyTransfer. Его нужно добавить в сервис
+//    @PostMapping("money-transfer")
+//    public ResponseEntity<?> moneyTransfer(String token,
+//                                           String pincode,
+//                                           Long senderId,
+//                                           Long value,
+//                                           Long receivingId) {
+//        return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
+//    }
+    //TODO: Тут тоже нужно добавить метод в сервис.
+//    @PostMapping("get-my-balance")
+//    public ResponseEntity<?> getMyBalance(Long cardId, Long value) {
+//        return cardService.getMyBalance(cardId, value);
+//    }
 
     //Для тестов
     @GetMapping("get-all-card-for-moder")
     public ResponseEntity<?> getAllCardsModer() {
         return cardService.getAllCards();
-    }
-    @PostMapping("get-me-money")
-    public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
-        return cardService.getMeMoney(cardId, value);
     }
 }

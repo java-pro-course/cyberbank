@@ -2,7 +2,7 @@ databaseChangeLog:
   - logicalFilePath: 1.0/tables/card
   - changeSet:
       id: card-0
-      author: xCrynge
+      author: roman
       changes:
         - createTable:
             schemaName: cyberbank_card
@@ -37,7 +37,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: pin_code
-                  type: text
+                  type: smallint
                   constraints:
                     nullable: false
               - column:
