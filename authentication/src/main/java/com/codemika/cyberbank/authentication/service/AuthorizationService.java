@@ -12,7 +12,6 @@ import com.codemika.cyberbank.authentication.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.codemika.cyberbank.authentication.constants.RoleConstants.IS_USER_ROLE_EXIST_CLAIMS_KEY;
-import static com.codemika.cyberbank.authentication.constants.RoleConstants.USER_ROLE;
+import static com.codemika.cyberbank.authentication.constants.RoleConstants.*;
 
 /**
  * Сервис для авторизации
@@ -117,9 +115,9 @@ public class AuthorizationService {
         claims.put("phone", tmpUser.get().getPhone());
 
         claims.put(IS_USER_ROLE_EXIST_CLAIMS_KEY, false);
-        claims.put("is_moder_role", false);
-        claims.put("is_tester_role", false);
-        claims.put("is_hacker_role", false);
+        claims.put(IS_MODER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_TESTER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_HACKER_ROLE_EXIST_CLAIMS_KEY, false);
 
         for (RoleUserEntity userRole : userRoles) {
             if (Objects.equals(userRole.getRole().getRole(), "USER")) {
@@ -163,16 +161,31 @@ public class AuthorizationService {
 
         Claims claims = jwtUtil.getClaims(token);
 
-        if (jwtUtil.getClaims(token).get("role", String.class) == null) {
-            claims.put("role", "USER");
-        }
-
+        Long id = claims.get("id", Long.class);
         String name = claims.get("name", String.class);
         String surname = claims.get("surname", String.class);
         String patronymic = claims.get("patronymic", String.class);
         String email = claims.get("email", String.class);
         String phone = claims.get("phone", String.class);
 
+        claims.put(IS_USER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_MODER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_TESTER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_HACKER_ROLE_EXIST_CLAIMS_KEY, false);
+
+        List<RoleUserEntity> userRoles = roleUserRepository.findAllByUser(userRepository.findById(id).get());
+
+        for (RoleUserEntity userRole : userRoles) {
+            if (Objects.equals(userRole.getRole().getRole(), "USER")) {
+                claims.replace(IS_USER_ROLE_EXIST_CLAIMS_KEY, true);
+            } else if (Objects.equals(userRole.getRole().getRole(), "MODER")) {
+                claims.replace("is_moder_role", true);
+            } else if (Objects.equals(userRole.getRole().getRole(), "TESTER")) {
+                claims.replace("is_tester_role", true);
+            } else if (Objects.equals(userRole.getRole().getRole(), "HACKER")) {
+                claims.replace("is_hacker_role", true);
+            }
+        }
         //TODO: Добавить карты, кредиты и т.д.
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
@@ -227,13 +240,13 @@ public class AuthorizationService {
      * @return имя, фамилию и отчество требуемого пользователя
      */
     public ResponseEntity<?> getUserByEmail(String email) {
-        // todo: вынести пользователя в переменную и работать с результатом
-        if (!userRepository.findByEmail(email).isPresent())
+        Optional<UserEntity> user = userRepository.findByEmail(email);
+        if (!user.isPresent())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
                     .body("Данный пользователь не существует!");
 
-        UserEntity rq = userRepository.findByEmail(email).get();
+        UserEntity rq = user.get();
         RsInfoUser rs = new RsInfoUser()
                 .setName(rq.getName())
                 .setSurname(rq.getSurname())
@@ -284,8 +297,9 @@ public class AuthorizationService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Данный пользователь не существует!");
         }
+        Optional<RoleEntity> roleModer = roleRepository.findByRole(MODER_ROLE);
 
-        if (!roleRepository.findByRole("MODER").isPresent()) {
+        if (!roleModer.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Извините, произошла ошибка! Данной роли не существует.");
@@ -293,7 +307,7 @@ public class AuthorizationService {
 
         RoleUserEntity newRoleUser = new RoleUserEntity()
                 .setUser(user.get())
-                .setRole(roleRepository.findByRole("MODER").get());
+                .setRole(roleModer.get());
         roleUserRepository.save(newRoleUser);
 
         return ResponseEntity

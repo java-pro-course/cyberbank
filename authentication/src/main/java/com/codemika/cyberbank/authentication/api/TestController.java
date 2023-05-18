@@ -25,25 +25,25 @@ public class TestController {
 
     @CheckRole(role = "MODER")
     @GetMapping("get-all-users")
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String token) {
         return service.getAllUsers();
     }
 
     @CheckRole(role = "MODER")
     @GetMapping("get-user-by-id")
-    public ResponseEntity<?> getUserById(@RequestParam Long id) {
+    public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @RequestParam Long id) {
         return service.getUserById(id);
     }
 
     @CheckRole(role = "MODER")
     @GetMapping("get-user-by-email")
-    public ResponseEntity<?> getUserByEmail(@RequestParam String email) {
+    public ResponseEntity<?> getUserByEmail(@RequestHeader("Authorization") String token, @RequestParam String email) {
         return service.getUserByEmail(email);
     }
 
     @CheckRole(role = "MODER")
     @GetMapping("get-user-by-phone")
-    public ResponseEntity<?> getUserByPhone(@RequestParam String phone) {
+    public ResponseEntity<?> getUserByPhone(@RequestHeader("Authorization") String token, @RequestParam String phone) {
         return service.getUserByPhone(phone);
     }
 

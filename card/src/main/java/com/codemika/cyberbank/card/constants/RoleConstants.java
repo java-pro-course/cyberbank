@@ -1,4 +1,4 @@
-package com.codemika.cyberbank.authentication.constants;
+package com.codemika.cyberbank.card.constants;
 
 public class RoleConstants {
     public final static String IS_USER_ROLE_EXIST_CLAIMS_KEY = "is_user_role";

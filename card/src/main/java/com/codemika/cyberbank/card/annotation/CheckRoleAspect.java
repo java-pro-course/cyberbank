@@ -13,27 +13,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
+import static com.codemika.cyberbank.card.constants.RoleConstants.*;
+
 @Aspect
 @Component
 @RequiredArgsConstructor
 public class CheckRoleAspect {
     private final JwtUtil jwtUtil;
-
-    /**
-     * Список всех ролей
-     **/
-
-    // Роль для всех пользователей сайта
-    private final String USER = "USER";
-
-    // Роль для модераторов банка, имеет повышенный, но не полный доступ к функциям банка.
-    private final String MODER = "MODER";
-
-    // Роль для тестировщиков, имеет доступ ко всем функциям банка
-    private final String TESTER = "TESTER";
-
-    // Шуточная роль, имеет доступ ко всем функциям банка
-    private final String HACKER = "HACKER";
 
     @Around(value = "@annotation(checkRole)")
     public Object checkRole(ProceedingJoinPoint proceedingJoinPoint, CheckRole checkRole) throws Throwable {
@@ -70,10 +56,10 @@ public class CheckRoleAspect {
      * @return уровень доступа(целый от 0 до 3)
      */
     public int getRoleAccessLevel(String role) {
-        if (role.equals(USER)) return 0;
-        if (role.equals(MODER)) return 1;
-        if (role.equals(TESTER)) return 2;
-        if (role.equals(HACKER)) return 3;
+        if (role.equals(USER_ROLE)) return 0;
+        if (role.equals(MODER_ROLE)) return 1;
+        if (role.equals(TESTER_ROLE)) return 2;
+        if (role.equals(HACKER_ROLE)) return 3;
         return 0;
     }
 }
