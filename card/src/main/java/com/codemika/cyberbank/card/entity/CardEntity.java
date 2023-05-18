@@ -36,6 +36,6 @@ public class CardEntity {
     private Long ownerUserId;
 
     @Column(name = "status")
-    private Boolean isFrozen;
+    private Boolean isFrozen = false;
 
 }

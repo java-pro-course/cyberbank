@@ -15,10 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
-import java.util.Optional;
+import javax.smartcardio.Card;
+import java.util.*;
 
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -381,18 +380,22 @@ public class CardService {
         return result.toString();
     }
 
-    public ResponseEntity<?> FreezeCard(RqCreateCard card, Long id, Date time, Long OwnerUserId){
+    public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long id, Long OwnerUserId){
         Optional<CardEntity> cardEntity = repository.findById(id);
         if(!cardEntity.isPresent()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The card doesn't exist!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данная карта не существует!");
         }
-            card.setIsFrozen(true);
 
+        if (!Objects.equals(card.getOwnerUserId(), OwnerUserId)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Вы не являетесь владельцем данной карты!");
+        }
+        else {
+            card.setIsFrozen(!card.getIsFrozen());
 
-        repository.updateById(card.getTitle(), card.getType(), card.getAccountNumber(), card.getOwnerUserId(), card.getIsFrozen(), id);
+            repository.updateById(card.getIsFrozen(), id);
 
-        return ResponseEntity.status(HttpStatus.OK).body(String.format("Card's status changed"));
-
+            return ResponseEntity.status(HttpStatus.OK).body(String.format("Статус карты успешно изменен"));
+        }
     }
 
     /**
