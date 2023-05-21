@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.card.service;
 
+import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import javax.smartcardio.Card;
+import java.util.*;
+
 import java.util.Optional;
 
 @Service
@@ -470,6 +473,28 @@ public class CardService {
         }
 
         return result.toString();
+    }
+
+    /**
+     * Заморозка и разморозка карты
+     * @param card - dto карты
+     * @param cardId - id карты
+     * @param userId - id пользователя
+     * @return результат изменения статуса
+     */
+    public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long cardId, Long userId) {
+        Optional<CardEntity> cardEntity = repository.findById(cardId);
+        if (!cardEntity.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данной карты не существует!");
+        }
+        if (!Objects.equals(card.getOwnerUserId(), userId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Вы не являетесь владельцем данной карты!");
+        }
+
+        card.setIsActive(!card.getIsActive());
+        repository.updateById(card.getIsActive(), cardId);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Статус карты успешно изменен!");
     }
 
     /**

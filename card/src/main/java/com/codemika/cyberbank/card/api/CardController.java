@@ -1,5 +1,7 @@
 package com.codemika.cyberbank.card.api;
 
+
+import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
 import com.codemika.cyberbank.card.service.CardService;
@@ -8,6 +10,8 @@ import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("api/card")
@@ -156,5 +160,10 @@ public class CardController {
     @PostMapping("get-me-money")
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
         return cardService.getMeMoney(cardId, value);
+    }
+
+    @PutMapping("freeze-card-by-id/{id}")
+    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card, @PathVariable Long id, @PathVariable Long userId){
+        return cardService.FreezeAndUnfreezeCard(card, id, userId);
     }
 }
