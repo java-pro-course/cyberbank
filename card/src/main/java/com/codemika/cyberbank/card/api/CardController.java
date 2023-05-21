@@ -34,7 +34,6 @@ public class CardController {
         return cardService.createCredit(token, rq);
 
     }
-
     /**
      * Изменение названия карты по id карты
      * @param id - id карты
@@ -45,6 +44,28 @@ public class CardController {
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
         return cardService.changeCardTitle(token, id, newTitle);
     }
+
+    ///**
+    // * Изменение названия дебетовой карты по id карты
+    // * @param id - id карты
+    // * @param newTitle - новое название карты
+    // * @return - изменение названия карты
+    // */
+    //   @PostMapping("change-debet-card-title-by-id")
+    //   public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
+    //       return cardService.changeCardTitle(token, id, newTitle);
+    //   }
+
+    ///**
+    // * Изменение названия кредитной карты по id карты
+    // * @param id - id карты
+    // * @param newTitle - новое название карты
+    // * @return - изменение названия карты
+    // */
+    //  @PostMapping("change-credit-card-title-by-id")
+    //   public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
+    //       return cardService.changeCardTitle(token, id, newTitle);
+    //   }
 
     /**
      * Изменение названия карты по номеру карты
@@ -57,6 +78,28 @@ public class CardController {
         return cardService.changeCardTitle(token, accountNumber, newTitle);
     }
 
+    ///**
+    // * Изменение названия дебетовой карты по номеру карты
+    // * @param accountNumber - номер карты
+    // * @param newTitle - новое название карты
+    // * @return - изменение названия карты
+    // */
+    //@PostMapping("change-debet-card-title-by-account-number")
+    //public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
+    //    return cardService.changeCardTitle(token, accountNumber, newTitle);
+    //}
+
+    ///**
+    // * Изменение названия кредитной карты по номеру карты
+    // * @param accountNumber - номер карты
+    // * @param newTitle - новое название карты
+    // * @return - изменение названия карты
+    // */
+    //@PostMapping("change-credit-card-title-by-account-number")
+    //public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
+    //    return cardService.changeCardTitle(token, accountNumber, newTitle);
+    //}
+
     /**
      * Изменение пин-кода карты по id карты
      * @param id - id карты
@@ -67,6 +110,28 @@ public class CardController {
     public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
         return cardService.changeCardPinCode(token, id, pincode, newPinCode);
     }
+
+    ///**
+    // * Изменение пин-кода дебетовой карты по id карты
+    // * @param id - id карты
+    // * @param newPinCode - новый пин-код карты
+    // * @return - изменение пин-кода карты
+    // */
+    //@PostMapping("change-debet-card-pincode-by-id")
+    //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
+    //    return cardService.changeCardPinCode(token, id, pincode, newPinCode);
+    //}
+
+    ///**
+    // * Изменение пин-кода кредитной карты по id карты
+    // * @param id - id карты
+    // * @param newPinCode - новый пин-код карты
+    // * @return - изменение пин-кода карты
+    // */
+    //@PostMapping("change-credit-card-pincode-by-id")
+    //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
+    //    return cardService.changeCardPinCode(token, id, pincode, newPinCode);
+    //}
 
     /**
      * Изменение пин-кода карты по номеру карты
@@ -79,6 +144,28 @@ public class CardController {
         return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
     }
 
+    ///**
+    // * Изменение пин-кода дебетовой карты по номеру карты
+    // * @param accountNumber - номер карты
+    // * @param newPinCode - новый пин-код карты
+    // * @return - изменение карты
+    // */
+    //@PostMapping("change-debet-card-pincode-by-account-number")
+    //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
+    //    return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
+    //}
+
+    ///**
+    // * Изменение пин-кода кредитной карты по номеру карты
+    // * @param accountNumber - номер карты
+    // * @param newPinCode - новый пин-код карты
+    // * @return - изменение карты
+    // */
+    //@PostMapping("change-credit-card-pincode-by-account-number")
+    //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
+    //    return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
+    //}
+
     /**
      * Удаление карты
      * @param token токен владельца
@@ -89,6 +176,28 @@ public class CardController {
     public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
         return ResponseEntity.ok(cardService.deleteCard(token, id));
     }
+
+    ///**
+    // * Удаление дебетовой карты
+    // * @param token токен владельца
+    // * @param id id карты
+    // * @return сообщение об успешном/не успешном удалении
+    // */
+    //@DeleteMapping("delete-debet-card")
+    //public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
+    //    return ResponseEntity.ok(cardService.deleteCard(token, id));
+    //}
+
+    ///**
+    // * Удаление кредитной карты
+    // * @param token токен владельца
+    // * @param id id карты
+    // * @return сообщение об успешном/не успешном удалении
+    // */
+    //@DeleteMapping("delete-credit-card")
+    //public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
+    //    return ResponseEntity.ok(cardService.deleteCard(token, id));
+    //}
 
     /**
      * Просмотр пользователем всех своих карт
@@ -130,6 +239,42 @@ public class CardController {
         return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
     }
 
+    ///**
+    // * Метод для перевода денег с карты на карту по id (дебет.)
+    // * @param token - токен пользователя, переводящего деньги
+    // * @param pincode - пин-код карты, с которой переводятся деньги
+    // * @param senderId - id карты, с которой переводятся деньги
+    // * @param value - сумма перевода (в рублях)
+    // * @param receivingId - id карты, на которую переводятся деньги
+    // * @return - перевод средств
+    // */
+    //@PostMapping("debet-money-transfer-by-id")
+    //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+    //                                       String pincode,
+    //                                       Long senderId,
+    //                                       Long value,
+    //                                       Long receivingId) {
+    //    return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
+    //}
+
+    ///**
+    // * Метод для перевода денег с карты на карту по id (кредит.)
+    // * @param token - токен пользователя, переводящего деньги
+    // * @param pincode - пин-код карты, с которой переводятся деньги
+    // * @param senderId - id карты, с которой переводятся деньги
+    // * @param value - сумма перевода (в рублях)
+    // * @param receivingId - id карты, на которую переводятся деньги
+    // * @return - перевод средств
+    // */
+    //@PostMapping("credit-money-transfer-by-id")
+    //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+    //                                       String pincode,
+    //                                       Long senderId,
+    //                                       Long value,
+    //                                       Long receivingId) {
+    //    return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
+    //}
+
     /**
      * Метод для перевода денег с карты на карту по номерам карт
      * @param token - токен пользователя, переводящего деньги
@@ -147,6 +292,42 @@ public class CardController {
                                            String receivingAccountNumber) {
         return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
     }
+
+    // /**
+    //  * Метод для перевода денег с карты на карту по номерам карт (дебет.)
+    //  * @param token - токен пользователя, переводящего деньги
+    //  * @param pincode - пин-код карты, с которой переводятся деньги
+    //  * @param senderAccountNumber - номер карты, с которой переводятся деньги
+    //  * @param value - сумма перевода (в рублях)
+    //  * @param receivingAccountNumber - номер карты, на которую переводятся деньги
+    // * @return - перевод средств
+    //  */
+    //@PostMapping("debet-money-transfer-by-account-number")
+    //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+    //                                       String pincode,
+    //                                       String senderAccountNumber,
+    //                                       Long value,
+    //                                       String receivingAccountNumber) {
+    //    return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
+    //}
+
+    ///**
+    // * Метод для перевода денег с карты на карту по номерам карт (кредит.)
+    // * @param token - токен пользователя, переводящего деньги
+    // * @param pincode - пин-код карты, с которой переводятся деньги
+    // * @param senderAccountNumber - номер карты, с которой переводятся деньги
+    // * @param value - сумма перевода (в рублях)
+    // * @param receivingAccountNumber - номер карты, на которую переводятся деньги
+    // * @return - перевод средств
+    // */
+    //@PostMapping("credit-money-transfer-by-account-number")
+    //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+    //                                       String pincode,
+    //                                       String senderAccountNumber,
+    //                                       Long value,
+    //                                       String receivingAccountNumber) {
+    //    return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
+    //}
 
     //Для тестов
     @GetMapping("get-all-card-for-moder")
