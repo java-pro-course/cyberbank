@@ -383,23 +383,16 @@ public class CardService {
     public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long id, Long OwnerUserId) {
         Optional<CardEntity> cardEntity = repository.findById(id);
         if (!cardEntity.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данная карта не существует!");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данной карты не существует!");
         }
-
         if (!Objects.equals(card.getOwnerUserId(), OwnerUserId)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Вы не являетесь владельцем данной карты!");
-        } else {
-
-
-            if (Objects.equals(card.getIsFrozen(), "unfrozen")) {
-                card.setIsFrozen("frozen");
-            } else {
-                card.setIsFrozen("unfrozen");
-            }
-
-            repository.updateById(card.getIsFrozen(), id);
-            return ResponseEntity.status(HttpStatus.OK).body(String.format("Статус карты успешно изменен"));
         }
+
+        card.setIsActive(!card.getIsActive());
+        repository.updateById(card.getIsActive(), id);
+
+        return ResponseEntity.status(HttpStatus.OK).body("Статус карты успешно изменен!");
     }
 
     /**

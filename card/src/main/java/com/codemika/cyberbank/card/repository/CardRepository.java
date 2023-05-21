@@ -15,8 +15,8 @@ import java.util.Optional;
 public interface CardRepository extends JpaRepository<CardEntity, Long> {
 
   @Modifying
-    @Query("UPDATE CardEntity card SET card.isFrozen = ?1 WHERE card.id = ?2")
-    void updateById(String isFrozen, Long id);
+    @Query("UPDATE CardEntity card SET card.isActive = ?1 WHERE card.id = ?2")
+    void updateById(Boolean isActive, Long id);
 
     List<CardEntity> findAllByOwnerUserId(Long id);
     Optional<CardEntity> findCardByAccountNumber(String AccountNumber);

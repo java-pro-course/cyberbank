@@ -46,7 +46,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: status
-                  type: text
+                  name: isActive
+                  type: boolean
                   constraints:
                     nullable: false
