@@ -36,6 +36,6 @@ public class CardEntity {
     private Long ownerUserId;
 
     @Column(name = "isActive")
-    private Boolean isActive = true;
+    private Boolean isActive = true; //активна или нет
 
-}
+ }
