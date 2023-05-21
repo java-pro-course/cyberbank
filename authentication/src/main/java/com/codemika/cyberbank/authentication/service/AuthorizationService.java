@@ -10,6 +10,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,6 +26,7 @@ public class AuthorizationService {
     private final JwtUtil jwtUtil;
     private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Регистрация пользователя
@@ -43,7 +45,9 @@ public class AuthorizationService {
                 .setPatronymic(rq.getPatronymic())
                 .setEmail(rq.getEmail())
                 .setPhone(rq.getPhone())
-                .setPassword(rq.getPassword());
+                .setPassword(
+                        passwordEncoder.encode(rq.getPassword()) // encode -> зашифровать
+                );
 
         userRepository.save(newUser);
 
@@ -187,13 +191,14 @@ public class AuthorizationService {
      * @return Результат входа и, в случае успеха, новый токен
      */
     public ResponseEntity<?> login(String phone, String pass) {
-        if (!userRepository.findByPhone(phone).isPresent()) {
+        Optional<UserEntity> user = userRepository.findByPhone(phone);
+        if (!user.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Пользователь с таким номером телефона не существует!");
         }
 
-        if (!userRepository.findByPhone(phone).get().getPassword().equals(pass)) {
+        if (!passwordEncoder.matches(pass, user.get().getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пароль или номер телефона неверны");
