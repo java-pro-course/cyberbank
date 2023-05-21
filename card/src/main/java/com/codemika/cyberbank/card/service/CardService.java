@@ -457,7 +457,7 @@ public class CardService {
     }
 
     public ResponseEntity<?> deleteCreditCard(String token, Long id){
-        Optional<CardEntity> card = creditRepository.findById(id);
+        Optional<CreditCardEntity> card = creditRepository.findById(id);
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
