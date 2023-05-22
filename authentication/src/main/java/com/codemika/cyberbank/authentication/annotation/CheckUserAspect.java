@@ -13,6 +13,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 @Slf4j
 @Data
-public class UserCheckAspect {
+public class CheckUserAspect {
     private final AuthorizationService authorizationService;
     private final UserRepository userRepository;
 
@@ -33,20 +34,20 @@ public class UserCheckAspect {
      * Основной метод класса(связующее звено)
      *
      * @param proceedingJoinPoint
-     * @param userCheck
+     * @param checkUser
      * @return результат регистрации
      */
-    @Around(value = "@annotation(userCheck)")
-    public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, UserCheck userCheck){
+    @Around(value = "@annotation(checkUser)")
+    public ResponseEntity<?> checkThisUser(ProceedingJoinPoint proceedingJoinPoint, CheckUser checkUser) {
         //Используется для поиска параметра по имени в аннотации
         MethodSignature methodSignature = (MethodSignature) proceedingJoinPoint.getSignature();
         Object[] args = proceedingJoinPoint.getArgs();
         String[] parameterNames = methodSignature.getParameterNames();
-        int nameIndex = Arrays.asList(parameterNames).indexOf(userCheck.name());
+        int nameIndex = Arrays.asList(parameterNames).indexOf(checkUser.name());
 
         RqCreateUser rq = (RqCreateUser) args[nameIndex];
 
-        if(!bigCheck(rq).getStatusCode().is2xxSuccessful()){
+        if (!bigCheck(rq).getStatusCode().is2xxSuccessful()) {
             authorizationService.setCheck(false); // устанавливаем параметр проверки в сервисе
             authorizationService.setErrorMessage(bigCheck(rq)); // отправляем сообщение с ошибкой
             return authorizationService.registration(rq); // вызываем метод сервиса
@@ -63,9 +64,9 @@ public class UserCheckAspect {
      * @param user проверяемый пользователь
      * @return Результат
      */
-    private ResponseEntity<?> bigCheck(RqCreateUser user){
+    private ResponseEntity<?> bigCheck(RqCreateUser user) {
         //Проверка на уникальность пользователя по почте и номеру
-        if(userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()){
+        if (userRepository.findByPhone(user.getPhone()).isPresent() || userRepository.findByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Пожалуйста, проверьте свою контактную информацию. Такой человек уже существует!");
@@ -117,7 +118,7 @@ public class UserCheckAspect {
         //Содержание имени, фамилии или отчества в пароле
         if (user.getPassword().toLowerCase().contains(user.getName().toLowerCase())
                 || user.getPassword().toLowerCase().contains(user.getSurname().toLowerCase())
-                || user.getPassword().toLowerCase().contains(user.getPatronymic().toLowerCase())){
+                || user.getPassword().toLowerCase().contains(user.getPatronymic().toLowerCase())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("В пароле не должно быть вашего имени, фамилии или отчества! Это не безопасно!");
@@ -130,7 +131,7 @@ public class UserCheckAspect {
                     .body("Ваш пароль должен состоять из ЗАГЛАВНЫХ и строчных букв!");
         }
         //Корректность номера телефона
-        if(!numberCheck(user.getPhone())){
+        if (!numberCheck(user.getPhone())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Ваш номер телефона должен быть настоящим!");
@@ -159,7 +160,7 @@ public class UserCheckAspect {
      * Проверка на содержание символов
      *
      * @param current строка для сравнения
-     * @param check проверяемая строка
+     * @param check   проверяемая строка
      * @return true/false
      */
     public static boolean lettersCheck(String current, String check) {
@@ -167,7 +168,7 @@ public class UserCheckAspect {
         for (int i = 0; i < check.length(); i++) {
             for (int j = 0; j < current.length(); j++) {
                 String a = String.valueOf(current.charAt(j));
-                if(check.contains(a)){
+                if (check.contains(a)) {
                     result = true;
                 }
             }
@@ -181,7 +182,7 @@ public class UserCheckAspect {
      * @param number проверяемый номер телефона
      * @return true/false
      */
-    public static boolean numberCheck(String number){
+    public static boolean numberCheck(String number) {
         Pattern ptrn = Pattern.compile("(0/300)?[7-9]?[0-9]{9}");
         Matcher match = ptrn.matcher(number);
 

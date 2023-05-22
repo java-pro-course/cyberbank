@@ -2,3 +2,9 @@ databaseChangeLog:
   - include:
       file: tables/user.yml
       relativeToChangelogFile: true
+  - include:
+      file: tables/role.yml
+      relativeToChangelogFile: true
+  - include:
+      file: tables/role_user.yml
+      relativeToChangelogFile: true

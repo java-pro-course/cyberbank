@@ -2,6 +2,7 @@ package com.codemika.cyberbank.card.entity;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
+
 import javax.persistence.*;
 
 /**

@@ -1,6 +1,6 @@
 package com.codemika.cyberbank.card.api;
 
-
+import com.codemika.cyberbank.card.annotation.CheckRole;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
@@ -24,26 +24,30 @@ public class CardController {
      * Оформление(создание) новой карты
      *
      * @param token токен пользователя, который оформляет карту
-     * @param rq    все данные карты(название, тип(деб/кред), пин-код)
+     * @param rq все данные карты(название, тип(деб/кред), пин-код)
      * @return созданную карту
      */
-    @PostMapping("create/debit")
+    @CheckRole(isUser = true)
+    @PostMapping("create-debit")
     public ResponseEntity<?> createDebit(@RequestHeader("Authorization") String token,//проверка на налы.1
-                                             @RequestBody RqCreateDebitCard rq) {
+                                         @RequestBody RqCreateDebitCard rq) {
         return cardService.createDebit(token, rq);
     }
-    @PostMapping("create/credit")
+
+    @CheckRole(isUser = true)
+    @PostMapping("create-credit")
     public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
-                                             @RequestBody RqCreateCreditCard rq) {
+                                          @RequestBody RqCreateCreditCard rq) {
         return cardService.createCredit(token, rq);
 
     }
     /**
      * Изменение названия карты по id карты
-     * @param id - id карты
-     * @param newTitle - новое название карты
-     * @return - изменение названия карты
+     * @param id id карты
+     * @param newTitle новое название карты
+     * @return изменение названия карты
      */
+    @CheckRole(isUser = true)
     @PostMapping("change-card-title-by-id")
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
         return cardService.changeCardTitle(token, id, newTitle);
@@ -51,9 +55,9 @@ public class CardController {
 
     ///**
     // * Изменение названия дебетовой карты по id карты
-    // * @param id - id карты
-    // * @param newTitle - новое название карты
-    // * @return - изменение названия карты
+    // * @param id id карты
+    // * @param newTitle новое название карты
+    // * @return изменение названия карты
     // */
     //   @PostMapping("change-debet-card-title-by-id")
     //   public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
@@ -62,9 +66,9 @@ public class CardController {
 
     ///**
     // * Изменение названия кредитной карты по id карты
-    // * @param id - id карты
-    // * @param newTitle - новое название карты
-    // * @return - изменение названия карты
+    // * @param id id карты
+    // * @param newTitle новое название карты
+    // * @return изменение названия карты
     // */
     //  @PostMapping("change-credit-card-title-by-id")
     //   public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
@@ -73,9 +77,9 @@ public class CardController {
 
     /**
      * Изменение названия карты по номеру карты
-     * @param accountNumber - номер карты
-     * @param newTitle - новое название карты
-     * @return - изменение названия карты
+     * @param accountNumber номер карты
+     * @param newTitle новое название карты
+     * @return изменение названия карты
      */
     @PostMapping("change-card-title-by-account-number")
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
@@ -84,9 +88,9 @@ public class CardController {
 
     ///**
     // * Изменение названия дебетовой карты по номеру карты
-    // * @param accountNumber - номер карты
-    // * @param newTitle - новое название карты
-    // * @return - изменение названия карты
+    // * @param accountNumber номер карты
+    // * @param newTitle новое название карты
+    // * @return изменение названия карты
     // */
     //@PostMapping("change-debet-card-title-by-account-number")
     //public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
@@ -95,9 +99,9 @@ public class CardController {
 
     ///**
     // * Изменение названия кредитной карты по номеру карты
-    // * @param accountNumber - номер карты
-    // * @param newTitle - новое название карты
-    // * @return - изменение названия карты
+    // * @param accountNumber номер карты
+    // * @param newTitle новое название карты
+    // * @return изменение названия карты
     // */
     //@PostMapping("change-credit-card-title-by-account-number")
     //public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
@@ -106,9 +110,9 @@ public class CardController {
 
     /**
      * Изменение пин-кода карты по id карты
-     * @param id - id карты
-     * @param newPinCode - новый пин-код карты
-     * @return - изменение пин-кода карты
+     * @param id id карты
+     * @param newPinCode новый пин-код карты
+     * @return изменение пин-кода карты
      */
     @PostMapping("change-card-pincode-by-id")
     public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
@@ -117,9 +121,9 @@ public class CardController {
 
     ///**
     // * Изменение пин-кода дебетовой карты по id карты
-    // * @param id - id карты
-    // * @param newPinCode - новый пин-код карты
-    // * @return - изменение пин-кода карты
+    // * @param id id карты
+    // * @param newPinCode новый пин-код карты
+    // * @return изменение пин-кода карты
     // */
     //@PostMapping("change-debet-card-pincode-by-id")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
@@ -128,9 +132,9 @@ public class CardController {
 
     ///**
     // * Изменение пин-кода кредитной карты по id карты
-    // * @param id - id карты
-    // * @param newPinCode - новый пин-код карты
-    // * @return - изменение пин-кода карты
+    // * @param id id карты
+    // * @param newPinCode новый пин-код карты
+    // * @return изменение пин-кода карты
     // */
     //@PostMapping("change-credit-card-pincode-by-id")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
@@ -139,9 +143,9 @@ public class CardController {
 
     /**
      * Изменение пин-кода карты по номеру карты
-     * @param accountNumber - номер карты
-     * @param newPinCode - новый пин-код карты
-     * @return - изменение карты
+     * @param accountNumber номер карты
+     * @param newPinCode новый пин-код карты
+     * @return изменение карты
      */
     @PostMapping("change-card-pincode-by-account-number")
     public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
@@ -150,9 +154,9 @@ public class CardController {
 
     ///**
     // * Изменение пин-кода дебетовой карты по номеру карты
-    // * @param accountNumber - номер карты
-    // * @param newPinCode - новый пин-код карты
-    // * @return - изменение карты
+    // * @param accountNumber номер карты
+    // * @param newPinCode новый пин-код карты
+    // * @return изменение карты
     // */
     //@PostMapping("change-debet-card-pincode-by-account-number")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
@@ -161,9 +165,9 @@ public class CardController {
 
     ///**
     // * Изменение пин-кода кредитной карты по номеру карты
-    // * @param accountNumber - номер карты
-    // * @param newPinCode - новый пин-код карты
-    // * @return - изменение карты
+    // * @param accountNumber номер карты
+    // * @param newPinCode новый пин-код карты
+    // * @return изменение карты
     // */
     //@PostMapping("change-credit-card-pincode-by-account-number")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
@@ -172,12 +176,14 @@ public class CardController {
 
     /**
      * Удаление карты
+     *
      * @param token токен владельца
-     * @param id id карты
+     * @param id    id карты
      * @return сообщение об успешном/не успешном удалении
      */
+    @CheckRole(isUser = true)
     @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id) {
         return ResponseEntity.ok(cardService.deleteCard(token, id));
     }
 
@@ -209,6 +215,7 @@ public class CardController {
      * @param token токен пользователя(чьи карты)
      * @return Все карты
      */
+    @CheckRole(isUser = true)
     @GetMapping("get-all-cards")
     public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
         if (token.isEmpty() || token.trim().isEmpty()) {
@@ -225,15 +232,17 @@ public class CardController {
 
         return cardService.getAllCards(token);
     }
+
     /**
      * Метод для перевода денег с карты на карту по id
-     * @param token - токен пользователя, переводящего деньги
-     * @param pincode - пин-код карты, с которой переводятся деньги
-     * @param senderId - id карты, с которой переводятся деньги
-     * @param value - сумма перевода (в рублях)
-     * @param receivingId - id карты, на которую переводятся деньги
-     * @return - перевод средств
+     * @param token токен пользователя, переводящего деньги
+     * @param pincode пин-код карты, с которой переводятся деньги
+     * @param senderId id карты, с которой переводятся деньги
+     * @param value сумма перевода (в рублях)
+     * @param receivingId id карты, на которую переводятся деньги
+     * @return перевод средств
      */
+    @CheckRole(isUser = true)
     @PostMapping("money-transfer-by-id")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
                                            String pincode,
@@ -334,12 +343,15 @@ public class CardController {
     //}
 
     //Для тестов
+    @CheckRole(isUser = true, isModer = true)
     @GetMapping("get-all-card-for-moder")
-    public ResponseEntity<?> getAllCardsModer() {
+    public ResponseEntity<?> getAllCardsModer(@RequestHeader("Authorization") String token) {
         return cardService.getAllCards();
     }
+
+    @CheckRole(isUser = true, isTester = true)
     @PostMapping("get-me-money")
-    public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
+    public ResponseEntity<?> getMeMoney(@RequestHeader("Authorization") String token, Long cardId, Long value) {
         return cardService.getMeMoney(cardId, value);
     }
 
