@@ -14,6 +14,7 @@ import io.jsonwebtoken.Jwts;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ public class AuthorizationService {
     private final JwtUtil jwtUtil;
     private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Регистрация пользователя
@@ -54,7 +56,9 @@ public class AuthorizationService {
                 .setPatronymic(rq.getPatronymic())
                 .setEmail(rq.getEmail())
                 .setPhone(rq.getPhone())
-                .setPassword(rq.getPassword());
+                .setPassword(
+                        passwordEncoder.encode(rq.getPassword()) // encode -> зашифровать
+                );
 
         Optional<RoleEntity> role = roleRepository.findByRole(USER_ROLE);
 
@@ -102,7 +106,7 @@ public class AuthorizationService {
                     .body("Пользователь с таким номером телефона не существует!");
         }
 
-        if (!tmpUser.get().getPassword().equals(pass)) {
+        if (!passwordEncoder.matches(pass, tmpUser.get().getPassword())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пароль или номер телефона неверны");
@@ -317,10 +321,10 @@ public class AuthorizationService {
         return userRepository.existsById(id);
     }
 
-    public ResponseEntity<?> becomeModer(Long idNewModer) {
-        // todo: проверять, что у пользователя уже нет роли MODER
 
+    public ResponseEntity<?> becomeModer(Long idNewModer) {
         Optional<UserEntity> user = userRepository.findById(idNewModer);
+
         if (!user.isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
