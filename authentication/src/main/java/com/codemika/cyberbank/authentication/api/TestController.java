@@ -34,7 +34,6 @@ public class TestController {
     public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @RequestParam Long id) {
         return service.getUserById(id);
     }
-    //eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MTQsIm5hbWUiOiLQodCy0LDRgNC-0LMiLCJzdXJuYW1lIjoi0KXQsNC60LXRgCIsInBhdHJvbnltaWMiOiLQo9C60YDQsNC40L3RgdC60LjQuSIsImVtYWlsIjoidGhlLnN2YXJvZy5oYWNrZXJAZW1haWwudWEiLCJwaG9uZSI6IjgyMzQ1Mjc5OTAiLCJpc191c2VyX3JvbGUiOnRydWUsImlzX21vZGVyX3JvbGUiOnRydWUsImlzX3Rlc3Rlcl9yb2xlIjpmYWxzZSwiaXNfaGFja2VyX3JvbGUiOmZhbHNlLCJleHAiOjE2OTA3NTgxODZ9.N_0cSBSATOsryTRJMBnRrBGJGpzVv6iSTDV8cTqS9W7S4nf_utbE-67BZlaMF1RJI4cIoImFcw94oKqM6UISCQ
     @CheckRole(isUser = true, isModer = true)
     @GetMapping("get-user-by-email")
     public ResponseEntity<?> getUserByEmail(@RequestHeader("Authorization") String token, @RequestParam String email) {
@@ -62,5 +61,15 @@ public class TestController {
     @PostMapping("become-moder")
     public ResponseEntity<?> becomeModer(@RequestHeader("Authorization") String token, Long idNewModer) {
         return service.becomeModer(idNewModer);
+    }
+    @CheckRole(isUser = true, isModer = true, isTester = true)
+    @PostMapping("become-tester")
+    public ResponseEntity<?> becomeTester(@RequestHeader("Authorization") String token, Long idNewTester) {
+        return service.becomeTester(idNewTester);
+    }
+    @CheckRole(isUser = true, isModer = true, isHacker = true)
+    @PostMapping("become-hacker")
+    public ResponseEntity<?> becomeHacker(@RequestHeader("Authorization") String token, Long idNewHacker) {
+        return service.becomeHacker(idNewHacker);
     }
 }

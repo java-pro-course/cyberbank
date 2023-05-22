@@ -326,6 +326,16 @@ public class AuthorizationService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Данный пользователь не существует!");
         }
+        List<RoleUserEntity> userRoles = roleUserRepository.findAllByUser(userRepository.findById(idNewModer).get());
+
+        for (RoleUserEntity userRole : userRoles) {
+            if (Objects.equals(userRole.getRole().getRole(), MODER_ROLE)) {
+                return ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Данный пользователь уже имеет роль MODER");
+            }
+        }
+
         Optional<RoleEntity> roleModer = roleRepository.findByRole(MODER_ROLE);
 
         if (!roleModer.isPresent()) {
@@ -343,4 +353,72 @@ public class AuthorizationService {
                 .status(HttpStatus.OK)
                 .body(String.format("Пользователь %s успешно получил роль MODER!", idNewModer));
     }
+    public ResponseEntity<?> becomeTester(Long idNewTester) {
+        Optional<UserEntity> user = userRepository.findById(idNewTester);
+        if (!user.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Данный пользователь не существует!");
+        }
+        Optional<RoleEntity> roleModer = roleRepository.findByRole(TESTER_ROLE);
+
+        List<RoleUserEntity> userRoles = roleUserRepository.findAllByUser(userRepository.findById(idNewTester).get());
+
+        for (RoleUserEntity userRole : userRoles) {
+            if (Objects.equals(userRole.getRole().getRole(), TESTER_ROLE)) {
+                return ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Данный пользователь уже имеет роль TESTER");
+            }
+        }
+        if (!roleModer.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Извините, произошла ошибка! Данной роли не существует.");
+        }
+
+        RoleUserEntity newRoleUser = new RoleUserEntity()
+                .setUser(user.get())
+                .setRole(roleModer.get());
+        roleUserRepository.save(newRoleUser);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(String.format("Пользователь %s успешно получил роль TESTER!", idNewTester));
+    }
+    public ResponseEntity<?> becomeHacker(Long idNewHacker) {
+        Optional<UserEntity> user = userRepository.findById(idNewHacker);
+        if (!user.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Данный пользователь не существует!");
+        }
+        Optional<RoleEntity> roleModer = roleRepository.findByRole(HACKER_ROLE);
+
+        List<RoleUserEntity> userRoles = roleUserRepository.findAllByUser(userRepository.findById(idNewHacker).get());
+
+        for (RoleUserEntity userRole : userRoles) {
+            if (Objects.equals(userRole.getRole().getRole(), HACKER_ROLE)) {
+                return ResponseEntity
+                        .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Данный пользователь уже имеет роль HACKER");
+            }
+        }
+
+        if (!roleModer.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Извините, произошла ошибка! Данной роли не существует.");
+        }
+
+        RoleUserEntity newRoleUser = new RoleUserEntity()
+                .setUser(user.get())
+                .setRole(roleModer.get());
+        roleUserRepository.save(newRoleUser);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(String.format("Пользователь %s успешно получил роль HACKER!", idNewHacker));
+    }
+
 }
