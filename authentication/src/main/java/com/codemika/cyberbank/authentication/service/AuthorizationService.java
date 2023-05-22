@@ -1,7 +1,7 @@
 package com.codemika.cyberbank.authentication.service;
 
 import com.codemika.cyberbank.authentication.dto.RqCreateUser;
-import com.codemika.cyberbank.authentication.dto.RsInfoUser;
+import com.codemika.cyberbank.authentication.dto.RsInfoUserPro;
 import com.codemika.cyberbank.authentication.entity.RoleEntity;
 import com.codemika.cyberbank.authentication.entity.RoleUserEntity;
 import com.codemika.cyberbank.authentication.entity.UserEntity;
@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -77,6 +78,9 @@ public class AuthorizationService {
         claims.put("email", newUser.getEmail());
         claims.put("phone", newUser.getPhone());
         claims.put(IS_USER_ROLE_EXIST_CLAIMS_KEY, true);
+        claims.put(IS_MODER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_TESTER_ROLE_EXIST_CLAIMS_KEY, false);
+        claims.put(IS_HACKER_ROLE_EXIST_CLAIMS_KEY, false);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -210,9 +214,22 @@ public class AuthorizationService {
                     .status(HttpStatus.ACCEPTED)
                     .body("У нас ещё нет ни одного пользователя... Хотите стать первым?🥺");
 
+        List<RsInfoUserPro> infoUsers = new ArrayList<>();
+        //Преобразование Entity в Info
+        for (UserEntity user : users){
+            RsInfoUserPro infoUser = new RsInfoUserPro()
+                    .setId(user.getId())
+                    .setName(user.getName())
+                    .setSurname(user.getSurname())
+                    .setPatronymic(user.getPatronymic())
+                    .setEmail(user.getEmail())
+                    .setPhone(user.getPhone());
+            infoUsers.add(infoUser);
+        }
+
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(users);
+                .body(infoUsers);
     }
 
     /**
@@ -228,9 +245,17 @@ public class AuthorizationService {
                     .status(HttpStatus.ACCEPTED)
                     .body("Данный пользователь не существует!");
 
+        RsInfoUserPro infoUser = new RsInfoUserPro()
+                .setId(user.get().getId())
+                .setName(user.get().getName())
+                .setSurname(user.get().getSurname())
+                .setPatronymic(user.get().getPatronymic())
+                .setEmail(user.get().getEmail())
+                .setPhone(user.get().getPhone());
+
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(user.get());
+                .body(infoUser);
     }
 
     /**
@@ -246,15 +271,17 @@ public class AuthorizationService {
                     .status(HttpStatus.ACCEPTED)
                     .body("Данный пользователь не существует!");
 
-        UserEntity rq = user.get();
-        RsInfoUser rs = new RsInfoUser()
-                .setName(rq.getName())
-                .setSurname(rq.getSurname())
-                .setPatronymic(rq.getPatronymic());
+        RsInfoUserPro infoUser = new RsInfoUserPro()
+                .setId(user.get().getId())
+                .setName(user.get().getName())
+                .setSurname(user.get().getSurname())
+                .setPatronymic(user.get().getPatronymic())
+                .setEmail(user.get().getEmail())
+                .setPhone(user.get().getPhone());
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(rs);
+                .body(infoUser);
     }
 
     /**
@@ -264,21 +291,23 @@ public class AuthorizationService {
      * @return имя, фамилию и отчество требуемого пользователя
      */
     public ResponseEntity<?> getUserByPhone(String phone) {
-        // todo: вынести пользователя в переменную и работать с результатом
-        if (!userRepository.findByPhone(phone).isPresent())
+        Optional<UserEntity> user = userRepository.findByPhone(phone);
+        if (!user.isPresent())
             return ResponseEntity
                     .status(HttpStatus.ACCEPTED)
                     .body("Данный пользователь не существует!");
 
-        UserEntity rq = userRepository.findByPhone(phone).get();
-        RsInfoUser rs = new RsInfoUser()
-                .setName(rq.getName())
-                .setSurname(rq.getSurname())
-                .setPatronymic(rq.getPatronymic());
+        RsInfoUserPro infoUser = new RsInfoUserPro()
+                .setId(user.get().getId())
+                .setName(user.get().getName())
+                .setSurname(user.get().getSurname())
+                .setPatronymic(user.get().getPatronymic())
+                .setEmail(user.get().getEmail())
+                .setPhone(user.get().getPhone());
 
         return ResponseEntity
                 .status(HttpStatus.ACCEPTED)
-                .body(rs);
+                .body(infoUser);
     }
 
     //Валидация пользователя по id

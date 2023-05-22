@@ -28,7 +28,7 @@ public class CheckRoleAspect {
      * Проверка ролей
      *
      * @param proceedingJoinPoint
-     * @param checkRole           boolean-значения для каждой роли является/не является
+     * @param checkRole boolean-значения для каждой роли является/не является
      * @return proceedingJoinPoint типо прога продолжает свою работу
      * @throws Throwable
      */

@@ -6,17 +6,15 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Интерфейс для полей аннотации проверки ролей
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CheckRole {
-    /**
-     * Название роли пользователя, которому нужно дать доступ
-     * @return название роли
-     */
-    String role();
-
+    boolean isUser() default false;
+    boolean isModer() default false;
+    boolean isTester() default false;
+    boolean isHacker() default false;
     /**
      * Название атрибута внутри контроллера, в котором хранится токен пользователя
      * @return название атрибута

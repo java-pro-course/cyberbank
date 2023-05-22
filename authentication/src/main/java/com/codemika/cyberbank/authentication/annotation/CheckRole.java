@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- *
+ * Интерфейс для полей аннотации проверки ролей
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

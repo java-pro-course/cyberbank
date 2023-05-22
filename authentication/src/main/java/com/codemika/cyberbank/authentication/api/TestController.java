@@ -34,14 +34,14 @@ public class TestController {
     public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @RequestParam Long id) {
         return service.getUserById(id);
     }
-
-    //@CheckRole(role = "MODER")
+    //eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MTQsIm5hbWUiOiLQodCy0LDRgNC-0LMiLCJzdXJuYW1lIjoi0KXQsNC60LXRgCIsInBhdHJvbnltaWMiOiLQo9C60YDQsNC40L3RgdC60LjQuSIsImVtYWlsIjoidGhlLnN2YXJvZy5oYWNrZXJAZW1haWwudWEiLCJwaG9uZSI6IjgyMzQ1Mjc5OTAiLCJpc191c2VyX3JvbGUiOnRydWUsImlzX21vZGVyX3JvbGUiOnRydWUsImlzX3Rlc3Rlcl9yb2xlIjpmYWxzZSwiaXNfaGFja2VyX3JvbGUiOmZhbHNlLCJleHAiOjE2OTA3NTgxODZ9.N_0cSBSATOsryTRJMBnRrBGJGpzVv6iSTDV8cTqS9W7S4nf_utbE-67BZlaMF1RJI4cIoImFcw94oKqM6UISCQ
+    @CheckRole(isUser = true, isModer = true)
     @GetMapping("get-user-by-email")
     public ResponseEntity<?> getUserByEmail(@RequestHeader("Authorization") String token, @RequestParam String email) {
         return service.getUserByEmail(email);
     }
 
-    //@CheckRole(role = "MODER")
+    @CheckRole(isUser = true, isModer = true, isTester = true)
     @GetMapping("get-user-by-phone")
     public ResponseEntity<?> getUserByPhone(@RequestHeader("Authorization") String token, @RequestParam String phone) {
         return service.getUserByPhone(phone);
@@ -58,6 +58,7 @@ public class TestController {
         return ResponseEntity.ok(claimsParseToken.toString());
     }
 
+    @CheckRole(isUser = true, isModer = true)
     @PostMapping("become-moder")
     public ResponseEntity<?> becomeModer(@RequestHeader("Authorization") String token, Long idNewModer) {
         return service.becomeModer(idNewModer);
