@@ -3,6 +3,7 @@ package com.codemika.cyberbank.card.service;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
+import com.codemika.cyberbank.card.entity.CreditCardEntity;
 import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import com.codemika.cyberbank.card.repository.CreditCardRepository;
 import com.codemika.cyberbank.card.repository.DebitCardRepository;
@@ -151,12 +152,13 @@ public class CardService {
         Long ownerUserId = claimsParseToken.get("id", Long.class);
         String typeNewCard = "Кредитная";
         //Подготавливаем результат
-        DebitCardEntity card = new DebitCardEntity()
+       CreditCardEntity card = new CreditCardEntity()
                 .setTitle(rq.getTitle())
                 .setType(typeNewCard)
                 .setOwnerUserId(ownerUserId)
                 .setBalance(rq.getValue())
                 .setPincode(rq.getPincode().trim())
+               .setCreditTerm(rq.getCreditTerm())
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
@@ -176,10 +178,9 @@ public class CardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Такого пользователя не существует!");
         }
-
-        card = creditRepository.save(card);
-
-        return ResponseEntity.ok(card);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(creditRepository.save(card));
     }
 
     /**
@@ -526,7 +527,7 @@ public class CardService {
      * @return результат изменения статуса
      */
     public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long cardId, Long userId) {
-        Optional<DebitCardEntity> cardEntity = repository.findById(cardId);
+        Optional<DebitCardEntity> cardEntity = debitRepository.findById(cardId);
         if (!cardEntity.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данной карты не существует!");
         }
@@ -535,7 +536,7 @@ public class CardService {
         }
 
         card.setIsActive(!card.getIsActive());
-        repository.updateById(card.getIsActive(), cardId);
+        debitRepository.updateById(card.getIsActive(), cardId);
 
         return ResponseEntity
           .status(HttpStatus.OK)
@@ -552,7 +553,7 @@ public class CardService {
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
 
-        List<DebitCardEntity> cards = repository.findAllByOwnerUserId(id);
+        List<DebitCardEntity> cards = debitRepository.findAllByOwnerUserId(id);// todo временно
 
         if (cards.isEmpty()) 
           return ResponseEntity
@@ -561,8 +562,6 @@ public class CardService {
 
         return ResponseEntity.ok(cards);
     }
-    //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
-
     /**
      * ТОЛЬКО ДЛЯ МОДЕРОВ
      * Получение ВСЕХ карт в банке
@@ -570,7 +569,7 @@ public class CardService {
      * @return Все карты банка
      */
     public ResponseEntity<?> getAllCards() {
-        List<DebitCardEntity> cards = repository.findAll();
+        List<DebitCardEntity> cards = debitRepository.findAll();// TODO временно
 
         if (cards.isEmpty()) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -589,7 +588,7 @@ public class CardService {
      */
     @Transactional
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
-        Optional<DebitCardEntity> card = repository.findById(cardId);
+        Optional<DebitCardEntity> card = debitRepository.findById(cardId);
         if (value <= 0)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -603,7 +602,7 @@ public class CardService {
         card.get()
                 .setBalance(card.get().getBalance() + value);
 
-        repository.moneyTransfer(card.get().getBalance(), cardId);
+        debitRepository.moneyTransfer(card.get().getBalance(), cardId);
 
         return ResponseEntity
                 .ok("Вы успешно получили " + value + " рублей");
