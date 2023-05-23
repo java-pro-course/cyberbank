@@ -3,8 +3,9 @@ package com.codemika.cyberbank.card.service;
 import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
-import com.codemika.cyberbank.card.entity.CardEntity;
-import com.codemika.cyberbank.card.repository.CardRepository;
+import com.codemika.cyberbank.card.entity.DebitCardEntity;
+import com.codemika.cyberbank.card.repository.CreditCardRepository;
+import com.codemika.cyberbank.card.repository.DebitCardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import javax.smartcardio.Card;
 import java.util.*;
 
 import java.util.Optional;
@@ -24,7 +24,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 public class CardService {
-    private final CardRepository repository;
+    private final DebitCardRepository debitRepository;
     private final CreditCardRepository creditRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
@@ -72,7 +72,7 @@ public class CardService {
         Long ownerUserId = claimsParseToken.get("id", Long.class);
         String typeNewCard = "Дебетовая";
         //Подготавливаем результат
-        CardEntity card = new CardEntity()
+        DebitCardEntity card = new DebitCardEntity()
                 .setTitle(rq.getTitle())
                 .setType(typeNewCard)
                 .setOwnerUserId(ownerUserId)
@@ -82,7 +82,7 @@ public class CardService {
                         generateAccountNumber(16)
                 );
 
-        if (repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
+        if (debitRepository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Такая карта уже существует!");
@@ -98,7 +98,7 @@ public class CardService {
                     .body("Такого пользователя не существует!");
         }
 
-        card = repository.save(card);
+        card = debitRepository.save(card);
 
         return ResponseEntity.ok(card);
     }
@@ -151,7 +151,7 @@ public class CardService {
         Long ownerUserId = claimsParseToken.get("id", Long.class);
         String typeNewCard = "Кредитная";
         //Подготавливаем результат
-        CardEntity card = new CardEntity()
+        DebitCardEntity card = new DebitCardEntity()
                 .setTitle(rq.getTitle())
                 .setType(typeNewCard)
                 .setOwnerUserId(ownerUserId)
@@ -161,7 +161,7 @@ public class CardService {
                         generateAccountNumber(16)
                 );
 
-        if (repository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
+        if (creditRepository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Такая карта уже существует!");
@@ -177,7 +177,7 @@ public class CardService {
                     .body("Такого пользователя не существует!");
         }
 
-        card = repository.save(card);
+        card = creditRepository.save(card);
 
         return ResponseEntity.ok(card);
     }
@@ -192,65 +192,65 @@ public class CardService {
      * @param receivingId id-карты, на которую переводятся деньги
      * @return сообщение об переводе и текущий баланс
      */
-    @Transactional
-    public ResponseEntity<?> moneyTransfer(String token, String pincode, Long id, Long value, Long receivingId) {
-        Optional<CardEntity> card = repository.findById(id);
-        Optional<CardEntity> receivingCard = repository.findById(receivingId);
-
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-
-        if (value == null)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Некорректная сумма перевода");
-        if (value <= 0)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не можете переводить отрицательные суммы");
-
-        if (!card.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с id " + id + " не существует");
-
-        if (!pincode.equals(card.get().getPincode()))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный пин-код");
-
-        if (!receivingCard.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с id " + receivingId + " не существует");
-
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id " + id);
-
-        if (card.get().getBalance() < value)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("На карте недостаточно средств");
-
-        if (id.equals(receivingId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не можете перевести деньги на свою карту");
-
-        receivingCard
-                .get()
-                .setBalance(receivingCard.get().getBalance() + value);
-        card.get()
-                .setBalance(card.get().getBalance() - value);
-
-        repository.moneyTransfer(card.get().getBalance(), id);
-        repository.moneyTransfer(receivingCard.get().getBalance(), receivingId);
-
-        return ResponseEntity
-                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
-}
+//    @Transactional
+//    public ResponseEntity<?> moneyTransfer(String token, String pincode, Long id, Long value, Long receivingId) {
+//        Optional<DebitCardEntity> card = repository.findById(id);
+//        Optional<DebitCardEntity> receivingCard = repository.findById(receivingId);
+//
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//
+//        if (value == null)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Некорректная сумма перевода");
+//        if (value <= 0)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Вы не можете переводить отрицательные суммы");
+//
+//        if (!card.isPresent())
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с id " + id + " не существует");
+//
+//        if (!pincode.equals(card.get().getPincode()))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Неверный пин-код");
+//
+//        if (!receivingCard.isPresent())
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с id " + receivingId + " не существует");
+//
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id " + id);
+//
+//        if (card.get().getBalance() < value)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("На карте недостаточно средств");
+//
+//        if (id.equals(receivingId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Вы не можете перевести деньги на свою карту");
+//
+//        receivingCard
+//                .get()
+//                .setBalance(receivingCard.get().getBalance() + value);
+//        card.get()
+//                .setBalance(card.get().getBalance() - value);
+//
+//        repository.moneyTransfer(card.get().getBalance(), id);
+//        repository.moneyTransfer(receivingCard.get().getBalance(), receivingId);
+//
+//        return ResponseEntity
+//                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
+//}
     /**
      * Метод для перервода денег с карты на карту по номерам карт
      * @param token - токен пользователя, переводящего деньги
@@ -260,65 +260,65 @@ public class CardService {
      * @param receivingAccountNumber - номер карты, на которую переводятся деньги
      * @return - сообщение о переводе и текущем балансе
      */
-    @Transactional
-    public ResponseEntity<?> moneyTransfer(String token, String pincode, String accountNumber, Long value, String receivingAccountNumber) {
-        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
-        Optional<CardEntity> receivingCard = repository.findCardByAccountNumber(receivingAccountNumber);
-
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-
-        if (value == null)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Некорректная сумма перевода");
-        if(value <= 0)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не можете переводить отрицательные суммы");
-
-        if (!card.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с номером карты " + accountNumber + " не существует");
-
-        if (!pincode.equals(card.get().getPincode()))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Неверный пин-код");
-
-        if (!receivingCard.isPresent())
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с номером карты " + receivingAccountNumber + " не существует");
-
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
-
-        if (card.get().getBalance() < value)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("На карте недостаточно средств");
-
-        if (accountNumber.equals(receivingAccountNumber))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не можете перевести деньги на свою карту");
-
-        receivingCard
-                .get()
-                .setBalance(receivingCard.get().getBalance() + value);
-        card.get()
-                .setBalance(card.get().getBalance() - value);
-
-        repository.moneyTransfer(card.get().getBalance(), card.get().getId());
-        repository.moneyTransfer(receivingCard.get().getBalance(), receivingCard.get().getId());
-
-        return ResponseEntity
-                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
-    }
+//    @Transactional
+//    public ResponseEntity<?> moneyTransfer(String token, String pincode, String accountNumber, Long value, String receivingAccountNumber) {
+//        Optional<DebitCardEntity> card = repository.findCardByAccountNumber(accountNumber);
+//        Optional<DebitCardEntity> receivingCard = repository.findCardByAccountNumber(receivingAccountNumber);
+//
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//
+//        if (value == null)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Некорректная сумма перевода");
+//        if(value <= 0)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Вы не можете переводить отрицательные суммы");
+//
+//        if (!card.isPresent())
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с номером карты " + accountNumber + " не существует");
+//
+//        if (!pincode.equals(card.get().getPincode()))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Неверный пин-код");
+//
+//        if (!receivingCard.isPresent())
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с номером карты " + receivingAccountNumber + " не существует");
+//
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
+//
+//        if (card.get().getBalance() < value)
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("На карте недостаточно средств");
+//
+//        if (accountNumber.equals(receivingAccountNumber))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Вы не можете перевести деньги на свою карту");
+//
+//        receivingCard
+//                .get()
+//                .setBalance(receivingCard.get().getBalance() + value);
+//        card.get()
+//                .setBalance(card.get().getBalance() - value);
+//
+//        repository.moneyTransfer(card.get().getBalance(), card.get().getId());
+//        repository.moneyTransfer(receivingCard.get().getBalance(), receivingCard.get().getId());
+//
+//        return ResponseEntity
+//                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
+//    }
 
     /**
      * Изменение названия карты по id карты
@@ -327,22 +327,22 @@ public class CardService {
      * @param newTitle - новое название карты
      * @return - сообщение об изменении названия карты
      */
-    public ResponseEntity<?> changeCardTitle(String token, Long id, String newTitle) {
-        Optional<CardEntity> card = repository.findById(id);
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с таким номером не существует!");
-        }
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Нельзя менять данные чужой карты!");
-        repository.updateCardTitle(newTitle, card.get().getId());
-        return ResponseEntity.ok("Название карты изменено.");
-    }
+//    public ResponseEntity<?> changeCardTitle(String token, Long id, String newTitle) {
+//        Optional<DebitCardEntity> card = repository.findById(id);
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//        if (!card.isPresent()) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с таким номером не существует!");
+//        }
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Нельзя менять данные чужой карты!");
+//        repository.updateCardTitle(newTitle, card.get().getId());
+//        return ResponseEntity.ok("Название карты изменено.");
+//    }
 
     /**
      * Изменение названия карты по номеру карты
@@ -351,23 +351,23 @@ public class CardService {
      * @param newTitle - новое название карты
      * @return - сообщение об изменении названия карты
      */
-    public ResponseEntity<?> changeCardTitle(String token, String accountNumber, String newTitle) {
-        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с таким номером не существует!");
-        }
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Нельзя менять данные чужой карты!");
-
-        repository.updateCardTitle(newTitle, card.get().getId());
-        return ResponseEntity.ok("Название карты изменено.");
-    }
+//    public ResponseEntity<?> changeCardTitle(String token, String accountNumber, String newTitle) {
+//        Optional<DebitCardEntity> card = repository.findCardByAccountNumber(accountNumber);
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//        if (!card.isPresent()) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с таким номером не существует!");
+//        }
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Нельзя менять данные чужой карты!");
+//
+//        repository.updateCardTitle(newTitle, card.get().getId());
+//        return ResponseEntity.ok("Название карты изменено.");
+//    }
 
     /**
      * Изменение пин-кода по id карты
@@ -377,28 +377,28 @@ public class CardService {
      * @param newPinCode - новый пин-код карты
      * @return - сообщение об изменении пин-кода карты
      */
-    public ResponseEntity<?> changeCardPinCode(String token, Long id, String pincode, String newPinCode) {
-        Optional<CardEntity> card = repository.findById(id);
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с таким id не существует!");
-        }
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Нельзя менять данные чужой карты!");
-        if (!card.get().getPincode().equals(pincode)){
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пин-код неверный!");
-        }
-
-        repository.updateCardPinCode(newPinCode, card.get().getId());
-        return ResponseEntity.ok("Пин-код карты изменен.");
-    }
+//    public ResponseEntity<?> changeCardPinCode(String token, Long id, String pincode, String newPinCode) {
+//        Optional<DebitCardEntity> card = repository.findById(id);
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//        if (!card.isPresent()) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с таким id не существует!");
+//        }
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Нельзя менять данные чужой карты!");
+//        if (!card.get().getPincode().equals(pincode)){
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Пин-код неверный!");
+//        }
+//
+//        repository.updateCardPinCode(newPinCode, card.get().getId());
+//        return ResponseEntity.ok("Пин-код карты изменен.");
+//    }
 
     /**
      * Изменение пин-кода карты по номеру карты
@@ -408,28 +408,28 @@ public class CardService {
      * @param newPinCode - новый пин-код карты
      * @return - сообщение об изменении пин-кода карты
      */
-    public ResponseEntity<?> changeCardPinCode(String token, String accountNumber, String pincode, String newPinCode) {
-        Optional<CardEntity> card = repository.findCardByAccountNumber(accountNumber);
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Карты с таким номером не существует!");
-        }
-        if (!card.get().getOwnerUserId().equals(ownerUserId))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Нельзя менять данные чужой карты!");
-        if (!card.get().getPincode().equals(pincode)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пин-код неверный!");
-        }
-
-        repository.updateCardPinCode(newPinCode, card.get().getId());
-        return ResponseEntity.ok("Пин-код карты изменен.");
-    }
+//    public ResponseEntity<?> changeCardPinCode(String token, String accountNumber, String pincode, String newPinCode) {
+//        Optional<DebitCardEntity> card = repository.findCardByAccountNumber(accountNumber);
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//        if (!card.isPresent()) {
+//            return ResponseEntity
+//                    .status(HttpStatus.NOT_FOUND)
+//                    .body("Карты с таким номером не существует!");
+//        }
+//        if (!card.get().getOwnerUserId().equals(ownerUserId))
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Нельзя менять данные чужой карты!");
+//        if (!card.get().getPincode().equals(pincode)) {
+//            return ResponseEntity
+//                    .status(HttpStatus.BAD_REQUEST)
+//                    .body("Пин-код неверный!");
+//        }
+//
+//        repository.updateCardPinCode(newPinCode, card.get().getId());
+//        return ResponseEntity.ok("Пин-код карты изменен.");
+//    }
 
     /**
      * Удаление карты
@@ -438,8 +438,8 @@ public class CardService {
      * @param id    id карты
      * @return Результат удаления
      */
-    public ResponseEntity<?> deleteCard(String token, Long id) {
-        Optional<CardEntity> card = repository.findById(id);
+    public ResponseEntity<?> deleteDebitCard(String token, Long id) {
+        Optional<DebitCardEntity> card = debitRepository.findById(id);
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
@@ -461,7 +461,7 @@ public class CardService {
                     "Пожалуйста, снимите их или переведите на другую карту!");
         }
 
-        repository.deleteById(id);
+        debitRepository.deleteById(id);
         return ResponseEntity
           .ok()
           .body("Карта была успешно удалена!");
@@ -526,7 +526,7 @@ public class CardService {
      * @return результат изменения статуса
      */
     public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long cardId, Long userId) {
-        Optional<CardEntity> cardEntity = repository.findById(cardId);
+        Optional<DebitCardEntity> cardEntity = repository.findById(cardId);
         if (!cardEntity.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данной карты не существует!");
         }
@@ -552,7 +552,7 @@ public class CardService {
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
 
-        List<CardEntity> cards = repository.findAllByOwnerUserId(id);
+        List<DebitCardEntity> cards = repository.findAllByOwnerUserId(id);
 
         if (cards.isEmpty()) 
           return ResponseEntity
@@ -570,7 +570,7 @@ public class CardService {
      * @return Все карты банка
      */
     public ResponseEntity<?> getAllCards() {
-        List<CardEntity> cards = repository.findAll();
+        List<DebitCardEntity> cards = repository.findAll();
 
         if (cards.isEmpty()) return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -589,7 +589,7 @@ public class CardService {
      */
     @Transactional
     public ResponseEntity<?> getMeMoney(Long cardId, Long value) {
-        Optional<CardEntity> card = repository.findById(cardId);
+        Optional<DebitCardEntity> card = repository.findById(cardId);
         if (value <= 0)
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

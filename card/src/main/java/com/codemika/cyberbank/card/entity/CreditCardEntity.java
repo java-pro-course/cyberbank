@@ -34,4 +34,8 @@ public class CreditCardEntity {
 
     @Column(name = "credit_term")
     private int creditTerm;
+
+    @Column(name = "is_active")
+    private Boolean isActive = true; //активна или нет
+
 }

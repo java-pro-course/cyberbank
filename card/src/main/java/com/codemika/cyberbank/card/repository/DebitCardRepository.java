@@ -1,6 +1,6 @@
 package com.codemika.cyberbank.card.repository;
 
-import com.codemika.cyberbank.card.entity.CardEntity;
+import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

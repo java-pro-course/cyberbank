@@ -1,6 +1,6 @@
 databaseChangeLog:
   - include:
-      file: tables/card.yml
+      file: tables/debit_card.yml
       relativeToChangelogFile: true
   - include:
       file: tables/credit_card.yml

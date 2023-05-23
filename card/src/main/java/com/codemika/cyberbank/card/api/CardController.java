@@ -187,40 +187,28 @@ public class CardController {
     //}
 
     /**
-     * Удаление карты
-     *
+     * Удаление дебетовой карты
      * @param token токен владельца
-     * @param id    id карты
+     * @param id id карты
      * @return сообщение об успешном/не успешном удалении
      */
     @CheckRole(isUser = true)
-    @DeleteMapping("delete-card")
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token,
-                                        @RequestParam  Long id) {
-        return ResponseEntity.ok(cardService.deleteCard(token, id));
+    @DeleteMapping("delete-debit-card")
+    public ResponseEntity<?> deleteDebitCard(@RequestHeader("Authorization") String token, Long id){
+        return ResponseEntity.ok(cardService.deleteDebitCard(token, id));
     }
 
-    ///**
-    // * Удаление дебетовой карты
-    // * @param token токен владельца
-    // * @param id id карты
-    // * @return сообщение об успешном/не успешном удалении
-    // */
-    //@DeleteMapping("delete-debit-card")
-    //public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
-    //    return ResponseEntity.ok(cardService.deleteCard(token, id));
-    //}
-
-    ///**
-    // * Удаление кредитной карты
-    // * @param token токен владельца
-    // * @param id id карты
-    // * @return сообщение об успешном/не успешном удалении
-    // */
-    //@DeleteMapping("delete-credit-card")
-    //public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
-    //    return ResponseEntity.ok(cardService.deleteCard(token, id));
-    //}
+    /**
+     * Удаление кредитной карты
+     * @param token токен владельца
+     * @param id id карты
+     * @return сообщение об успешном/не успешном удалении
+     */
+    @CheckRole(isUser = true)
+    @DeleteMapping("delete-credit-card")
+    public ResponseEntity<?> deleteCreditCard(@RequestHeader("Authorization") String token, Long id){
+        return ResponseEntity.ok(cardService.deleteCreditCard(token, id));
+    }
 
     /**
      * Просмотр пользователем всех своих карт

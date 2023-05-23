@@ -1,7 +1,7 @@
 databaseChangeLog:
-  - logicalFilePath: 1.0/tables/card
+  - logicalFilePath: 1.0/tables/credit_card
   - changeSet:
-      id: credit_card-0
+      id: credit-card-0
       author: xCrynge
       changes:
         - createTable:
@@ -48,5 +48,10 @@ databaseChangeLog:
               - column:
                   name: credit_term
                   type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_active
+                  type: boolean
                   constraints:
                     nullable: false
