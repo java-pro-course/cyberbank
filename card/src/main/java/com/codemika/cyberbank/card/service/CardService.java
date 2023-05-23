@@ -5,6 +5,7 @@ import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
 import com.codemika.cyberbank.card.entity.CardEntity;
 import com.codemika.cyberbank.card.repository.CardRepository;
+//import com.codemika.cyberbank.card.repository.CreditCardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
-import javax.smartcardio.Card;
 import java.util.*;
 
 import java.util.Optional;
@@ -25,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final CardRepository repository;
-    private final CreditCardRepository creditRepository;
+    //private final CreditCardRepository creditRepository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
     public final JwtUtil jwtUtil;
@@ -468,36 +467,36 @@ public class CardService {
           .body("Карта была успешно удалена!");
     }
 
-    public ResponseEntity<?> deleteCreditCard(String token, Long id) {
-        Optional<CreditCardEntity> card = creditRepository.findById(id);
-
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-
-        if (!card.isPresent()) {
-            return ResponseEntity
-              .badRequest()
-              .body("Карта с id: " + id + " не существует!");
-        }
-
-        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
-            return ResponseEntity
-              .badRequest()
-              .body("Вы не являетесь владельцем данной карты!");
-        }
-
-        if (card.get().getBalance() != 0) {
-            return ResponseEntity
-              .badRequest()
-              .body("Вы не можете удалисть карту на которой есть деньги!" +
-                    "Пожалуйста, снимите их или переведите на другую карту");
-        }
-
-        creditRepository.deleteById(id);
-        return ResponseEntity
-          .ok()
-          .body("Карта была успешно удалена");
-    }
+//    public ResponseEntity<?> deleteCreditCard(String token, Long id) {
+//        Optional<CreditCardEntity> card = creditRepository.findById(id);
+//
+//        Claims claimsParseToken = jwtUtil.getClaims(token);
+//        Long ownerUserId = claimsParseToken.get("id", Long.class);
+//
+//        if (!card.isPresent()) {
+//            return ResponseEntity
+//              .badRequest()
+//              .body("Карта с id: " + id + " не существует!");
+//        }
+//
+//        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
+//            return ResponseEntity
+//              .badRequest()
+//              .body("Вы не являетесь владельцем данной карты!");
+//        }
+//
+//        if (card.get().getBalance() != 0) {
+//            return ResponseEntity
+//              .badRequest()
+//              .body("Вы не можете удалить карту на которой есть деньги!" +
+//                    "Пожалуйста, снимите их или переведите на другую карту");
+//        }
+//
+//        creditRepository.deleteById(id);
+//        return ResponseEntity
+//          .ok()
+//          .body("Карта была успешно удалена");
+//    }
 
 
 
@@ -562,7 +561,6 @@ public class CardService {
 
         return ResponseEntity.ok(cards);
     }
-    //todo после создания ролей, добавить сюда проверку на содержание токена роли МОДЕР
 
     /**
      * ТОЛЬКО ДЛЯ МОДЕРОВ

@@ -88,6 +88,6 @@ public class CheckRoleAspect {
                   boolean isHackerToken, boolean isHacker) {
         if (isTester || isHacker) return isTesterToken || isHackerToken;
         if (isModer) return isModerToken;
-        return false;
+        return true;
     }
 }
