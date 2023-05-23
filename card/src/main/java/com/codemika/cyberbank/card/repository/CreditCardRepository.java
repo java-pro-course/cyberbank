@@ -9,8 +9,15 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+/**
+ * Репозиторий для кредитных карт
+ */
+ @Repository
 public interface CreditCardRepository extends JpaRepository<CreditCardEntity, Long> {
+
+    @Modifying
+    @Query("UPDATE CreditCardEntity card SET card.isActive = ?1 WHERE card.id = ?2")
+    void updateById(Boolean isActive, Long id);
     List<CreditCardEntity> findAllByOwnerUserId(Long id);
     Optional<CreditCardEntity> findCardByAccountNumber(String AccountNumber);
     Optional<CreditCardEntity> findAllByAccountNumber(String AccountNumber);
