@@ -1,12 +1,12 @@
 databaseChangeLog:
   - logicalFilePath: 1.0/tables/card
   - changeSet:
-      id: card-0
+      id: credit_card-0
       author: xCrynge
       changes:
         - createTable:
             schemaName: cyberbank_card
-            tableName: card
+            tableName: credit_card
             columns:
               - column:
                   name: id
@@ -46,7 +46,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: isActive
-                  type: boolean
+                  name: credit_term
+                  type: int
                   constraints:
                     nullable: false

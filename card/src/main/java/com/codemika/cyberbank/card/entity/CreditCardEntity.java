@@ -5,15 +5,11 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-/**
- * Entity для карт
- */
 @Entity
-@Table(schema = "cyberbank_card", name = "card")
+@Table(schema = "cyberbank_card", name = "credit_card")
 @Data
 @Accessors(chain = true)
-public class CardEntity {
-
+public class CreditCardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,18 +21,17 @@ public class CardEntity {
     private Long balance;
 
     @Column(name = "type")
-    private String type; // дебет / кредит
+    private String type;
 
     @Column(name = "account_number")
     private String accountNumber;
 
     @Column(name = "pin_code")
-    private String pincode; //пин-код состоит из 4-х цифр.
+    private String pincode;
 
     @Column(name = "owner_user_id")
     private Long ownerUserId;
 
-    @Column(name = "isActive")
-    private Boolean isActive = true; //активна или нет
-
- }
+    @Column(name = "credit_term")
+    private int creditTerm;
+}

@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
 import java.util.Date;
 
 /**
@@ -16,16 +17,16 @@ public class JwtUtil {
     /**
      * SIGN - это ключ для генерации и расшифровки токена.
      */
-   private final String SIGN = "SuPErSecRETsign228CyBERbANk";
+    private final String SIGN = "SuPErSecRETsign228CyBERbANk";
 
     /**
      * Создание нового токена. Используется при входе
-     *
      * Длительность токена 69,(4) дней
+     *
      * @param claims информация, содержащаяся в токене
      * @return Токен
      */
-    public String generateToken(Claims claims){
+    public String generateToken(Claims claims) {
         long nowMillis = System.currentTimeMillis();
         long expirationMillis = nowMillis + 6_000_000_000L;
         Date exp = new Date(expirationMillis);
@@ -60,18 +61,18 @@ public class JwtUtil {
      * @param token токен
      * @return Информацию, содержащуюся в токене
      */
-    public Claims getClaims(String token){
+    public Claims getClaims(String token) {
         token = token.replace("\"", "");
         token = token.trim();
 
-        try{
+        try {
             return Jwts.parser()
                     .setSigningKey(SIGN)
                     .parseClaimsJws(token)
                     .getBody();
-        }catch (RuntimeException e){
-            log.error("Token is invalid");
-            log.error(e.getMessage() + "=>"+ e);
+        } catch (RuntimeException e) {
+            log.error("Неверный токен!");
+            log.error(e.getMessage() + "=>" + e);
         }
 
         return null;

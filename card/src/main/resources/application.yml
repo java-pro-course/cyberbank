@@ -6,7 +6,7 @@ spring:
   liquibase: # liquibase liquibase для накатки sql скриптов на БД
     enabled: true
     change-log: classpath:db/changelog-master.yml
-    liquibase-schema: cyberbank_liquibase
+    liquibase-schema: card_liquibase
   application: # название приложения
     name: card
   cloud:
