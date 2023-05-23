@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 
 @RestController
 @RequestMapping("api/card")
@@ -49,7 +48,9 @@ public class CardController {
      */
     @CheckRole(isUser = true)
     @PostMapping("change-card-title-by-id")
-    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
+    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
+                                             @RequestParam Long id,
+                                             @RequestParam String newTitle){
         return cardService.changeCardTitle(token, id, newTitle);
     }
 
@@ -59,7 +60,7 @@ public class CardController {
     // * @param newTitle новое название карты
     // * @return изменение названия карты
     // */
-    //   @PostMapping("change-debet-card-title-by-id")
+    //   @PostMapping("change-debit-card-title-by-id")
     //   public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, Long id, String newTitle){
     //       return cardService.changeCardTitle(token, id, newTitle);
     //   }
@@ -81,8 +82,11 @@ public class CardController {
      * @param newTitle новое название карты
      * @return изменение названия карты
      */
+    @CheckRole(isUser = true)
     @PostMapping("change-card-title-by-account-number")
-    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
+    public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
+                                             @RequestParam String accountNumber,
+                                             @RequestParam String newTitle){
         return cardService.changeCardTitle(token, accountNumber, newTitle);
     }
 
@@ -92,7 +96,7 @@ public class CardController {
     // * @param newTitle новое название карты
     // * @return изменение названия карты
     // */
-    //@PostMapping("change-debet-card-title-by-account-number")
+    //@PostMapping("change-debit-card-title-by-account-number")
     //public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token, String accountNumber, String newTitle){
     //    return cardService.changeCardTitle(token, accountNumber, newTitle);
     //}
@@ -114,8 +118,12 @@ public class CardController {
      * @param newPinCode новый пин-код карты
      * @return изменение пин-кода карты
      */
+    @CheckRole(isUser = true)
     @PostMapping("change-card-pincode-by-id")
-    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
+    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token,
+                                           @RequestParam Long id,
+                                           @RequestParam String pincode,
+                                           @RequestParam String newPinCode){
         return cardService.changeCardPinCode(token, id, pincode, newPinCode);
     }
 
@@ -125,7 +133,7 @@ public class CardController {
     // * @param newPinCode новый пин-код карты
     // * @return изменение пин-кода карты
     // */
-    //@PostMapping("change-debet-card-pincode-by-id")
+    //@PostMapping("change-debit-card-pincode-by-id")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, Long id, String pincode, String newPinCode){
     //    return cardService.changeCardPinCode(token, id, pincode, newPinCode);
     //}
@@ -147,8 +155,12 @@ public class CardController {
      * @param newPinCode новый пин-код карты
      * @return изменение карты
      */
+    @CheckRole(isUser = true)
     @PostMapping("change-card-pincode-by-account-number")
-    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
+    public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token,
+                                           @RequestParam  String accountNumber,
+                                           @RequestParam  String pincode,
+                                           @RequestParam  String newPinCode){
         return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
     }
 
@@ -158,7 +170,7 @@ public class CardController {
     // * @param newPinCode новый пин-код карты
     // * @return изменение карты
     // */
-    //@PostMapping("change-debet-card-pincode-by-account-number")
+    //@PostMapping("change-debit-card-pincode-by-account-number")
     //public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token, String accountNumber, String pincode, String newPinCode){
     //    return cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
     //}
@@ -182,8 +194,9 @@ public class CardController {
      * @return сообщение об успешном/не успешном удалении
      */
     @CheckRole(isUser = true)
-    @DeleteMapping("delete")
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id) {
+    @DeleteMapping("delete-card")
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token,
+                                        @RequestParam  Long id) {
         return ResponseEntity.ok(cardService.deleteCard(token, id));
     }
 
@@ -193,7 +206,7 @@ public class CardController {
     // * @param id id карты
     // * @return сообщение об успешном/не успешном удалении
     // */
-    //@DeleteMapping("delete-debet-card")
+    //@DeleteMapping("delete-debit-card")
     //public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, Long id){
     //    return ResponseEntity.ok(cardService.deleteCard(token, id));
     //}
@@ -245,10 +258,10 @@ public class CardController {
     @CheckRole(isUser = true)
     @PostMapping("money-transfer-by-id")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-                                           String pincode,
-                                           Long senderId,
-                                           Long value,
-                                           Long receivingId) {
+                                           @RequestParam String pincode,
+                                           @RequestParam Long senderId,
+                                           @RequestParam Long value,
+                                           @RequestParam Long receivingId) {
         return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
     }
 
@@ -261,7 +274,7 @@ public class CardController {
     // * @param receivingId - id карты, на которую переводятся деньги
     // * @return - перевод средств
     // */
-    //@PostMapping("debet-money-transfer-by-id")
+    //@PostMapping("debit-money-transfer-by-id")
     //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
     //                                       String pincode,
     //                                       Long senderId,
@@ -299,10 +312,10 @@ public class CardController {
      */
     @PostMapping("money-transfer-by-account-number")
     public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-                                           String pincode,
-                                           String senderAccountNumber,
-                                           Long value,
-                                           String receivingAccountNumber) {
+                                           @RequestParam String pincode,
+                                           @RequestParam String senderAccountNumber,
+                                           @RequestParam Long value,
+                                           @RequestParam String receivingAccountNumber) {
         return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
     }
 
@@ -315,7 +328,7 @@ public class CardController {
     //  * @param receivingAccountNumber - номер карты, на которую переводятся деньги
     // * @return - перевод средств
     //  */
-    //@PostMapping("debet-money-transfer-by-account-number")
+    //@PostMapping("debit-money-transfer-by-account-number")
     //public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
     //                                       String pincode,
     //                                       String senderAccountNumber,
@@ -351,12 +364,16 @@ public class CardController {
 
     @CheckRole(isUser = true, isTester = true)
     @PostMapping("get-me-money")
-    public ResponseEntity<?> getMeMoney(@RequestHeader("Authorization") String token, Long cardId, Long value) {
+    public ResponseEntity<?> getMeMoney(@RequestHeader("Authorization") String token,
+                                        @RequestParam Long cardId,
+                                        @RequestParam Long value) {
         return cardService.getMeMoney(cardId, value);
     }
 
-    @PutMapping("freeze-card-by-id/{id}")
-    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card, @PathVariable Long id, @PathVariable Long userId){
+    @PutMapping("freeze-card-by-id/{id}/{userId}")
+    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card,
+                                        @PathVariable Long id,
+                                        @PathVariable Long userId){
         return cardService.FreezeAndUnfreezeCard(card, id, userId);
     }
 }
