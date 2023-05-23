@@ -14,9 +14,22 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
     private final AuthorizationService authorizationService;
 
-    @GetMapping("login/token")
+    @GetMapping("login-token")
     public ResponseEntity<?> loginWithToken(@RequestHeader("Authorization") String token) {
         return authorizationService.login(token);
+    }
+
+    @DeleteMapping("delete-by-phone")
+    public ResponseEntity<?> deleteByPhone(String token, String phone, String password){
+        return authorizationService.deleteUser(token, password, phone);
+    }
+    @DeleteMapping("delete-by-id")
+    public ResponseEntity<?> deleteById(String token, Long id, String password){
+        return authorizationService.deleteUser(token, password, id);
+    }
+    @DeleteMapping("delete-by-email")
+    public ResponseEntity<?> deleteByEmail(String token, String email, String password){
+        return authorizationService.deleteUserByEmail(token, password, email);
     }
 
     @GetMapping("login")

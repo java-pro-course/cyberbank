@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -313,6 +312,58 @@ public class AuthorizationService {
                 .status(HttpStatus.ACCEPTED)
                 .body(infoUser);
     }
+    // TODO нужно перед удалением проверять есть ли у пользователя карты и удалять их тоже!
+    public ResponseEntity<?> deleteUser(String token, String password, String phone){
+        jwtUtil.validateToken(token);
+        Claims claims = jwtUtil.getClaims(token);
+        Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
+        if(user.isPresent()){
+            if (!user.get().getPhone().equals(phone)){
+                return ResponseEntity.badRequest().body("Неверный номер телефона!");
+            }
+            if (!user.get().getPassword().equals(password)){
+                return ResponseEntity.badRequest().body("Неверный пароль!");
+            }
+            userRepository.deleteById(user.get().getId());
+            return ResponseEntity.ok("Успешное удаление");
+        }
+        return ResponseEntity.badRequest().body("Пользователь не существует!");
+    }
+    public ResponseEntity<?> deleteUser(String token, String password, Long id){
+        jwtUtil.validateToken(token);
+        Claims claims = jwtUtil.getClaims(token);
+        Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
+        if(user.isPresent()){
+            if (!user.get().getId().equals(id)){
+                return ResponseEntity.badRequest().body("Неверный id!");
+            }
+            if (!user.get().getPassword().equals(password)){
+                return ResponseEntity.badRequest().body("Неверный пароль!");
+            }
+            userRepository.deleteById(id);
+            return ResponseEntity.ok("Успешное удаление");
+        }
+        return ResponseEntity.badRequest().body("Пользователь не существует!");
+    }
+    public ResponseEntity<?> deleteUserByEmail(String token, String password, String email){
+        jwtUtil.validateToken(token);
+        Claims claims = jwtUtil.getClaims(token);
+        Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
+        if(user.isPresent()){
+            if (!user.get().getEmail().equals((email))){
+                return ResponseEntity.badRequest().body("Неверная почта!");
+            }
+            if (!user.get().getPassword().equals(password)){
+                return ResponseEntity.badRequest().body("Неверный пароль!");
+            }
+            userRepository.deleteById(user.get().getId());
+            return ResponseEntity.ok("Успешное удаление");
+        }
+        return ResponseEntity.badRequest().body("Пользователь не существует!");
+    }
+
+
+
 
     //Валидация пользователя по id
     public Boolean validateUserByToken(String token) {
