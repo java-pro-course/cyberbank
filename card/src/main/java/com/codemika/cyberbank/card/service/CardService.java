@@ -522,10 +522,11 @@ public class CardService {
      *
      * @param token  токен владельца
      * @param cardId id карты
+     * @param pincode пин-код карты(не точно, это проверяется)
      * @return сообщение об успешной/не успешной заморозке/разморозке
      */
     @Transactional
-    public ResponseEntity<?> FreezeAndUnfreezeCard(String token, Long cardId) {
+    public ResponseEntity<?> FreezeAndUnfreezeCard(String token, Long cardId, String pincode) {
         Optional<DebitCardEntity> cardEntity = debitRepository.findById(cardId);
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
@@ -539,6 +540,11 @@ public class CardService {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Вы не являетесь владельцем данной карты!");
+        }
+        if (!Objects.equals(cardEntity.get().getPincode(), pincode)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вами введён неверный пин-код!");
         }
 
         debitRepository.updateById(!cardEntity.get().getIsActive(), cardId);
