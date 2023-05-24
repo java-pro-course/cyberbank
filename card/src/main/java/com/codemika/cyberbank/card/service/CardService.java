@@ -1,6 +1,5 @@
 package com.codemika.cyberbank.card.service;
 
-import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
 import com.codemika.cyberbank.card.entity.CreditCardEntity;
@@ -152,13 +151,13 @@ public class CardService {
         Long ownerUserId = claimsParseToken.get("id", Long.class);
         String typeNewCard = "Кредитная";
         //Подготавливаем результат
-       CreditCardEntity card = new CreditCardEntity()
+        CreditCardEntity card = new CreditCardEntity()
                 .setTitle(rq.getTitle())
                 .setType(typeNewCard)
                 .setOwnerUserId(ownerUserId)
                 .setBalance(rq.getValue())
                 .setPincode(rq.getPincode().trim())
-               .setCreditTerm(rq.getCreditTerm())
+                .setCreditTerm(rq.getCreditTerm())
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
@@ -253,7 +252,7 @@ public class CardService {
 //                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
 //}
     /**
-     * Метод для перервода денег с карты на карту по номерам карт
+     * Метод для перевода денег с карты на карту по номерам карт
      * @param token - токен пользователя, переводящего деньги
      * @param pincode - пин-код карты, с которой переводятся деньги
      * @param accountNumber - номер карты, с которой переводятся деньги
@@ -447,25 +446,25 @@ public class CardService {
 
         if (!card.isPresent()) {
             return ResponseEntity
-              .badRequest()
-              .body("Карта с  ID: " + id + " не существует");
+                    .badRequest()
+                    .body("Карта с  ID: " + id + " не существует");
         }
         if (!card.get().getOwnerUserId().equals(ownerUserId)) {
             return ResponseEntity
-              .badRequest()
-              .body("Вы не можете удалить чужую карту!");
+                    .badRequest()
+                    .body("Вы не можете удалить чужую карту!");
         }
         if (card.get().getBalance() != 0) {
             return ResponseEntity
-              .badRequest()
-              .body("Вы не можете удалить карту, на которой есть деньги! " +
-                    "Пожалуйста, снимите их или переведите на другую карту!");
+                    .badRequest()
+                    .body("Вы не можете удалить карту, на которой есть деньги! " +
+                            "Пожалуйста, снимите их или переведите на другую карту!");
         }
 
         debitRepository.deleteById(id);
         return ResponseEntity
-          .ok()
-          .body("Карта была успешно удалена!");
+                .ok()
+                .body("Карта была успешно удалена!");
     }
 
     public ResponseEntity<?> deleteCreditCard(String token, Long id) {
@@ -476,29 +475,28 @@ public class CardService {
 
         if (!card.isPresent()) {
             return ResponseEntity
-              .badRequest()
-              .body("Карта с id: " + id + " не существует!");
+                    .badRequest()
+                    .body("Карта с id: " + id + " не существует!");
         }
 
         if (!card.get().getOwnerUserId().equals(ownerUserId)) {
             return ResponseEntity
-              .badRequest()
-              .body("Вы не являетесь владельцем данной карты!");
+                    .badRequest()
+                    .body("Вы не являетесь владельцем данной карты!");
         }
 
         if (card.get().getBalance() != 0) {
             return ResponseEntity
-              .badRequest()
-              .body("Вы не можете удалисть карту на которой есть деньги!" +
-                    "Пожалуйста, снимите их или переведите на другую карту");
+                    .badRequest()
+                    .body("Вы не можете удалить карту на которой есть деньги!" +
+                            "Пожалуйста, снимите их или переведите на другую карту");
         }
 
         creditRepository.deleteById(id);
         return ResponseEntity
-          .ok()
-          .body("Карта была успешно удалена");
+                .ok()
+                .body("Карта была успешно удалена");
     }
-
 
 
     /**
@@ -521,26 +519,37 @@ public class CardService {
 
     /**
      * Заморозка и разморозка карты
-     * @param card - dto карты
-     * @param cardId - id карты
-     * @param userId - id пользователя
-     * @return результат изменения статуса
+     *
+     * @param token  токен владельца
+     * @param cardId id карты
+     * @return сообщение об успешной/не успешной заморозке/разморозке
      */
-    public ResponseEntity<?> FreezeAndUnfreezeCard(RqCreateCard card, Long cardId, Long userId) {
+    @Transactional
+    public ResponseEntity<?> FreezeAndUnfreezeCard(String token, Long cardId) {
         Optional<DebitCardEntity> cardEntity = debitRepository.findById(cardId);
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long id = claimsParseToken.get("id", Long.class);
+
         if (!cardEntity.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Данной карты не существует!");
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Данной карты не существует!");
         }
-        if (!Objects.equals(card.getOwnerUserId(), userId)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Вы не являетесь владельцем данной карты!");
+        if (!Objects.equals(cardEntity.get().getOwnerUserId(), id)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не являетесь владельцем данной карты!");
         }
 
-        card.setIsActive(!card.getIsActive());
-        debitRepository.updateById(card.getIsActive(), cardId);
+        debitRepository.updateById(!cardEntity.get().getIsActive(), cardId);
 
         return ResponseEntity
-          .status(HttpStatus.OK)
-          .body("Статус карты успешно изменен!");
+                .status(HttpStatus.OK)
+                .body("Ваша карта была успешно " + (
+                        cardEntity.get().getIsActive()
+                                ? "заморожена!"  //Если карта была размороженной(true)
+                                : "разморожена!" //Если карта была замороженной(false)
+                ));
     }
 
     /**
@@ -555,13 +564,14 @@ public class CardService {
 
         List<DebitCardEntity> cards = debitRepository.findAllByOwnerUserId(id);// todo временно
 
-        if (cards.isEmpty()) 
-          return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("У вас нет карт!");
+        if (cards.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("У вас нет карт!");
 
         return ResponseEntity.ok(cards);
     }
+
     /**
      * ТОЛЬКО ДЛЯ МОДЕРОВ
      * Получение ВСЕХ карт в банке

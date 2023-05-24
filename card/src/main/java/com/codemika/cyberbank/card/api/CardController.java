@@ -1,7 +1,6 @@
 package com.codemika.cyberbank.card.api;
 
 import com.codemika.cyberbank.card.annotation.CheckRole;
-import com.codemika.cyberbank.card.dto.RqCreateCard;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
 import com.codemika.cyberbank.card.service.CardService;
@@ -360,10 +359,9 @@ public class CardController {
         return cardService.getMeMoney(cardId, value);
     }
 
-    @PutMapping("freeze-card-by-id/{id}/{userId}")
-    public ResponseEntity<?> freezeCard(@RequestBody RqCreateCard card,
-                                        @PathVariable Long id,
-                                        @PathVariable Long userId) {
-        return cardService.FreezeAndUnfreezeCard(card, id, userId);
+    @PutMapping("freeze-card-by-id/{id}")
+    public ResponseEntity<?> freezeCard(@RequestHeader("Authorization") String token,
+                                        @PathVariable Long id) {
+        return cardService.FreezeAndUnfreezeCard(token, id);
     }
 }

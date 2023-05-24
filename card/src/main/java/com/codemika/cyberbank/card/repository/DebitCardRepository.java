@@ -4,6 +4,7 @@ import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Optional;
 /**
  * Репозиторий для дебетовых карт
  */
+@Repository
 public interface DebitCardRepository extends JpaRepository<DebitCardEntity, Long> {
 
     @Modifying
