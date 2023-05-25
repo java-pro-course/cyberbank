@@ -126,7 +126,7 @@ public class DebitCardService {
                     .status(HttpStatus.FORBIDDEN)
                     .body("Вы не можете удалить чужую карту!");
         }
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode))
+        if (!passwordEncoder.matches(pincode, card.get().getPincode()))
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body("Неверный пин-код!");
@@ -162,7 +162,7 @@ public class DebitCardService {
                     .body("Вы не являетесь владельцем данной карты!");
         }
 
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body("Неверный пин-код!");
@@ -206,7 +206,7 @@ public class DebitCardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Нельзя менять данные чужой карты!");
         }
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пин-код неверный!");
@@ -241,7 +241,7 @@ public class DebitCardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Нельзя менять данные чужой карты!");
         }
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пин-код неверный!");

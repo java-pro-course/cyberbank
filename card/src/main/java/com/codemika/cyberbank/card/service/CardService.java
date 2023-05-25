@@ -94,12 +94,12 @@ public class CardService {
 //}
     /**
      * Метод для перевода денег с карты на карту по номерам карт
-     * @param token - токен пользователя, переводящего деньги
-     * @param pincode - пин-код карты, с которой переводятся деньги
-     * @param accountNumber - номер карты, с которой переводятся деньги
-     * @param value - количество переводимых денег (в рублях)
-     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
-     * @return - сообщение о переводе и текущем балансе
+     * @param token токен пользователя, переводящего деньги
+     * @param pincode пин-код карты, с которой переводятся деньги
+     * @param accountNumber номер карты, с которой переводятся деньги
+     * @param value количество переводимых денег (в рублях)
+     * @param receivingAccountNumber номер карты, на которую переводятся деньги
+     * @return сообщение о переводе и текущем балансе
      */
 //    @Transactional
 //    public ResponseEntity<?> moneyTransfer(String token, String pincode, String accountNumber, Long value, String receivingAccountNumber) {

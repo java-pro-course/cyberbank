@@ -126,7 +126,10 @@ public class CreditCardService {
                     .body("Вы не являетесь владельцем данной карты!");
         }
 
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
+            log.info(pincode);
+            log.info(card.get().getPincode());
+            log.info(passwordEncoder.encode(pincode));
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body("Неверный пин-код!");
@@ -163,7 +166,7 @@ public class CreditCardService {
                     .body("Вы не являетесь владельцем данной карты!");
         }
 
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body("Неверный пин-код!");
@@ -207,7 +210,7 @@ public class CreditCardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Нельзя менять данные чужой карты!");
         }
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пин-код неверный!");
@@ -242,7 +245,7 @@ public class CreditCardService {
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Нельзя менять данные чужой карты!");
         }
-        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+        if (!passwordEncoder.matches(pincode, card.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Пин-код неверный!");
