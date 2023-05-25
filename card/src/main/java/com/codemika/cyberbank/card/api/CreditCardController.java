@@ -3,6 +3,7 @@ package com.codemika.cyberbank.card.api;
 import com.codemika.cyberbank.card.annotation.CheckRole;
 import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
 import com.codemika.cyberbank.card.service.CardService;
+import com.codemika.cyberbank.card.service.CreditCardService;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @Data
 public class CreditCardController {
     private final JwtUtil jwtUtil;
-    private final CardService cardService;
+    private final CardService service;
+    private final CreditCardService creditService;
 
     /**
      * Оформление(создание) новой карты
@@ -29,7 +31,7 @@ public class CreditCardController {
     @PostMapping("create")
     public ResponseEntity<?> createCredit(@RequestHeader("Authorization") String token,
                                           @RequestBody RqCreateCreditCard rq) {
-        return cardService.createCredit(token, rq);
+        return creditService.create(token, rq);
     }
 
     /**
@@ -43,7 +45,7 @@ public class CreditCardController {
     @DeleteMapping("delete")
     public ResponseEntity<?> deleteCreditCard(@RequestHeader("Authorization") String token,
                                               @RequestParam Long id) {
-        return cardService.deleteCreditCard(token, id);
+        return creditService.delete(token, id);
     }
 
     /**

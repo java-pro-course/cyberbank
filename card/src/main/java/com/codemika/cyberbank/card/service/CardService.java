@@ -1,8 +1,5 @@
 package com.codemika.cyberbank.card.service;
 
-import com.codemika.cyberbank.card.dto.RqCreateCreditCard;
-import com.codemika.cyberbank.card.dto.RqCreateDebitCard;
-import com.codemika.cyberbank.card.entity.CreditCardEntity;
 import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import com.codemika.cyberbank.card.repository.CreditCardRepository;
 import com.codemika.cyberbank.card.repository.DebitCardRepository;
@@ -25,162 +22,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final DebitCardRepository debitRepository;
-    private final CreditCardRepository creditRepository;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
     public final JwtUtil jwtUtil;
 
-    /**
-     * Создание дебетовой карты
-     *
-     * @param token пользователя(будущего владельца)
-     * @param rq    параметры карты
-     * @return Созданную карту
-     */
-    public ResponseEntity<?> createDebit(String token, RqCreateDebitCard rq) {
-        if (rq.getTitle().isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не указали название карты");
-        }
-        if (rq.getPincode().isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не указали пин-код");
-        }
-        if (!rq.getPincode().toLowerCase().matches("[0-9]+"))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пин-код должен состоять из цифр! Например: 3856");
-
-        if (rq.getPincode().trim().length() != 4)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Длина пин-кода должна быть 4 цифры!!! Например: 3856");
-
-        if (rq.getPincode().equals("1234") || rq.getPincode().equals("2580")
-                || rq.getPincode().equals("0000") || rq.getPincode().equals("4321")
-                || rq.getPincode().equals("9999") || rq.getPincode().equals("6666")
-                || rq.getPincode().equals("1111") || rq.getPincode().equals("8520")
-                || rq.getPincode().equals("5678") || rq.getPincode().equals("0852")) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Извините, но мы запретили некоторые излишне простые пин-коды для вашей безопасности.");
-        }
-        //Достаём id из токена
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        String typeNewCard = "Дебетовая";
-        //Подготавливаем результат
-        DebitCardEntity card = new DebitCardEntity()
-                .setTitle(rq.getTitle())
-                .setType(typeNewCard)
-                .setOwnerUserId(ownerUserId)
-                .setBalance(0L)
-                .setPincode(rq.getPincode().trim())
-                .setAccountNumber(
-                        generateAccountNumber(16)
-                );
-
-        if (debitRepository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Такая карта уже существует!");
-        }
-
-        ResponseEntity<Boolean> response = restTemplate.getForEntity(url + token, Boolean.class);
-
-        //Проверка валидности пользователя
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.info(card.toString());
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Такого пользователя не существует!");
-        }
-
-        card = debitRepository.save(card);
-
-        return ResponseEntity.ok(card);
-    }
-
-    /**
-     * Создание кредитной карты
-     *
-     * @param token пользователя(будущего владельца)
-     * @param rq    параметры карты
-     * @return Созданную карту
-     */
-    public ResponseEntity<?> createCredit(String token, RqCreateCreditCard rq) {
-        int maxValue = (int) ((rq.getMonthlyIncome() * rq.getCreditTerm() * 0.5) / (1 + (0.15 * rq.getCreditTerm()))); // хз насколько я правильно эту формулу вписал.
-
-        if (rq.getValue() > maxValue) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Учитывая ваши данные, мы не можем выдать вам кредит на сумму: " + rq.getValue());
-        }
-        if (rq.getTitle().isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не указали название карты");
-        }
-        if (rq.getPincode().isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Вы не указали пин-код");
-        }
-        //Проверка на валидный пин-код
-        if (!rq.getPincode().toLowerCase().matches("[0-9]+"))
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Пин-код должен состоять из цифр! Например: 3856");
-        if (rq.getPincode().trim().length() != 4)
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Длина пин-кода должна быть 4 цифры!!! Например: 3856");
-        if (rq.getPincode().equals("1234") || rq.getPincode().equals("2580")
-                || rq.getPincode().equals("0000") || rq.getPincode().equals("4321")
-                || rq.getPincode().equals("9999") || rq.getPincode().equals("6666")
-                || rq.getPincode().equals("1111") || rq.getPincode().equals("8520")
-                || rq.getPincode().equals("5678") || rq.getPincode().equals("0852")) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Извините, но мы запретили некоторые излишне простые пин-коды для вашей безопасности.");
-        }
-        //Достаём id из токена
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-        String typeNewCard = "Кредитная";
-        //Подготавливаем результат
-        CreditCardEntity card = new CreditCardEntity()
-                .setTitle(rq.getTitle())
-                .setType(typeNewCard)
-                .setOwnerUserId(ownerUserId)
-                .setBalance(rq.getValue())
-                .setPincode(rq.getPincode().trim())
-                .setCreditTerm(rq.getCreditTerm())
-                .setAccountNumber(
-                        generateAccountNumber(16)
-                );
-
-        if (creditRepository.findAllByAccountNumber(card.getAccountNumber()).isPresent()) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Такая карта уже существует!");
-        }
-
-        ResponseEntity<Boolean> response = restTemplate.getForEntity(url + token, Boolean.class);
-
-        //Проверка валидности пользователя
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.info(card.toString());
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Такого пользователя не существует!");
-        }
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(creditRepository.save(card));
-    }
 
     /**
      * Метод для перевода денег с карты на карту
@@ -432,80 +275,12 @@ public class CardService {
 //    }
 
     /**
-     * Удаление карты
-     *
-     * @param token токен-владельца
-     * @param id    id карты
-     * @return Результат удаления
-     */
-    public ResponseEntity<?> deleteDebitCard(String token, Long id) {
-        Optional<DebitCardEntity> card = debitRepository.findById(id);
-
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Карта с  ID: " + id + " не существует");
-        }
-        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Вы не можете удалить чужую карту!");
-        }
-        if (card.get().getBalance() != 0) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Вы не можете удалить карту, на которой есть деньги! " +
-                            "Пожалуйста, снимите их или переведите на другую карту!");
-        }
-
-        debitRepository.deleteById(id);
-        return ResponseEntity
-                .ok()
-                .body("Карта была успешно удалена!");
-    }
-
-    public ResponseEntity<?> deleteCreditCard(String token, Long id) {
-        Optional<CreditCardEntity> card = creditRepository.findById(id);
-
-        Claims claimsParseToken = jwtUtil.getClaims(token);
-        Long ownerUserId = claimsParseToken.get("id", Long.class);
-
-        if (!card.isPresent()) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Карта с id: " + id + " не существует!");
-        }
-
-        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Вы не являетесь владельцем данной карты!");
-        }
-
-        if (card.get().getBalance() != 0) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Вы не можете удалить карту на которой есть деньги!" +
-                            "Пожалуйста, снимите их или переведите на другую карту");
-        }
-
-        creditRepository.deleteById(id);
-        return ResponseEntity
-                .ok()
-                .body("Карта была успешно удалена");
-    }
-
-
-    /**
      * Генерация случайного номера карты
      *
      * @param n размер строки(у нас 16)
      * @return Случайную строку
      */
-    private static String generateAccountNumber(int n) {
+    public static String generateAccountNumber(int n) {
         String alphabet = "0123456789";
 
         StringBuilder result = new StringBuilder();
@@ -520,8 +295,8 @@ public class CardService {
     /**
      * Заморозка и разморозка карты
      *
-     * @param token  токен владельца
-     * @param cardId id карты
+     * @param token   токен владельца
+     * @param cardId  id карты
      * @param pincode пин-код карты(не точно, это проверяется)
      * @return сообщение об успешной/не успешной заморозке/разморозке
      */
