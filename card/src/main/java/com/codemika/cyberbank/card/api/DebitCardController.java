@@ -78,7 +78,7 @@ public class DebitCardController {
     public ResponseEntity<?> changeDebitCardTitle(@RequestHeader("Authorization") String token,
                                                   @RequestParam Long id,
                                                   @RequestParam String newTitle) {
-        return null;//cardService.changeCardTitle(token, id, newTitle);
+        return debitService.changeTitle(token, id, newTitle);
     }
 
     /**
@@ -93,7 +93,7 @@ public class DebitCardController {
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
                                              @RequestParam String accountNumber,
                                              @RequestParam String newTitle) {
-        return null; //cardService.changeCardTitle(token, accountNumber, newTitle);
+        return debitService.changeTitle(token, accountNumber, newTitle);
     }
 
     /**
@@ -110,7 +110,7 @@ public class DebitCardController {
                                            @RequestParam Long id,
                                            @RequestParam String pincode,
                                            @RequestParam String newPinCode) {
-        return null; //cardService.changeCardPinCode(token, id, pincode, newPinCode);
+        return debitService.changePincode(token, id, pincode, newPinCode);
     }
 
     /**
@@ -126,6 +126,6 @@ public class DebitCardController {
                                            @RequestParam String accountNumber,
                                            @RequestParam String pincode,
                                            @RequestParam String newPinCode) {
-        return null; //cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
+        return debitService.changePincode(token, accountNumber, pincode, newPinCode);
     }
 }
