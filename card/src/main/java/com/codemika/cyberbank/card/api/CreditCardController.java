@@ -42,10 +42,27 @@ public class CreditCardController {
      * @return сообщение об успешном/не успешном удалении
      */
     @CheckRole(isUser = true)
-    @DeleteMapping("delete")
+    @DeleteMapping("delete-by-id")
     public ResponseEntity<?> deleteCreditCard(@RequestHeader("Authorization") String token,
-                                              @RequestParam Long id) {
-        return creditService.delete(token, id);
+                                              @RequestParam Long id,
+                                              @RequestParam String pincode) {
+        return creditService.delete(token, id, pincode);
+    }
+
+    /**
+     * Удаление карты по номеру телефона
+     *
+     * @param token         токен владельца
+     * @param accountNumber номер карты
+     * @param pincode       пин-код карты(проверяется)
+     * @return сообщение об успешном/не успешном удалении
+     */
+    @CheckRole(isUser = true)
+    @DeleteMapping("delete-by-number")
+    public ResponseEntity<?> deleteCardByNumber(@RequestHeader("Authorization") String token,
+                                                @RequestParam String accountNumber,
+                                                @RequestParam String pincode) {
+        return creditService.delete(token, accountNumber, pincode);
     }
 
     /**

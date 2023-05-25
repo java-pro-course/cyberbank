@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,7 +24,8 @@ public class DebitCardService {
     private final DebitCardRepository repository;
     private final RestTemplate restTemplate = new RestTemplate();
     private final String url = "http://localhost:8081/api/auth/validate-user/?token=";
-    public final JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Создание дебетовой карты
@@ -73,7 +75,9 @@ public class DebitCardService {
                 .setType(typeNewCard)
                 .setOwnerUserId(ownerUserId)
                 .setBalance(0L)
-                .setPincode(rq.getPincode().trim())
+                .setPincode(
+                        passwordEncoder.encode(rq.getPincode())
+                )
                 .setAccountNumber(
                         generateAccountNumber(16)
                 );
@@ -106,7 +110,7 @@ public class DebitCardService {
      * @param id    id карты
      * @return Результат удаления
      */
-    public ResponseEntity<?> delete(String token, Long id) {
+    public ResponseEntity<?> delete(String token, Long id, String pincode) {
         Optional<DebitCardEntity> card = repository.findById(id);
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -114,15 +118,19 @@ public class DebitCardService {
 
         if (!card.isPresent()) {
             return ResponseEntity
-                    .badRequest()
+                    .status(HttpStatus.NOT_FOUND)
                     .body("Карта с  ID: " + id + " не существует");
         }
         if (!card.get().getOwnerUserId().equals(ownerUserId)) {
             return ResponseEntity
-                    .badRequest()
+                    .status(HttpStatus.FORBIDDEN)
                     .body("Вы не можете удалить чужую карту!");
         }
-        if (card.get().getBalance() != 0) {
+        if (!passwordEncoder.matches(card.get().getPincode(), pincode))
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Неверный пин-код!");
+        if (card.get().getBalance() != 0){
             return ResponseEntity
                     .badRequest()
                     .body("Вы не можете удалить карту, на которой есть деньги! " +
@@ -131,9 +139,43 @@ public class DebitCardService {
 
         repository.deleteById(id);
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.ACCEPTED)
                 .body("Карта была успешно удалена!");
     }
+    public ResponseEntity<?> delete(String token, String accountNumber, String pincode) {
+        Optional<DebitCardEntity> card = repository.findCardByAccountNumber(accountNumber);
 
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
 
+        if (!card.isPresent()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Карты с номером: " + accountNumber + " не существует!");
+        }
+
+        if (!card.get().getOwnerUserId().equals(ownerUserId)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Вы не являетесь владельцем данной карты!");
+        }
+
+        if (!passwordEncoder.matches(card.get().getPincode(), pincode)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Неверный пин-код!");
+        }
+
+        if (card.get().getBalance() != 0) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Вы не можете удалить карту на которой есть деньги!" +
+                            "Пожалуйста, снимите их или переведите на другую карту");
+        }
+
+        repository.deleteByAccountNumber(accountNumber);
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .body("Карта была успешно удалена");
+    }
 }
