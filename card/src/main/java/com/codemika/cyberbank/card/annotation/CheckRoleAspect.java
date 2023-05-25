@@ -86,6 +86,7 @@ public class CheckRoleAspect {
     boolean isLet(boolean isModerToken, boolean isModer,
                   boolean isTesterToken, boolean isTester,
                   boolean isHackerToken, boolean isHacker) {
+        if (!(isModer || isTester || isHacker)) return true;
         if (isTester || isHacker) return isTesterToken || isHackerToken;
         if (isModer) return isModerToken;
         return false;

@@ -11,10 +11,10 @@ public class HistoryEntity {
     private Long id;
 
     @OneToOne // доделать связь с CardEntity
-    private CardEntity fromCard;
+    private DebitCardEntity fromCard;
 
     @OneToOne // доделать связь с CardEntity
-    private CardEntity toCard;
+    private DebitCardEntity toCard;
 
     private Long amount;
 

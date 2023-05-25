@@ -9,10 +9,10 @@ import javax.persistence.*;
  * Entity для карт
  */
 @Entity
-@Table(schema = "cyberbank_card", name = "card")
+@Table(schema = "cyberbank_card", name = "debit_card")
 @Data
 @Accessors(chain = true)
-public class CardEntity {
+public class DebitCardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class CardEntity {
     @Column(name = "owner_user_id")
     private Long ownerUserId;
 
-    @Column(name = "isActive")
+    @Column(name = "is_active")
     private Boolean isActive = true; //активна или нет
 
  }
