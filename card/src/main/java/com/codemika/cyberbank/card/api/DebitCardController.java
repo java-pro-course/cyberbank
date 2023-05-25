@@ -43,8 +43,26 @@ public class DebitCardController {
      */
     @CheckRole(isUser = true)
     @DeleteMapping("delete")
-    public ResponseEntity<?> deleteDebitCard(@RequestHeader("Authorization") String token, Long id) {
-        return debitService.delete(token, id);
+    public ResponseEntity<?> deleteDebitCard(@RequestHeader("Authorization") String token,
+                                             @RequestParam Long id,
+                                             @RequestParam String pincode) {
+        return debitService.delete(token, id, pincode);
+    }
+
+    /**
+     * Удаление карты по номеру телефона
+     *
+     * @param token         токен владельца
+     * @param accountNumber номер карты
+     * @param pincode       пин-код карты(проверяется)
+     * @return сообщение об успешном/не успешном удалении
+     */
+    @CheckRole(isUser = true)
+    @DeleteMapping("delete-by-number")
+    public ResponseEntity<?> deleteCardByNumber(@RequestHeader("Authorization") String token,
+                                                @RequestParam String accountNumber,
+                                                @RequestParam String pincode) {
+        return debitService.delete(token, accountNumber, pincode);
     }
 
     /**
@@ -60,7 +78,7 @@ public class DebitCardController {
     public ResponseEntity<?> changeDebitCardTitle(@RequestHeader("Authorization") String token,
                                                   @RequestParam Long id,
                                                   @RequestParam String newTitle) {
-        return null;//cardService.changeCardTitle(token, id, newTitle);
+        return debitService.changeTitle(token, id, newTitle);
     }
 
     /**
@@ -75,7 +93,7 @@ public class DebitCardController {
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
                                              @RequestParam String accountNumber,
                                              @RequestParam String newTitle) {
-        return null; //cardService.changeCardTitle(token, accountNumber, newTitle);
+        return debitService.changeTitle(token, accountNumber, newTitle);
     }
 
     /**
@@ -92,20 +110,22 @@ public class DebitCardController {
                                            @RequestParam Long id,
                                            @RequestParam String pincode,
                                            @RequestParam String newPinCode) {
-        return null; //cardService.changeCardPinCode(token, id, pincode, newPinCode);
+        return debitService.changePincode(token, id, pincode, newPinCode);
     }
+
     /**
      * Изменение пин-кода карты по номеру карты
-     * @param token токен владельца
+     *
+     * @param token         токен владельца
      * @param accountNumber номер карты
-     * @param newPinCode новый пин-код карты
+     * @param newPinCode    новый пин-код карты
      * @return изменение карты
      */
     @PostMapping("change-pincode-by-account-number")
     public ResponseEntity<?> changePinCode(@RequestHeader("Authorization") String token,
                                            @RequestParam String accountNumber,
                                            @RequestParam String pincode,
-                                           @RequestParam String newPinCode){
-        return null; //cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
+                                           @RequestParam String newPinCode) {
+        return debitService.changePincode(token, accountNumber, pincode, newPinCode);
     }
 }

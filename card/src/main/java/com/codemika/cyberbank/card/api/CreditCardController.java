@@ -42,10 +42,27 @@ public class CreditCardController {
      * @return сообщение об успешном/не успешном удалении
      */
     @CheckRole(isUser = true)
-    @DeleteMapping("delete")
+    @DeleteMapping("delete-by-id")
     public ResponseEntity<?> deleteCreditCard(@RequestHeader("Authorization") String token,
-                                              @RequestParam Long id) {
-        return creditService.delete(token, id);
+                                              @RequestParam Long id,
+                                              @RequestParam String pincode) {
+        return creditService.delete(token, id, pincode);
+    }
+
+    /**
+     * Удаление карты по номеру телефона
+     *
+     * @param token         токен владельца
+     * @param accountNumber номер карты
+     * @param pincode       пин-код карты(проверяется)
+     * @return сообщение об успешном/не успешном удалении
+     */
+    @CheckRole(isUser = true)
+    @DeleteMapping("delete-by-number")
+    public ResponseEntity<?> deleteCardByNumber(@RequestHeader("Authorization") String token,
+                                                @RequestParam String accountNumber,
+                                                @RequestParam String pincode) {
+        return creditService.delete(token, accountNumber, pincode);
     }
 
     /**
@@ -61,7 +78,7 @@ public class CreditCardController {
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
                                              @RequestParam Long id,
                                              @RequestParam String newTitle) {
-        return null;//cardService.changeCardTitle(token, id, newTitle);
+        return creditService.changeTitle(token, id, newTitle);
     }
 
     /**
@@ -77,7 +94,7 @@ public class CreditCardController {
     public ResponseEntity<?> changeCardTitle(@RequestHeader("Authorization") String token,
                                              @RequestParam String accountNumber,
                                              @RequestParam String newTitle) {
-        return null; //cardService.changeCardTitle(token, accountNumber, newTitle);
+        return creditService.changeTitle(token, accountNumber, newTitle);
     }
 
     /**
@@ -95,7 +112,7 @@ public class CreditCardController {
                                            @RequestParam Long id,
                                            @RequestParam String pincode,
                                            @RequestParam String newPinCode) {
-        return null; //cardService.changeCardPinCode(token, id, pincode, newPinCode);
+        return creditService.changePincode(token, id, pincode, newPinCode);
     }
 
     /**
@@ -111,6 +128,6 @@ public class CreditCardController {
                                            @RequestParam String accountNumber,
                                            @RequestParam String pincode,
                                            @RequestParam String newPinCode) {
-        return null; //cardService.changeCardPinCode(token, accountNumber, pincode, newPinCode);
+        return creditService.changePincode(token, accountNumber, pincode, newPinCode);
     }
 }

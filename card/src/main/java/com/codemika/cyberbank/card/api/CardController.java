@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class CardController {
     private final JwtUtil jwtUtil;
     private final CardService cardService;
+
     /**
      * Просмотр пользователем всех своих карт
      *
@@ -54,6 +55,7 @@ public class CardController {
                                         @RequestParam Long value) {
         return cardService.getMeMoney(cardId, value);
     }
+
     @CheckRole(isUser = true)
     @PutMapping("freeze-card-by-id/{id}")
     public ResponseEntity<?> freezeCard(@RequestHeader("Authorization") String token,

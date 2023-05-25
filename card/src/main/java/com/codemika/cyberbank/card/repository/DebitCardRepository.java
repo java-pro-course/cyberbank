@@ -20,15 +20,22 @@ public interface DebitCardRepository extends JpaRepository<DebitCardEntity, Long
     void updateById(Boolean isActive, Long id);
 
     List<DebitCardEntity> findAllByOwnerUserId(Long id);
+
     Optional<DebitCardEntity> findCardByAccountNumber(String AccountNumber);
+
     Optional<DebitCardEntity> findAllByAccountNumber(String AccountNumber);
+
     @Modifying
     @Query("UPDATE DebitCardEntity card SET card.balance = ?1 WHERE card.id = ?2")
     void moneyTransfer(Long value, Long id);
+
     @Modifying
     @Query("UPDATE DebitCardEntity card SET card.title = ?1 WHERE card.id = ?2")
     void updateCardTitle(String title, Long id);
+
     @Modifying
     @Query("UPDATE DebitCardEntity card SET card.pincode = ?1 WHERE card.id = ?2")
     void updateCardPinCode(String pincode, Long id);
+
+    void deleteByAccountNumber(String accountNumber);
 }
