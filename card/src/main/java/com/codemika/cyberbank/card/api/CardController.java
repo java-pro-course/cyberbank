@@ -63,112 +63,25 @@ public class CardController {
                                         @RequestParam String pincode) {
         return cardService.FreezeAndUnfreezeCard(token, id, pincode);
     }
-//    /**
-//     * Метод для перевода денег с карты на карту по id
-//     * @param token токен пользователя, переводящего деньги
-//     * @param pincode пин-код карты, с которой переводятся деньги
-//     * @param senderId id карты, с которой переводятся деньги
-//     * @param value сумма перевода (в рублях)
-//     * @param receivingId id карты, на которую переводятся деньги
-//     * @return перевод средств
-//     */
-//    @CheckRole(isUser = true)
-//    @PostMapping("money-transfer-by-id")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           @RequestParam String pincode,
-//                                           @RequestParam Long senderId,
-//                                           @RequestParam Long value,
-//                                           @RequestParam Long receivingId) {
-//        return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
-//    }
-//
-//    /**
-//     * Метод для перевода денег с карты на карту по id (дебет.)
-//     * @param token - токен пользователя, переводящего деньги
-//     * @param pincode - пин-код карты, с которой переводятся деньги
-//     * @param senderId - id карты, с которой переводятся деньги
-//     * @param value - сумма перевода (в рублях)
-//     * @param receivingId - id карты, на которую переводятся деньги
-//     * @return - перевод средств
-//     */
-//    @PostMapping("debit-money-transfer-by-id")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           String pincode,
-//                                           Long senderId,
-//                                           Long value,
-//                                           Long receivingId) {
-//        return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
-//    }
-//
-//    /**
-//     * Метод для перевода денег с карты на карту по id (кредит.)
-//     * @param token - токен пользователя, переводящего деньги
-//     * @param pincode - пин-код карты, с которой переводятся деньги
-//     * @param senderId - id карты, с которой переводятся деньги
-//     * @param value - сумма перевода (в рублях)
-//     * @param receivingId - id карты, на которую переводятся деньги
-//     * @return - перевод средств
-//     */
-//    @PostMapping("credit-money-transfer-by-id")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           String pincode,
-//                                           Long senderId,
-//                                           Long value,
-//                                           Long receivingId) {
-//        return cardService.moneyTransfer(token, pincode, senderId, value, receivingId);
-//    }
-//
-//    /**
-//     * Метод для перевода денег с карты на карту по номерам карт
-//     * @param token - токен пользователя, переводящего деньги
-//     * @param pincode - пин-код карты, с которой переводятся деньги
-//     * @param senderAccountNumber - номер карты, с которой переводятся деньги
-//     * @param value - сумма перевода (в рублях)
-//     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
-//     * @return - перевод средств
-//     */
-//    @PostMapping("money-transfer-by-account-number")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           @RequestParam String pincode,
-//                                           @RequestParam String senderAccountNumber,
-//                                           @RequestParam Long value,
-//                                           @RequestParam String receivingAccountNumber) {
-//        return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
-//    }
 
-//     /**
-//      * Метод для перевода денег с карты на карту по номерам карт (дебет.)
-//      * @param token - токен пользователя, переводящего деньги
-//      * @param pincode - пин-код карты, с которой переводятся деньги
-//      * @param senderAccountNumber - номер карты, с которой переводятся деньги
-//      * @param value - сумма перевода (в рублях)
-//      * @param receivingAccountNumber - номер карты, на которую переводятся деньги
-//     * @return - перевод средств
-//      */
-//    @PostMapping("debit-money-transfer-by-account-number")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           String pincode,
-//                                           String senderAccountNumber,
-//                                           Long value,
-//                                           String receivingAccountNumber) {
-//        return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
-//    }
-//
-//    /**
-//     * Метод для перевода денег с карты на карту по номерам карт (кредит.)
-//     * @param token - токен пользователя, переводящего деньги
-//     * @param pincode - пин-код карты, с которой переводятся деньги
-//     * @param senderAccountNumber - номер карты, с которой переводятся деньги
-//     * @param value - сумма перевода (в рублях)
-//     * @param receivingAccountNumber - номер карты, на которую переводятся деньги
-//     * @return - перевод средств
-//     */
-//    @PostMapping("credit-money-transfer-by-account-number")
-//    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
-//                                           String pincode,
-//                                           String senderAccountNumber,
-//                                           Long value,
-//                                           String receivingAccountNumber) {
-//        return cardService.moneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
-//    }
+    /**
+     * Метод для перевода денег с карты на карту по номерам карт
+     *
+     * @param token                  токен пользователя, переводящего деньги
+     * @param pincode                пин-код карты, с которой переводятся деньги
+     * @param senderAccountNumber    номер карты, с которой переводятся деньги
+     * @param value                  сумма перевода (в рублях)
+     * @param receivingAccountNumber номер карты, на которую переводятся деньги
+     * @return перевод средств
+     */
+    @CheckRole(isUser = true)
+    @PostMapping("money-transfer")
+    public ResponseEntity<?> moneyTransfer(@RequestHeader("Authorization") String token,
+                                           @RequestParam String pincode,
+                                           @RequestParam String senderAccountNumber,
+                                           @RequestParam Long value,
+                                           @RequestParam String receivingAccountNumber) {
+        return cardService.mainMoneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
+    }
+
 }
