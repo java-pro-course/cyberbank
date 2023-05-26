@@ -1,6 +1,8 @@
 package com.codemika.cyberbank.card.service;
 
+import com.codemika.cyberbank.card.entity.CreditCardEntity;
 import com.codemika.cyberbank.card.entity.DebitCardEntity;
+import com.codemika.cyberbank.card.repository.CreditCardRepository;
 import com.codemika.cyberbank.card.repository.DebitCardRepository;
 import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,146 +23,310 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CardService {
     private final DebitCardRepository debitRepository;
-    public final JwtUtil jwtUtil;
-
+    private final CreditCardRepository creditRepository;
+    private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     /**
-     * Метод для перевода денег с карты на карту
+     * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer.
      *
-     * @param token токен переводящего деньги
-     * @param pincode пин-код карты, с которой переводятся деньги
-     * @param id id-карты, с которой переводятся деньги
-     * @param value количество переводимых денег (в рублях)
-     * @param receivingId id-карты, на которую переводятся деньги
-     * @return сообщение об переводе и текущий баланс
-     */
-//    @Transactional
-//    public ResponseEntity<?> moneyTransfer(String token, String pincode, Long id, Long value, Long receivingId) {
-//        Optional<DebitCardEntity> card = repository.findById(id);
-//        Optional<DebitCardEntity> receivingCard = repository.findById(receivingId);
-//
-//        Claims claimsParseToken = jwtUtil.getClaims(token);
-//        Long ownerUserId = claimsParseToken.get("id", Long.class);
-//
-//        if (value == null)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Некорректная сумма перевода");
-//        if (value <= 0)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Вы не можете переводить отрицательные суммы");
-//
-//        if (!card.isPresent())
-//            return ResponseEntity
-//                    .status(HttpStatus.NOT_FOUND)
-//                    .body("Карты с id " + id + " не существует");
-//
-//        if (!pincode.equals(card.get().getPincode()))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Неверный пин-код");
-//
-//        if (!receivingCard.isPresent())
-//            return ResponseEntity
-//                    .status(HttpStatus.NOT_FOUND)
-//                    .body("Карты с id " + receivingId + " не существует");
-//
-//        if (!card.get().getOwnerUserId().equals(ownerUserId))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Пользователь с id " + ownerUserId + " не обладает картой с id " + id);
-//
-//        if (card.get().getBalance() < value)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("На карте недостаточно средств");
-//
-//        if (id.equals(receivingId))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Вы не можете перевести деньги на свою карту");
-//
-//        receivingCard
-//                .get()
-//                .setBalance(receivingCard.get().getBalance() + value);
-//        card.get()
-//                .setBalance(card.get().getBalance() - value);
-//
-//        repository.moneyTransfer(card.get().getBalance(), id);
-//        repository.moneyTransfer(receivingCard.get().getBalance(), receivingId);
-//
-//        return ResponseEntity
-//                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
-//}
-    /**
-     * Метод для перевода денег с карты на карту по номерам карт
-     * @param token токен пользователя, переводящего деньги
-     * @param pincode пин-код карты, с которой переводятся деньги
-     * @param accountNumber номер карты, с которой переводятся деньги
-     * @param value количество переводимых денег (в рублях)
+     * @param token                  токен пользователя, переводящего деньги
+     * @param pincode                пин-код карты, с которой переводятся деньги
+     * @param accountNumber          номер карты, с которой переводятся деньги
+     * @param value                  количество переводимых денег (в рублях)
      * @param receivingAccountNumber номер карты, на которую переводятся деньги
-     * @return сообщение о переводе и текущем балансе
+     * @return см. вызываемый метод
      */
-//    @Transactional
-//    public ResponseEntity<?> moneyTransfer(String token, String pincode, String accountNumber, Long value, String receivingAccountNumber) {
-//        Optional<DebitCardEntity> card = repository.findCardByAccountNumber(accountNumber);
-//        Optional<DebitCardEntity> receivingCard = repository.findCardByAccountNumber(receivingAccountNumber);
-//
-//        Claims claimsParseToken = jwtUtil.getClaims(token);
-//        Long ownerUserId = claimsParseToken.get("id", Long.class);
-//
-//        if (value == null)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Некорректная сумма перевода");
-//        if(value <= 0)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Вы не можете переводить отрицательные суммы");
-//
-//        if (!card.isPresent())
-//            return ResponseEntity
-//                    .status(HttpStatus.NOT_FOUND)
-//                    .body("Карты с номером карты " + accountNumber + " не существует");
-//
-//        if (!pincode.equals(card.get().getPincode()))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Неверный пин-код");
-//
-//        if (!receivingCard.isPresent())
-//            return ResponseEntity
-//                    .status(HttpStatus.NOT_FOUND)
-//                    .body("Карты с номером карты " + receivingAccountNumber + " не существует");
-//
-//        if (!card.get().getOwnerUserId().equals(ownerUserId))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
-//
-//        if (card.get().getBalance() < value)
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("На карте недостаточно средств");
-//
-//        if (accountNumber.equals(receivingAccountNumber))
-//            return ResponseEntity
-//                    .status(HttpStatus.BAD_REQUEST)
-//                    .body("Вы не можете перевести деньги на свою карту");
-//
-//        receivingCard
-//                .get()
-//                .setBalance(receivingCard.get().getBalance() + value);
-//        card.get()
-//                .setBalance(card.get().getBalance() - value);
-//
-//        repository.moneyTransfer(card.get().getBalance(), card.get().getId());
-//        repository.moneyTransfer(receivingCard.get().getBalance(), receivingCard.get().getId());
-//
-//        return ResponseEntity
-//                .ok("Перевод доставлен! На данный момент ваш баланс " + card.get().getBalance() + " рублей");
-//    }
+    @Transactional
+    public ResponseEntity<?> mainMoneyTransfer(String token,
+                                               String pincode,
+                                               String accountNumber,
+                                               Long value,
+                                               String receivingAccountNumber) {
+        Optional<DebitCardEntity> card = debitRepository.findCardByAccountNumber(accountNumber);
+        Optional<DebitCardEntity> receivingCard = debitRepository.findCardByAccountNumber(receivingAccountNumber);
+        Optional<CreditCardEntity> cCard = null;
+        Optional<CreditCardEntity> cRec = null;
+
+        boolean isDebit = true;
+        boolean isRecDebit = true;
+
+        if (value == null)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Некорректная сумма перевода");
+        if (value <= 0)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent()) {
+            cCard = creditRepository.findAllByAccountNumber(accountNumber);
+            isDebit = false;
+            if (!cCard.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером карты " + accountNumber + " не существует");
+        }
+
+        if (!receivingCard.isPresent()) {
+            cRec = creditRepository.findAllByAccountNumber(receivingAccountNumber);
+            isRecDebit = false;
+            if (!cRec.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером " + receivingAccountNumber + " не существует");
+        }
+        if (isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    receivingAccountNumber,
+                    card.get(),
+                    receivingCard.get());
+        } else if (!isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    receivingAccountNumber,
+                    cCard.get(),
+                    receivingCard.get());
+        } else if (isDebit && !isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    receivingAccountNumber,
+                    card.get(),
+                    cRec.get());
+        } else {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    receivingAccountNumber,
+                    cCard.get(),
+                    cRec.get());
+        }
+    }
+
+    /**
+     * Один из методов перевода. Тип - Д&Д
+     *
+     * @param token                  токен переводящего
+     * @param pincode                пин-код карты, с которой происходит перевод
+     * @param accountNumber          номер карты, с которой происходит перевод
+     * @param value                  сумма перевода
+     * @param receivingAccountNumber номер, на который происходит перевод
+     * @param card                   карта, с которой происходит перевод
+     * @param rCard                  карта, на которую происходит перевод
+     * @return перевод + вывод нового баланса карты переводящего
+     */
+    private ResponseEntity<?> moneyTransfer(String token,
+                                            String pincode,
+                                            String accountNumber,
+                                            Long value,
+                                            String receivingAccountNumber,
+                                            DebitCardEntity card,
+                                            DebitCardEntity rCard) {
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+
+        if (!passwordEncoder.matches(pincode, card.getPincode()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный пин-код");
+
+        if (!card.getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
+
+        if (card.getBalance() < value)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("На карте недостаточно средств");
+
+        if (accountNumber.equals(receivingAccountNumber))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        rCard.setBalance(rCard.getBalance() + value);
+        card.setBalance(card.getBalance() - value);
+
+        debitRepository.moneyTransfer(card.getBalance(), card.getId());
+        debitRepository.moneyTransfer(rCard.getBalance(), rCard.getId());
+
+        return ResponseEntity
+                .ok("Перевод доставлен! На данный момент ваш баланс " + card.getBalance() + " рублей");
+    }
+
+    /**
+     * Один из методов перевода. Тип - К&Д
+     *
+     * @param token                  токен переводящего
+     * @param pincode                пин-код карты, с которой происходит перевод
+     * @param accountNumber          номер карты, с которой происходит перевод
+     * @param value                  сумма перевода
+     * @param receivingAccountNumber номер, на который происходит перевод
+     * @param card                   карта, с которой происходит перевод
+     * @param rCard                  карта, на которую происходит перевод
+     * @return перевод + вывод нового баланса карты переводящего
+     */
+    private ResponseEntity<?> moneyTransfer(String token,
+                                            String pincode,
+                                            String accountNumber,
+                                            Long value,
+                                            String receivingAccountNumber,
+                                            CreditCardEntity card,
+                                            DebitCardEntity rCard) {
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+
+        if (!passwordEncoder.matches(pincode, card.getPincode()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный пин-код");
+
+        if (!card.getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
+
+        if (card.getBalance() < value)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("На карте недостаточно средств");
+
+        if (accountNumber.equals(receivingAccountNumber))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        rCard.setBalance(rCard.getBalance() + value);
+        card.setBalance(card.getBalance() - value);
+
+        creditRepository.moneyTransfer(card.getBalance(), card.getId());
+        debitRepository.moneyTransfer(rCard.getBalance(), rCard.getId());
+
+        return ResponseEntity
+                .ok("Перевод доставлен! На данный момент ваш баланс " + card.getBalance() + " рублей");
+    }
+
+    /**
+     * Один из методов перевода. Тип - Д&К
+     *
+     * @param token                  токен переводящего
+     * @param pincode                пин-код карты, с которой происходит перевод
+     * @param accountNumber          номер карты, с которой происходит перевод
+     * @param value                  сумма перевода
+     * @param receivingAccountNumber номер, на который происходит перевод
+     * @param card                   карта, с которой происходит перевод
+     * @param rCard                  карта, на которую происходит перевод
+     * @return перевод + вывод нового баланса карты переводящего
+     */
+    private ResponseEntity<?> moneyTransfer(String token,
+                                            String pincode,
+                                            String accountNumber,
+                                            Long value,
+                                            String receivingAccountNumber,
+                                            DebitCardEntity card,
+                                            CreditCardEntity rCard) {
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+
+        if (!passwordEncoder.matches(pincode, card.getPincode()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный пин-код");
+
+        if (!card.getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
+
+        if (card.getBalance() < value)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("На карте недостаточно средств");
+
+        if (accountNumber.equals(receivingAccountNumber))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        rCard.setBalance(rCard.getBalance() + value);
+        card.setBalance(card.getBalance() - value);
+
+        debitRepository.moneyTransfer(card.getBalance(), card.getId());
+        creditRepository.moneyTransfer(rCard.getBalance(), rCard.getId());
+
+        return ResponseEntity
+                .ok("Перевод доставлен! На данный момент ваш баланс " + card.getBalance() + " рублей");
+    }
+
+    /**
+     * Один из методов перевода. Тип - К&К
+     *
+     * @param token                  токен переводящего
+     * @param pincode                пин-код карты, с которой происходит перевод
+     * @param accountNumber          номер карты, с которой происходит перевод
+     * @param value                  сумма перевода
+     * @param receivingAccountNumber номер, на который происходит перевод
+     * @param card                   карта, с которой происходит перевод
+     * @param rCard                  карта, на которую происходит перевод
+     * @return перевод + вывод нового баланса карты переводящего
+     */
+    private ResponseEntity<?> moneyTransfer(String token,
+                                            String pincode,
+                                            String accountNumber,
+                                            Long value,
+                                            String receivingAccountNumber,
+                                            CreditCardEntity card,
+                                            CreditCardEntity rCard) {
+
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long ownerUserId = claimsParseToken.get("id", Long.class);
+
+
+        if (!passwordEncoder.matches(pincode, card.getPincode()))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Неверный пин-код");
+
+        if (!card.getOwnerUserId().equals(ownerUserId))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Пользователь с id " + ownerUserId + " не обладает картой с номером карты " + accountNumber);
+
+        if (card.getBalance() < value)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("На карте недостаточно средств");
+
+        if (accountNumber.equals(receivingAccountNumber))
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете перевести деньги на свою карту");
+
+        rCard.setBalance(rCard.getBalance() + value);
+        card.setBalance(card.getBalance() - value);
+
+        creditRepository.moneyTransfer(card.getBalance(), card.getId());
+        creditRepository.moneyTransfer(rCard.getBalance(), rCard.getId());
+
+        return ResponseEntity
+                .ok("Перевод доставлен! На данный момент ваш баланс " + card.getBalance() + " рублей");
+    }
 
     /**
      * Генерация случайного номера карты
