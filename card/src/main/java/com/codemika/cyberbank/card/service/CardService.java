@@ -8,14 +8,16 @@ import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
-
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,6 +28,10 @@ public class CardService {
     private final CreditCardRepository creditRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    private final String urlGetUserByPhone = "http://localhost:8081/api/auth/get-user-by-phone";
+    private final String adminToken = "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MTQsIm5hbWUiOiLQodCy0LDRgNC-0LMiLCJzdXJuYW1lIjoi0KXQsNC60LXRgCIsInBhdHJvbnltaWMiOiLQo9C60YDQsNC40L3RgdC60LjQuSIsImVtYWlsIjoidGhlLnN2YXJvZy5oYWNrZXJAZW1haWwudWEiLCJwaG9uZSI6IjgyMzQ1Mjc5OTAiLCJpc191c2VyX3JvbGUiOnRydWUsImlzX21vZGVyX3JvbGUiOnRydWUsImlzX3Rlc3Rlcl9yb2xlIjp0cnVlLCJpc19oYWNrZXJfcm9sZSI6dHJ1ZSwiZXhwIjoxNjkwNzc2MDMxfQ.ubFlFxoNZ1HNg8cuuMoBXoESBjnAn2-I3NHypTtaOlzoSkAaKVk-y_rIXS-gwvxWaDHBKepqwzavHHVM4lFBFw";
 
     /**
      * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer.
@@ -107,6 +113,118 @@ public class CardService {
                     accountNumber,
                     value,
                     receivingAccountNumber,
+                    cCard.get(),
+                    cRec.get());
+        }
+    }
+
+    /**
+     * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer. (Это оказалось довольно сложно)
+     *
+     * @param token         токен пользователя, переводящего деньги
+     * @param pincode       пин-код карты, с которой переводятся деньги
+     * @param accountNumber номер карты, с которой переводятся деньги
+     * @param value         количество переводимых денег (в рублях)
+     * @param phone         номер телефона владельца карты, на которую переводятся деньги
+     * @return см. вызываемый метод
+     */
+    @Transactional
+    public ResponseEntity<?> mainMoneyTransferByPhone(String token,
+                                                      String pincode,
+                                                      String accountNumber,
+                                                      Long value,
+                                                      String phone) {
+        Optional<DebitCardEntity> card = debitRepository.findCardByAccountNumber(accountNumber);
+        headers.add("Authorization", adminToken);
+        /* FIXME: 27.05.2023*/ ResponseEntity<Long> response = restTemplate.getForEntity(urlGetUserByPhone + token, Long.class, headers);
+        List<DebitCardEntity> dCards = debitRepository.findAllByOwnerUserId(response.getBody());//fixme
+
+        List<CreditCardEntity> cCards = null;
+        boolean isD = true;
+        if (dCards.isEmpty()) {
+            isD = false;
+            cCards = creditRepository.findAllByOwnerUserId(response.getBody());//fixme
+            if (cCards.isEmpty())
+                return ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .body("Получатель не имеет карт.");
+        }
+        String recNumber;
+        if (isD) {
+            recNumber = dCards.get(0).getAccountNumber();
+        } else {
+            recNumber = cCards.get(0).getAccountNumber();
+        }
+        Optional<DebitCardEntity> dreceivingCard = null;
+        Optional<CreditCardEntity> creceivingCard = null;
+        if (isD) {
+            dreceivingCard = debitRepository.findCardByAccountNumber(recNumber);
+        } else {
+            creceivingCard = creditRepository.findCardByAccountNumber(recNumber);
+        }
+
+        Optional<CreditCardEntity> cCard = null;
+        Optional<CreditCardEntity> cRec = null;
+
+        boolean isDebit = true;
+        boolean isRecDebit = true;
+
+        if (value == null)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Некорректная сумма перевода");
+        if (value <= 0)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent()) {
+            cCard = creditRepository.findAllByAccountNumber(accountNumber);
+            isDebit = false;
+            if (!cCard.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером карты " + accountNumber + " не существует");
+        }
+
+        if (!dreceivingCard.isPresent()) {
+            cRec = creditRepository.findAllByAccountNumber(recNumber);
+            isRecDebit = false;
+            if (!cRec.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером " + recNumber + " не существует");
+        }
+        if (isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    card.get(),
+                    dreceivingCard.get());
+        } else if (!isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    cCard.get(),
+                    dreceivingCard.get());
+        } else if (isDebit && !isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    card.get(),
+                    cRec.get());
+        } else {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
                     cCard.get(),
                     cRec.get());
         }

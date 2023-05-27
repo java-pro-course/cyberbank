@@ -83,5 +83,24 @@ public class CardController {
                                            @RequestParam String receivingAccountNumber) {
         return cardService.mainMoneyTransfer(token, pincode, senderAccountNumber, value, receivingAccountNumber);
     }
+    /**
+     * Метод для перевода денег с карты на карту по номеру телефона
+     *
+     * @param token                  токен пользователя, переводящего деньги
+     * @param pincode                пин-код карты, с которой переводятся деньги
+     * @param senderAccountNumber    номер карты, с которой переводятся деньги
+     * @param value                  сумма перевода (в рублях)
+     * @param recPhone номер телефона, владельца карты, на которую происходит перевод
+     * @return перевод средств
+     */
+    @CheckRole(isUser = true)
+    @PostMapping("money-transfer-by-phone")
+    public ResponseEntity<?> MoneyTransferByPhone(@RequestHeader("Authorization") String token,
+                                           @RequestParam String pincode,
+                                           @RequestParam String senderAccountNumber,
+                                           @RequestParam Long value,
+                                           @RequestParam String recPhone) {
+        return cardService.mainMoneyTransferByPhone(token, pincode, senderAccountNumber, value, recPhone);
+    }
 
 }
