@@ -355,7 +355,7 @@ public class CardService {
      * @return сообщение об успешной/не успешной заморозке/разморозке
      */
     @Transactional
-    public ResponseEntity<?> FreezeAndUnfreezeCard(String token, Long cardId, String pincode) {
+    public ResponseEntity<?> freezeAndUnfreezeCard(String token, Long cardId, String pincode) {
         Optional<DebitCardEntity> cardEntity = debitRepository.findById(cardId);
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
@@ -421,6 +421,19 @@ public class CardService {
                 .body("All users have no cards!");
 
         return ResponseEntity.ok(cards);
+    }
+
+    /**
+     * Вывод всех кредитных карт пользователя
+     *
+     * @param token уникальный токен авторизации
+     * @return Все карты
+     */
+    public List<CreditCardEntity> getAllCreditCards(String token) {
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long id = claimsParseToken.get("id", Long.class);
+
+        return creditRepository.findAllByOwnerUserId(id);
     }
 
     /**

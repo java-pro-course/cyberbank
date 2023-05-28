@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +39,9 @@ public class AuthorizationService {
     private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String url = "http://localhost:8082/api/card/output/get-user-credit-cards/?token=";
+
 
     /**
      * Регистрация пользователя
@@ -142,7 +147,7 @@ public class AuthorizationService {
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                         "Ваша эл. почта: %s\n" +
                         "Ваш номер телефона: %s\n" +
-                        //"Ваши карты: \n" +
+                        "Ваши карты: " + "\n" +
                         "Ваш новый токен: ",
                 tmpUser.get().getSurname(), tmpUser.get().getName(),
                 tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
@@ -193,11 +198,14 @@ public class AuthorizationService {
                 claims.replace("is_hacker_role", true);
             }
         }
-        //TODO: Добавить карты, кредиты и т.д.
+
+        ResponseEntity<List> response = restTemplate.getForEntity(url + token, List.class);
+
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
-                //"Ваши карты: \n" +
+                "Ваши карты: \n" +
+                response.getBody() + "\n" +
                 "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
 
         return ResponseEntity
