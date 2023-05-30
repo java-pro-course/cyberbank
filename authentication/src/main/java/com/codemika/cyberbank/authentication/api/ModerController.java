@@ -24,7 +24,7 @@ public class ModerController {
      * @param token токен модера
      * @return все пользователи банка
      */
-    @CheckRole(isUser = true, isModer = true)
+    @CheckRole(isUser = true, isModer = true, isTester = true)
     @GetMapping("get-all-users")
     public ResponseEntity<?> getAllUsers(@RequestHeader("Authorization") String token) {
         return service.getAllUsers();
@@ -37,7 +37,7 @@ public class ModerController {
      * @param id    id пользователя
      * @return искомый пользователь
      */
-    @CheckRole(isUser = true, isModer = true)
+    @CheckRole(isUser = true, isModer = true, isTester = true)
     @GetMapping("get-user-by-id")
     public ResponseEntity<?> getUserById(@RequestHeader("Authorization") String token, @RequestParam Long id) {
         return service.getUserById(id);
@@ -50,7 +50,7 @@ public class ModerController {
      * @param email эл. почта пользователя
      * @return искомый пользователь
      */
-    @CheckRole(isUser = true, isModer = true)
+    @CheckRole(isUser = true, isModer = true, isTester = true)
     @GetMapping("get-user-by-email")
     public ResponseEntity<?> getUserByEmail(@RequestHeader("Authorization") String token, @RequestParam String email) {
         return service.getUserByEmail(email);
@@ -130,4 +130,17 @@ public class ModerController {
     public ResponseEntity<?> becomeHacker(@RequestHeader("Authorization") String token, Long idNewHacker) {
         return service.becomeHacker(idNewHacker);
     }
+
+    /**
+     * Поиск пользователя по номеру телефона(Это для сервиса. Название не менять, а то его можно будет найти перебором и использовать не модером)
+     * Это временная версия, не могу разобраться с header'ами в rest template
+     *
+     * @param phone телефон пользователя
+     * @return искомый пользователь
+     */
+    @GetMapping("jgkg3459-ffklre-dgjkrl345tkg94vkdpfjogrpo394")
+    public ResponseEntity<?> getUserIdByPhone(@RequestParam String phone) {
+        return service.getUserIdByPhone(phone);
+    }
+
 }
