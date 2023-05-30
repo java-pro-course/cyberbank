@@ -252,7 +252,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -306,7 +314,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -360,7 +376,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -414,7 +438,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -483,12 +515,14 @@ public class CardService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Данной карты не существует!");
         }
+
         if (!Objects.equals(cardEntity.get().getOwnerUserId(), id)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Вы не являетесь владельцем данной карты!");
         }
-        if (!Objects.equals(cardEntity.get().getPincode(), pincode)) {
+
+        if (!passwordEncoder.matches(pincode, cardEntity.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Вами введён неверный пин-код!");
@@ -534,9 +568,10 @@ public class CardService {
     public ResponseEntity<?> getAllCards() {
         List<DebitCardEntity> cards = debitRepository.findAll();// TODO временно
 
-        if (cards.isEmpty()) return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("All users have no cards!");
+        if (cards.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("All users have no cards!");
 
         return ResponseEntity.ok(cards);
     }
@@ -562,8 +597,7 @@ public class CardService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Карты с id: " + cardId + " не существует");
 
-        card.get()
-                .setBalance(card.get().getBalance() + value);
+        card.get().setBalance(card.get().getBalance() + value);
 
         debitRepository.moneyTransfer(card.get().getBalance(), cardId);
 

@@ -35,7 +35,11 @@ public class CreditCardService {
      * @return Созданную карту
      */
     public ResponseEntity<?> create(String token, RqCreateCreditCard rq) {
-        int maxValue = (int) ((rq.getMonthlyIncome() * rq.getCreditTerm() * 0.5) / (1 + (0.15 * rq.getCreditTerm()))); // хз насколько я правильно эту формулу вписал.
+        int maxValue = (int) (
+                (rq.getMonthlyIncome() * rq.getCreditTerm() * 0.5)
+                        /
+                        (1 + (0.15 * rq.getCreditTerm()))
+        ); // хз насколько я правильно эту формулу вписал.
 
         if (rq.getValue() > maxValue) {
             return ResponseEntity
@@ -98,7 +102,6 @@ public class CreditCardService {
 
         //Проверка валидности пользователя
         if (!response.getStatusCode().is2xxSuccessful()) {
-            log.info(card.toString());
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Такого пользователя не существует!");
