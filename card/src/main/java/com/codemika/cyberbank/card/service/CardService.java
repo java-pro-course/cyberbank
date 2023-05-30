@@ -8,7 +8,6 @@ import com.codemika.cyberbank.card.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,9 +28,7 @@ public class CardService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final RestTemplate restTemplate = new RestTemplate();
-    HttpHeaders headers = new HttpHeaders();
-    private final String urlGetUserByPhone = "http://localhost:8081/api/auth/get-user-by-phone";
-    private final String adminToken = "eyJhbGciOiJIUzUxMiJ9.eyJpZCI6MTQsIm5hbWUiOiLQodCy0LDRgNC-0LMiLCJzdXJuYW1lIjoi0KXQsNC60LXRgCIsInBhdHJvbnltaWMiOiLQo9C60YDQsNC40L3RgdC60LjQuSIsImVtYWlsIjoidGhlLnN2YXJvZy5oYWNrZXJAZW1haWwudWEiLCJwaG9uZSI6IjgyMzQ1Mjc5OTAiLCJpc191c2VyX3JvbGUiOnRydWUsImlzX21vZGVyX3JvbGUiOnRydWUsImlzX3Rlc3Rlcl9yb2xlIjp0cnVlLCJpc19oYWNrZXJfcm9sZSI6dHJ1ZSwiZXhwIjoxNjkwNzc2MDMxfQ.ubFlFxoNZ1HNg8cuuMoBXoESBjnAn2-I3NHypTtaOlzoSkAaKVk-y_rIXS-gwvxWaDHBKepqwzavHHVM4lFBFw";
+    private final String urlGetUserByPhone = "http://localhost:8081/api/auth/jgkg3459-ffklre-dgjkrl345tkg94vkdpfjogrpo394/?phone=";
 
     /**
      * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer.
@@ -135,10 +132,13 @@ public class CardService {
                                                       Long value,
                                                       String phone) {
         Optional<DebitCardEntity> card = debitRepository.findCardByAccountNumber(accountNumber);
-        headers.add("Authorization", adminToken);
-        /* FIXME: 27.05.2023*/ ResponseEntity<Long> response = restTemplate.getForEntity(urlGetUserByPhone + token, Long.class, headers);
-        List<DebitCardEntity> dCards = debitRepository.findAllByOwnerUserId(response.getBody());//fixme
-
+        ResponseEntity<Long> response = restTemplate.getForEntity(urlGetUserByPhone + phone, Long.class);
+        List<DebitCardEntity> dCards = debitRepository.findAllByOwnerUserId(response.getBody());
+        //fixme: header не работает, тут временная мера
+        /*
+        org.springframework.web.client.HttpClientErrorException$BadRequest:
+        400 : [Missing request header 'Authorization' for method parameter of type String]
+         */
         List<CreditCardEntity> cCards = null;
         boolean isD = true;
         if (dCards.isEmpty()) {
