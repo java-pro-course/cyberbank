@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,8 @@ public class CardService {
     private final CreditCardRepository creditRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String urlGetUserByPhone = "http://localhost:8081/api/auth/jgkg3459-ffklre-dgjkrl345tkg94vkdpfjogrpo394/?phone=";
 
     /**
      * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer.
@@ -115,6 +118,121 @@ public class CardService {
     }
 
     /**
+     * Главный метод для всех переводов. Определяет типы карт и отправляет в нужный moneyTransfer. (Это оказалось довольно сложно)
+     *
+     * @param token         токен пользователя, переводящего деньги
+     * @param pincode       пин-код карты, с которой переводятся деньги
+     * @param accountNumber номер карты, с которой переводятся деньги
+     * @param value         количество переводимых денег (в рублях)
+     * @param phone         номер телефона владельца карты, на которую переводятся деньги
+     * @return см. вызываемый метод
+     */
+    @Transactional
+    public ResponseEntity<?> mainMoneyTransferByPhone(String token,
+                                                      String pincode,
+                                                      String accountNumber,
+                                                      Long value,
+                                                      String phone) {
+        Optional<DebitCardEntity> card = debitRepository.findCardByAccountNumber(accountNumber);
+        ResponseEntity<Long> response = restTemplate.getForEntity(urlGetUserByPhone + phone, Long.class);
+        List<DebitCardEntity> dCards = debitRepository.findAllByOwnerUserId(response.getBody());
+        //fixme: header не работает, тут временная мера
+        /*
+        org.springframework.web.client.HttpClientErrorException$BadRequest:
+        400 : [Missing request header 'Authorization' for method parameter of type String]
+         */
+        List<CreditCardEntity> cCards = null;
+        boolean isD = true;
+        if (dCards.isEmpty()) {
+            isD = false;
+            cCards = creditRepository.findAllByOwnerUserId(response.getBody());//fixme
+            if (cCards.isEmpty())
+                return ResponseEntity
+                        .status(HttpStatus.NO_CONTENT)
+                        .body("Получатель не имеет карт.");
+        }
+        String recNumber;
+        if (isD) {
+            recNumber = dCards.get(0).getAccountNumber();
+        } else {
+            recNumber = cCards.get(0).getAccountNumber();
+        }
+        Optional<DebitCardEntity> dreceivingCard = null;
+        Optional<CreditCardEntity> creceivingCard = null;
+        if (isD) {
+            dreceivingCard = debitRepository.findCardByAccountNumber(recNumber);
+        } else {
+            creceivingCard = creditRepository.findCardByAccountNumber(recNumber);
+        }
+
+        Optional<CreditCardEntity> cCard = null;
+        Optional<CreditCardEntity> cRec = null;
+
+        boolean isDebit = true;
+        boolean isRecDebit = true;
+
+        if (value == null)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Некорректная сумма перевода");
+        if (value <= 0)
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Вы не можете переводить отрицательные суммы");
+
+        if (!card.isPresent()) {
+            cCard = creditRepository.findAllByAccountNumber(accountNumber);
+            isDebit = false;
+            if (!cCard.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером карты " + accountNumber + " не существует");
+        }
+
+        if (!dreceivingCard.isPresent()) {
+            cRec = creditRepository.findAllByAccountNumber(recNumber);
+            isRecDebit = false;
+            if (!cRec.isPresent())
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body("Карты с номером " + recNumber + " не существует");
+        }
+        if (isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    card.get(),
+                    dreceivingCard.get());
+        } else if (!isDebit && isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    cCard.get(),
+                    dreceivingCard.get());
+        } else if (isDebit && !isRecDebit) {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    card.get(),
+                    cRec.get());
+        } else {
+            return moneyTransfer(token,
+                    pincode,
+                    accountNumber,
+                    value,
+                    recNumber,
+                    cCard.get(),
+                    cRec.get());
+        }
+    }
+
+    /**
      * Один из методов перевода. Тип - Д&Д
      *
      * @param token                  токен переводящего
@@ -136,7 +254,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -190,7 +316,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -244,7 +378,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -298,7 +440,15 @@ public class CardService {
 
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long ownerUserId = claimsParseToken.get("id", Long.class);
+        if (!card.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта отправителя заморожена");
 
+        if (!rCard.getIsActive())
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("Карта получателя заморожена");
 
         if (!passwordEncoder.matches(pincode, card.getPincode()))
             return ResponseEntity
@@ -367,12 +517,14 @@ public class CardService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Данной карты не существует!");
         }
+
         if (!Objects.equals(cardEntity.get().getOwnerUserId(), id)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Вы не являетесь владельцем данной карты!");
         }
-        if (!Objects.equals(cardEntity.get().getPincode(), pincode)) {
+
+        if (!passwordEncoder.matches(pincode, cardEntity.get().getPincode())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Вами введён неверный пин-код!");
@@ -418,9 +570,10 @@ public class CardService {
     public ResponseEntity<?> getAllCards() {
         List<DebitCardEntity> cards = debitRepository.findAll();// TODO временно
 
-        if (cards.isEmpty()) return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("All users have no cards!");
+        if (cards.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("All users have no cards!");
 
         return ResponseEntity.ok(cards);
     }
@@ -470,8 +623,7 @@ public class CardService {
                     .status(HttpStatus.NOT_FOUND)
                     .body("Карты с id: " + cardId + " не существует");
 
-        card.get()
-                .setBalance(card.get().getBalance() + value);
+        card.get().setBalance(card.get().getBalance() + value);
 
         debitRepository.moneyTransfer(card.get().getBalance(), cardId);
 
