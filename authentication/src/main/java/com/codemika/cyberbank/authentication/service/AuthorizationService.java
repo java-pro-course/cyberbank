@@ -143,15 +143,15 @@ public class AuthorizationService {
             }
         }
 
-        //TODO: Добавить карты, кредиты и т.д.
+        String response = String.valueOf(restTemplate.getForEntity(url + jwtUtil.generateToken(claims), String.class).getBody());
+
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
-                        "Ваша эл. почта: %s\n" +
-                        "Ваш номер телефона: %s\n" +
-                        "Ваши карты: " + "\n" +
-                        "Ваш новый токен: ",
-                tmpUser.get().getSurname(), tmpUser.get().getName(),
-                tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
-                phone) + jwtUtil.generateToken(claims);
+                "Ваша эл. почта: %s\n" +
+                "Ваш номер телефона: %s\n" +
+                "Ваш новый токен: ", tmpUser.get().getSurname(), tmpUser.get().getName(), tmpUser.get().getPatronymic(),
+                tmpUser.get().getEmail(), phone) + jwtUtil.generateToken(claims) + "\n" +
+                "Ваши карты--v \n" +
+                response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -199,14 +199,14 @@ public class AuthorizationService {
             }
         }
 
-        ResponseEntity<List> response = restTemplate.getForEntity(url + token, List.class);
+        String response = String.valueOf(restTemplate.getForEntity(url + token, String.class).getBody());
 
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
-                "Ваши карты: \n" +
-                response.getBody() + "\n" +
-                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
+                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims) + "\n" +
+                "Ваши карты--v \n" +
+                response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)

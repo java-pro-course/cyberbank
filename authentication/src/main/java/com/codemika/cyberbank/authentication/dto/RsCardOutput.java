@@ -1,4 +1,4 @@
-package com.codemika.cyberbank.card.dto;
+package com.codemika.cyberbank.authentication.dto;
 
 import lombok.Data;
 import lombok.experimental.Accessors;

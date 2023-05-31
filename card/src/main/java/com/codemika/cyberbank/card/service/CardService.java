@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.card.service;
 
+import com.codemika.cyberbank.card.dto.RsCardOutput;
 import com.codemika.cyberbank.card.entity.CreditCardEntity;
 import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import com.codemika.cyberbank.card.repository.CreditCardRepository;
@@ -429,11 +430,19 @@ public class CardService {
      * @param token уникальный токен авторизации
      * @return Все карты
      */
-    public List<CreditCardEntity> getAllCreditCards(String token) {
+    public List<RsCardOutput> getAllCreditCards(String token) {
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
-
-        return creditRepository.findAllByOwnerUserId(id);
+        List<CreditCardEntity> cards = creditRepository.findAllByOwnerUserId(id);
+        List<RsCardOutput> output = new ArrayList<>();
+        for (CreditCardEntity card : cards) {
+            RsCardOutput temp = new RsCardOutput()
+                    .setTitle(card.getTitle())
+                    .setBalance(card.getBalance())
+                    .setCreditTerm(card.getCreditTerm());
+            output.add(temp);
+        }
+        return output;
     }
 
     /**
