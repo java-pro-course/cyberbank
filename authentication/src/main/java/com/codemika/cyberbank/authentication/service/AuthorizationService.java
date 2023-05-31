@@ -144,14 +144,13 @@ public class AuthorizationService {
         }
 
         String response = String.valueOf(restTemplate.getForEntity(url + jwtUtil.generateToken(claims), String.class).getBody());
-
+        if (response == null || response.isEmpty() || response.equals("null")) response = "Отсутствуют";
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
-                "Ваша эл. почта: %s\n" +
-                "Ваш номер телефона: %s\n" +
-                "Ваш новый токен: ", tmpUser.get().getSurname(), tmpUser.get().getName(), tmpUser.get().getPatronymic(),
+                        "Ваша эл. почта: %s\n" +
+                        "Ваш номер телефона: %s\n" +
+                        "Ваш новый токен: ", tmpUser.get().getSurname(), tmpUser.get().getName(), tmpUser.get().getPatronymic(),
                 tmpUser.get().getEmail(), phone) + jwtUtil.generateToken(claims) + "\n" +
-                "Ваши карты--v \n" +
-                response;
+                "Ваши карты: \n" + response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -205,8 +204,7 @@ public class AuthorizationService {
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
                 "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims) + "\n" +
-                "Ваши карты--v \n" +
-                response;
+                "Ваши карты--v \n" + response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -227,7 +225,7 @@ public class AuthorizationService {
 
         List<RsInfoUserPro> infoUsers = new ArrayList<>();
         //Преобразование Entity в Info
-        for (UserEntity user : users){
+        for (UserEntity user : users) {
             RsInfoUserPro infoUser = new RsInfoUserPro()
                     .setId(user.getId())
                     .setName(user.getName())
@@ -320,16 +318,17 @@ public class AuthorizationService {
                 .status(HttpStatus.ACCEPTED)
                 .body(infoUser);
     }
+
     // TODO нужно перед удалением проверять есть ли у пользователя карты и удалять их тоже!
-    public ResponseEntity<?> deleteUser(String token, String password, String phone){
+    public ResponseEntity<?> deleteUser(String token, String password, String phone) {
         jwtUtil.validateToken(token);
         Claims claims = jwtUtil.getClaims(token);
         Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
-        if(user.isPresent()){
-            if (!user.get().getPhone().equals(phone)){
+        if (user.isPresent()) {
+            if (!user.get().getPhone().equals(phone)) {
                 return ResponseEntity.badRequest().body("Неверный номер телефона!");
             }
-            if (!user.get().getPassword().equals(password)){
+            if (!user.get().getPassword().equals(password)) {
                 return ResponseEntity.badRequest().body("Неверный пароль!");
             }
             userRepository.deleteById(user.get().getId());
@@ -337,15 +336,16 @@ public class AuthorizationService {
         }
         return ResponseEntity.badRequest().body("Пользователь не существует!");
     }
-    public ResponseEntity<?> deleteUser(String token, String password, Long id){
+
+    public ResponseEntity<?> deleteUser(String token, String password, Long id) {
         jwtUtil.validateToken(token);
         Claims claims = jwtUtil.getClaims(token);
         Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
-        if(user.isPresent()){
-            if (!user.get().getId().equals(id)){
+        if (user.isPresent()) {
+            if (!user.get().getId().equals(id)) {
                 return ResponseEntity.badRequest().body("Неверный id!");
             }
-            if (!user.get().getPassword().equals(password)){
+            if (!user.get().getPassword().equals(password)) {
                 return ResponseEntity.badRequest().body("Неверный пароль!");
             }
             userRepository.deleteById(id);
@@ -353,15 +353,16 @@ public class AuthorizationService {
         }
         return ResponseEntity.badRequest().body("Пользователь не существует!");
     }
-    public ResponseEntity<?> deleteUserByEmail(String token, String password, String email){
+
+    public ResponseEntity<?> deleteUserByEmail(String token, String password, String email) {
         jwtUtil.validateToken(token);
         Claims claims = jwtUtil.getClaims(token);
         Optional<UserEntity> user = userRepository.findById(Long.valueOf(claims.get("id").toString()));
-        if(user.isPresent()){
-            if (!user.get().getEmail().equals((email))){
+        if (user.isPresent()) {
+            if (!user.get().getEmail().equals((email))) {
                 return ResponseEntity.badRequest().body("Неверная почта!");
             }
-            if (!user.get().getPassword().equals(password)){
+            if (!user.get().getPassword().equals(password)) {
                 return ResponseEntity.badRequest().body("Неверный пароль!");
             }
             userRepository.deleteById(user.get().getId());
@@ -369,8 +370,6 @@ public class AuthorizationService {
         }
         return ResponseEntity.badRequest().body("Пользователь не существует!");
     }
-
-
 
 
     //Валидация пользователя по id
@@ -416,6 +415,7 @@ public class AuthorizationService {
                 .status(HttpStatus.OK)
                 .body(String.format("Пользователь %s успешно получил роль MODER!", idNewModer));
     }
+
     public ResponseEntity<?> becomeTester(Long idNewTester) {
         Optional<UserEntity> user = userRepository.findById(idNewTester);
         if (!user.isPresent()) {
@@ -449,6 +449,7 @@ public class AuthorizationService {
                 .status(HttpStatus.OK)
                 .body(String.format("Пользователь %s успешно получил роль TESTER!", idNewTester));
     }
+
     public ResponseEntity<?> becomeHacker(Long idNewHacker) {
         Optional<UserEntity> user = userRepository.findById(idNewHacker);
         if (!user.isPresent()) {

@@ -26,7 +26,7 @@ public class CardController {
      */
     @CheckRole(isUser = true)
     @GetMapping("get-all-cards")
-    public ResponseEntity<?> getAllCards(@RequestParam String token) {
+    public ResponseEntity<?> getAllCards(@RequestHeader("Authorization") String token) {
         if (token.isEmpty() || token.trim().isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)

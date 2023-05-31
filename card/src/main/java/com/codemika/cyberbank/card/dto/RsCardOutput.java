@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 public class RsCardOutput {
 
     private String title;
+    private String accountNumber;
     private Long balance;
     private int creditTerm;
 }

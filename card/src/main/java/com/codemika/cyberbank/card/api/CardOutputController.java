@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.card.api;
 
+import com.codemika.cyberbank.card.annotation.CheckRole;
 import com.codemika.cyberbank.card.dto.RsCardOutput;
 import com.codemika.cyberbank.card.service.CardService;
 import lombok.Data;
@@ -17,15 +18,16 @@ import java.util.List;
 public class CardOutputController {
     private final CardService cardService;
     private final RestTemplate restTemplate = new RestTemplate();
-
+    @CheckRole(isUser = true)
     @GetMapping("get-user-credit-cards")
     public String getCreditCards(@RequestParam String token){
         List<RsCardOutput> cards = cardService.getAllCreditCards(token);
         String output = "";
         for (RsCardOutput temp: cards) {
             output += "Название: " + temp.getTitle() + "\n"
-                    + "Баланс - " + temp.getBalance() + "\n"
-                    + "Срок на " + temp.getCreditTerm() + " месяцев" + "\n"
+                    + "Номер: " + "************" + temp.getAccountNumber().substring(temp.getAccountNumber().length() - 4) + "\n"
+                    + "Баланс: " + temp.getBalance() + "\n"
+                    + "Срок кредита: " + temp.getCreditTerm() + " месяцев" + "\n"
                     + "---------------------------------------------------\n";
         }
         return output;

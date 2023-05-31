@@ -15,8 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -389,10 +390,10 @@ public class CardService {
     }
 
     /**
-     * Вывод всех карт пользователя
+     * Вывод <b>пока что</b> только дебетовых карт пользователя
      *
      * @param token уникальный токен авторизации
-     * @return Все карты
+     * @return Все дебетовые карты
      */
     public ResponseEntity<?> getAllCards(String token) {
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -433,11 +434,14 @@ public class CardService {
     public List<RsCardOutput> getAllCreditCards(String token) {
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
+
         List<CreditCardEntity> cards = creditRepository.findAllByOwnerUserId(id);
         List<RsCardOutput> output = new ArrayList<>();
+
         for (CreditCardEntity card : cards) {
             RsCardOutput temp = new RsCardOutput()
                     .setTitle(card.getTitle())
+                    .setAccountNumber(card.getAccountNumber())
                     .setBalance(card.getBalance())
                     .setCreditTerm(card.getCreditTerm());
             output.add(temp);

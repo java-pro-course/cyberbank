@@ -9,5 +9,6 @@ public class RsCardOutput {
 
     private String title;
     private Long balance;
+    private String accountNumber;
     private int creditTerm;
 }
