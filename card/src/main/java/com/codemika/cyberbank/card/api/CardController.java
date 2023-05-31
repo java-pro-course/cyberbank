@@ -61,7 +61,7 @@ public class CardController {
     public ResponseEntity<?> freezeCard(@RequestHeader("Authorization") String token,
                                         @PathVariable Long id,
                                         @RequestParam String pincode) {
-        return cardService.FreezeAndUnfreezeCard(token, id, pincode);
+        return cardService.freezeAndUnfreezeCard(token, id, pincode);
     }
 
     /**

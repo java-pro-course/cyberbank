@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,9 @@ public class AuthorizationService {
     private boolean check = false; // переменная проверенного пользователя
     private ResponseEntity<?> errorMessage; // сообщение, если что-то не так при регистрации
     private final PasswordEncoder passwordEncoder;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final String url = "http://localhost:8082/api/card/output/get-user-credit-cards/?token=";
+
 
     /**
      * Регистрация пользователя
@@ -139,15 +143,14 @@ public class AuthorizationService {
             }
         }
 
-        //TODO: Добавить карты, кредиты и т.д.
+        String response = String.valueOf(restTemplate.getForEntity(url + jwtUtil.generateToken(claims), String.class).getBody());
+        if (response == null || response.isEmpty() || response.equals("null")) response = "Отсутствуют";
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                         "Ваша эл. почта: %s\n" +
                         "Ваш номер телефона: %s\n" +
-                        //"Ваши карты: \n" +
-                        "Ваш новый токен: ",
-                tmpUser.get().getSurname(), tmpUser.get().getName(),
-                tmpUser.get().getPatronymic(), tmpUser.get().getEmail(),
-                phone) + jwtUtil.generateToken(claims);
+                        "Ваш новый токен: ", tmpUser.get().getSurname(), tmpUser.get().getName(), tmpUser.get().getPatronymic(),
+                tmpUser.get().getEmail(), phone) + jwtUtil.generateToken(claims) + "\n" +
+                "Ваши карты: \n" + response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -194,12 +197,14 @@ public class AuthorizationService {
                 claims.replace("is_hacker_role", true);
             }
         }
-        //TODO: Добавить карты, кредиты и т.д.
+
+        String response = String.valueOf(restTemplate.getForEntity(url + token, String.class).getBody());
+
         String result = String.format("Добро пожаловать, %s %s %s!\n" +
                 "Ваша эл. почта: %s\n" +
                 "Ваш номер телефона: %s\n" +
-                //"Ваши карты: \n" +
-                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims);
+                "Ваш новый токен: ", surname, name, patronymic, email, phone) + jwtUtil.generateToken(claims) + "\n" +
+                "Ваши карты--v \n" + response;
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -329,7 +334,7 @@ public class AuthorizationService {
                 .body(404L));
 
     }
-
+  
     // TODO нужно перед удалением проверять есть ли у пользователя карты и удалять их тоже!
     public ResponseEntity<?> deleteUser(String token, String password, String phone) {
         jwtUtil.validateToken(token);
@@ -411,7 +416,6 @@ public class AuthorizationService {
         return ResponseEntity
                 .ok("Успешное удаление");
     }
-
 
     //Валидация пользователя по id
     public Boolean validateUserByToken(String token) {

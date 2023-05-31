@@ -1,5 +1,6 @@
 package com.codemika.cyberbank.card.service;
 
+import com.codemika.cyberbank.card.dto.RsCardOutput;
 import com.codemika.cyberbank.card.entity.CreditCardEntity;
 import com.codemika.cyberbank.card.entity.DebitCardEntity;
 import com.codemika.cyberbank.card.repository.CreditCardRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -505,7 +507,7 @@ public class CardService {
      * @return сообщение об успешной/не успешной заморозке/разморозке
      */
     @Transactional
-    public ResponseEntity<?> FreezeAndUnfreezeCard(String token, Long cardId, String pincode) {
+    public ResponseEntity<?> freezeAndUnfreezeCard(String token, Long cardId, String pincode) {
         Optional<DebitCardEntity> cardEntity = debitRepository.findById(cardId);
         Claims claimsParseToken = jwtUtil.getClaims(token);
         Long id = claimsParseToken.get("id", Long.class);
@@ -540,10 +542,10 @@ public class CardService {
     }
 
     /**
-     * Вывод всех карт пользователя
+     * Вывод <b>пока что</b> только дебетовых карт пользователя
      *
      * @param token уникальный токен авторизации
-     * @return Все карты
+     * @return Все дебетовые карты
      */
     public ResponseEntity<?> getAllCards(String token) {
         Claims claimsParseToken = jwtUtil.getClaims(token);
@@ -574,6 +576,30 @@ public class CardService {
                     .body("All users have no cards!");
 
         return ResponseEntity.ok(cards);
+    }
+
+    /**
+     * Вывод всех кредитных карт пользователя
+     *
+     * @param token уникальный токен авторизации
+     * @return Все карты
+     */
+    public List<RsCardOutput> getAllCreditCards(String token) {
+        Claims claimsParseToken = jwtUtil.getClaims(token);
+        Long id = claimsParseToken.get("id", Long.class);
+
+        List<CreditCardEntity> cards = creditRepository.findAllByOwnerUserId(id);
+        List<RsCardOutput> output = new ArrayList<>();
+
+        for (CreditCardEntity card : cards) {
+            RsCardOutput temp = new RsCardOutput()
+                    .setTitle(card.getTitle())
+                    .setAccountNumber(card.getAccountNumber())
+                    .setBalance(card.getBalance())
+                    .setCreditTerm(card.getCreditTerm());
+            output.add(temp);
+        }
+        return output;
     }
 
     /**
